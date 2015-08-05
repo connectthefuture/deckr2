@@ -1,10 +1,14 @@
 package deckr;
 
-// Super Union for all deckr messages
-// Next field: 3
-message DeckrMessage {
+// Union for all deckr messages that can be sent by the client
+// and recieved by the server
+// Next field: 6
+message ClientMessage {
     optional CreateMessage create_message = 1;
     optional JoinMessage join_message = 2;
+    optional ActionMessage action_message = 3;
+    optional LeaveMessage leave_message = 4;
+    optional QuitMessage quit_message = 5;
 }
 
 
@@ -15,12 +19,52 @@ message CreateMessage {
 }
 
 
+// Next Field: 4
 message JoinMessage {
+
     enum ClientType {
         PLAYER = 0;
         SPECTATOR = 1;
     }
 
+    message PlayerConfig { }
+
     required string game_id = 1;
     required ClientType client_type = 2;
+    optional PlayerConfig player_config = 3;
+}
+
+// Next Field: 1
+message ActionMessage { }
+
+// Next Field: 1
+message LeaveMessage { }
+
+// Next Field: 1
+message QuitMessage { }
+
+// Collection of all messages that can be sent by the server to
+// the client.
+// Next Field: 5
+message ServerMessage {
+    optional CreateResponse create_response = 1;
+    optional JoinResponse join_response = 2;
+    optional LeaveResponse leave_response = 3;
+    optional ErrorResponse error_response = 4;
+}
+
+// Next Field: 2
+message CreateResponse {
+    required string game_id = 1;
+}
+
+// Next Field: 1
+message JoinResponse { }
+
+// Next Field: 1
+message LeaveResponse { }
+
+// Next Field: 2
+message ErrorResponse {
+    required string message = 1;
 }
