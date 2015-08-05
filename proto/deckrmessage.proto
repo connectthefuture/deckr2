@@ -1,0 +1,26 @@
+package deckr;
+
+// Super Union for all deckr messages
+// Next field: 3
+message DeckrMessage {
+    optional CreateMessage create_message = 1;
+    optional JoinMessage join_message = 2;
+}
+
+
+// Next Field: 3
+message CreateMessage {
+    optional string variant = 1;
+    optional int32 max_players = 2;
+}
+
+
+message JoinMessage {
+    enum ClientType {
+        PLAYER = 0;
+        SPECTATOR = 1;
+    }
+
+    required string game_id = 1;
+    required ClientType client_type = 2;
+}
