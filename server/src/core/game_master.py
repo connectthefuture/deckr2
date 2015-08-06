@@ -1,5 +1,7 @@
+from services.service import Service
 
-class GameMaster(object):
+
+class GameMaster(Service):
 
     def __init__(self):
         self._games = {}
@@ -32,5 +34,5 @@ class GameMaster(object):
 		"""
 		Save all games to a file.
 		"""
-	
+
 		pass

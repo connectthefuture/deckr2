@@ -4,14 +4,14 @@ class ServiceStarter(object):
     connected.
     """
 
-    def add_service(self, config):
+    def add_service(self, service_config):
 		pass
-    
+
 	def start(self):
 		"""
 		Start all currently added services. NOTE: This does not have an event loop; we assume
 		one of the services (i.e. the server) will handle the event loop. This will most likely
 		be started last.
 		"""
-	
+
 		pass

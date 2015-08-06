@@ -1,22 +1,15 @@
 from network.proxy import Proxy
+from services.service import Service
 
-class DeckrServer(object):
+
+class DeckrServer(Service):
     """
     An interface for the deckr server.
     """
 
     def __init__(self):
-        self.proxy = Proxy()
+        self._proxy = Proxy()
+        self._game_master = None
 
-    def start(self):
-	"""
-	At this point the server takes over the event loop.
-	"""
-
-	pass
-
-    def stop(self):
-	"""
-	Shutdown the server. Also relinquish control of the event loop.
-	"""
-	pass
+    def set_game(self, game):
+        pass
