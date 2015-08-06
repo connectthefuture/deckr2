@@ -5,4 +5,9 @@ class Proxy(object):
     games, other services. Each server has a single proxy associated with it.
     """
 
-    pass
+    def handle_message(self, message, connection):
+	"""
+	Entry point for all messages. This will call the appropriate subhandler.
+	"""
+	
+	pass
