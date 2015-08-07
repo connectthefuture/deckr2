@@ -1,0 +1,26 @@
+// Collection of all messages that can be sent by the server to
+// the client.
+// Next Field: 4
+message ServerResponse {
+    enum ServerResponseType {
+        CREATE = 0;
+        JOIN = 1;
+        LEAVE = 2;
+        ERROR = 3;
+    }
+
+    required ServerResponseType response_type = 1;
+
+    optional CreateResponse create_response = 2;
+    optional ErrorResponse error_response = 3;
+}
+
+// Next Field: 2
+message CreateResponse {
+    required string game_id = 1;
+}
+
+// Next Field: 2
+message ErrorResponse {
+    required string message = 1;
+}

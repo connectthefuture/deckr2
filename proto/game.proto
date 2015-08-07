@@ -1,0 +1,31 @@
+// START GAME DEFINITION
+message GameState {
+    repeated Player players = 1;
+    required string current_phase = 2;
+    required string current_step = 3;
+    repeated Card cards = 4;
+}
+
+message Player {
+    required int32 game_id = 1;
+    required Zone hand = 2;
+    required Zone graveyard = 3;
+    required Zone library = 4;
+    required int32 life = 5;
+}
+
+message Zone {
+    required int32 game_id = 1;
+    repeated int32 objs = 2; // List of game ids
+}
+
+message Card {
+    required int32 game_id = 1;
+    required string name = 2;
+    repeated KeyValuePair meta = 3; // Use to convey extra things like what version, etc.
+}
+
+message KeyValuePair {
+    required string key = 1;
+    required string value = 2;
+}
