@@ -1,4 +1,5 @@
 import 'proto/game_action.proto';
+import 'proto/util.proto';
 
 // Union for all deckr messages that can be sent by the client
 // Next field: 5
@@ -57,5 +58,10 @@ message ActionMessage {
 }
 
 message PlayerConfig {
-    //TODO
+    message CardInfo {
+		required string name = 1;
+		repeated KeyValuePair meta = 2;
+	}
+	
+	repeated CardInfo deck = 1;
 }
