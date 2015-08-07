@@ -1,0 +1,16 @@
+---
+# The name of the service. This will be used by other services to determine dependancy
+name: 'DeckrServer'
+
+# Module where the service is located
+module: 'src.network.deckr_server'
+
+# Class that implements service
+class: 'DeckrServer'
+
+# What this service depends on as [attribute_name, ServiceName] tuples
+dependancies:
+    - ['game_master', 'GameMaster']
+
+# Does this require the event loop (should only be true of one service); defaults to false
+requires_event_loop: true

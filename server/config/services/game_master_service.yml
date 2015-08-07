@@ -1,0 +1,9 @@
+---
+# The name of the service. This will be used by other services to determine dependancy
+name: 'GameMaster'
+
+# Module where the service is located
+module: 'src.core.game_master'
+
+# Class that implements service
+class: 'GameMaster'
