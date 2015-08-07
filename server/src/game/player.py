@@ -1,5 +1,6 @@
 
 from game.game_object import GameObject
+from game.zone import Zone
 
 
 class Player(GameObject):
@@ -7,6 +8,10 @@ class Player(GameObject):
     def __init__(self):
         self.life = 20
         self.poison_counters = 0
+
+	self.hand = Zone('hand', self)
+	self.graveyard = Zone('graveyard', self)
+	self.library = Zone('library', self)
 
     def play_card(self, card):
         pass
