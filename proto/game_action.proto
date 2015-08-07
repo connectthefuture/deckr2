@@ -1,4 +1,3 @@
-
 // Next Field: 2
 message PlayAction {
     required int32 card = 1;

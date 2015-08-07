@@ -1,4 +1,4 @@
-import 'game_action.proto';
+import 'proto/game_action.proto';
 
 // Union for all deckr messages that can be sent by the client
 // Next field: 5
