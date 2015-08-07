@@ -1,10 +1,26 @@
 import 'proto/util.proto';
 
 message GameState {
-    repeated Player players = 1;
-    required string current_phase = 2;
-    required string current_step = 3;
-    repeated Card cards = 4;
+    required string current_phase = 1;
+    required string current_step = 2;
+    repeated GameObject game_objects = 3;
+}
+
+// Union to represent any type of game object
+message GameObject {
+    enum GameObjectType {
+        PLAYER = 0;
+        ZONE = 1;
+        CARD = 2;
+        COUNTER = 3;
+    }
+
+    required GameObjectType game_object_type = 1;
+
+    optional Player player = 2;
+    optional Zone zone = 3;
+    optional Card card = 4;
+    optional Counter counter = 5;
 }
 
 message Player {
@@ -23,5 +39,23 @@ message Zone {
 message Card {
     required int32 game_id = 1;
     required string name = 2;
-    repeated KeyValuePair meta = 3; // Use to convey extra things like what version, etc.
+
+    optional string mana_cost = 3;
+    optional string color = 4; // In case mana cost is 0
+    repeated string super_types = 5;
+    repeated string types = 6;
+    repeated string subtypes = 7;
+    repeated string abilities = 8; // This is an array of all abilities of the card
+    optional string flavor_text = 9;
+    optional int32 power = 10;
+    optional int32 toughness = 11;
+
+    // Anything not conveyed above can be stuffed in meta (like artwork)
+    repeated KeyValuePair meta = 12;
+}
+
+// For +1/+1 counters, loyalty counters, etc.
+message Counter {
+    required int32 game_id = 1;
+    required string type = 2;
 }

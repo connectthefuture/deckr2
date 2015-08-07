@@ -1,18 +1,24 @@
+import 'proto/game.proto';
+
 // Collection of all messages that can be sent by the server to
 // the client.
-// Next Field: 4
+// Next Field: 6
 message ServerResponse {
     enum ServerResponseType {
         CREATE = 0;
         JOIN = 1;
         LEAVE = 2;
         ERROR = 3;
+        GAME_STATE = 4;
+        GAME_UPDATE = 5;
     }
 
     required ServerResponseType response_type = 1;
 
     optional CreateResponse create_response = 2;
     optional ErrorResponse error_response = 3;
+    optional GameStateResponse game_state_response = 4;
+    optional GameUpdateResponse game_update_response = 5;
 }
 
 // Next Field: 2
@@ -23,4 +29,17 @@ message CreateResponse {
 // Next Field: 2
 message ErrorResponse {
     required string message = 1;
+}
+
+
+message GameStateResponse {
+    required GameState game_state = 1;
+}
+
+// Update a single game object instead of the entire state. If the game_object
+// with the same ID already exists just update; otherwise create a new one. If
+// remove is set to True, remove that game object from the game.
+message GameUpdateResponse {
+    required GameObject game_object = 1;
+    optional bool remove = 2;
 }
