@@ -1,10 +1,28 @@
+"""
+This module provides the base code for cards.
+"""
+
 from game.game_object import GameObject
 
 
 def create_card_from_dict(card_data):
+    """
+    Create a new card from a dictionary.
+
+    Args:
+        card_data (dict): Dictionary containing card data.
+
+    Returns:
+        Card The newly created card.
+    """
+
     pass
 
 class Card(GameObject):
+    """
+    A card represents a card in magic. Instead of having subclasses we implement all card
+    functionality on this class (since basically any card can become any other card type).
+    """
 
     def __init__(self, *args, **kwargs):
         super(Card, self).__init__(*args, **kwargs)
@@ -15,13 +33,9 @@ class Card(GameObject):
         self.name = ''
         self.owner = None
         self.controller = None
-
-    def resolve(self):
-        """
-        Called when the card actually resolves.
-        """
-
-        pass
+        # These will generally be hidden based on the types of the card.
+        self.power = 0
+        self.toughness = 0
 
     def reset(self):
         """
@@ -29,11 +43,4 @@ class Card(GameObject):
         (We'll deal with exceptions eventually.)
         """
 
-# Here we have a set of mixins to help with different card types
-class CreatureMixin(object):
-    def __init__(self, *args, **kwargs):
-        super(CreatureMixin, self).__init__(*args, **kwargs)
-        
-        self.power = 0
-        self.toughness = 0
-
+        pass

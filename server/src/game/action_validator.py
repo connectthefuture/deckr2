@@ -1,10 +1,50 @@
-class ActionValidator(object):
+"""
+This module provides all of the code to test if actions are legal, and respond if they are not.
+Note that the action validator is implemented as a service to allow for easier reloading.
+"""
+
+from services.service import Service
+
+
+class InvalidActionException(Exception):
     """
-    Makes sure that actions are legal and if not gives a descriptive error message.
+    This should be raised whenever a player tries to make an invalid action. It should include a
+    descriptive reason why their action was invalid.
     """
 
-    def __init__(self, game):
-        self._game = game
+    pass
 
-    def validate(self, action):
+class ActionValidator(Service):
+    """
+    Makes sure that actions are legal and if not gives a descriptive error message. Note that this
+    is mostly stateless and so is reused across games.
+    """
+
+    def __init__(self):
+        pass
+
+    def start(self):
+        """
+        Run any setup for the validator.
+        """
+
+        pass
+
+    def stop(self):
+        """
+        Run any teardown for the validator.
+        """
+
+        pass
+
+    def validate(self, game, action):
+        """
+        Validate a specific action. Returns if the action is valid, and raises an exception
+        otherwise.
+
+        Args:
+            game MagicTheGathering: The game that the action is being applied to.
+            action (???): An action that is being performed.
+        """
+
         pass

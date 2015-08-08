@@ -5,4 +5,9 @@ class GameLoop(object):
     """
 
     def run_loop(self):
+        """
+        Run the main game loop. This has a lot of logic embedded in it, but all you need to know
+        is that this will run until the next time when user input is needed.
+        """
+        
         pass

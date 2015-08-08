@@ -1,4 +1,4 @@
-from network.proxy import Proxy
+from network.router import Router
 from services.service import Service
 
 
@@ -11,5 +11,26 @@ class DeckrServer(Service):
         self._proxy = Proxy()
         self._game_master = None
 
-    def set_game(self, game):
+    def set_game_master(self, game_master):
+        """
+        Set the game master (required by the service architecture).
+
+        Args:
+            game_master (GameMaster): the game master to set.
+        """
+
+        pass
+
+    def start(self):
+        """
+        Start the server. This will be a blocking function call.
+        """
+
+        pass
+
+    def stop(self):
+        """
+        Stop the server and relinquish the control loop.
+        """
+
         pass

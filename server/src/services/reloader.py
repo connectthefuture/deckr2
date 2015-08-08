@@ -29,14 +29,6 @@ class Reloader(object):
 
         pass
 
-    def start(self):
-        """
-        Start the service. Since this works in another process, this will return, even if the
-        service requires the event loop.
-        """
-
-        pass
-
 class ReloaderProxy(object):
     """
     This represents a proxy object. If on the sending end it's returned as a normal object. If
