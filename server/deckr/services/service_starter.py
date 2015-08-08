@@ -3,18 +3,27 @@ This module provides code that will enable a server to properly start services.
 """
 
 
-class ServiceConfig(object):
+import importlib
+
+
+class ServiceWrapper(object):
     """
-    This class represents a service configuration. This includes the configuration to actually
+    This class represents a service wrapper. This includes the configuration to actually
     create the service (service_config) and the configuration that should be passed to the
     service (config_for_service).
     """
 
     def __init__(self, service_config, config_for_service=None):
-        #: dict Everything needed to create the service.
-        self._service_config = service_config
+        self.name = service_config["name"]
+        self.dependancies = service_config.get("dependancies", [])
+        self.requires_event_loop = service_config.get(
+            "requires_event_loop", False)
+        self._module = service_config["module"]
+        self._class = service_config["class"]
+
+        self._instance = None
         #: dict Configuration that will be passed to the service on creation.
-        self._config_for_service = config_for_service
+        self.config_for_service = config_for_service
 
     def create(self):
         """
@@ -23,9 +32,23 @@ class ServiceConfig(object):
         Note:
             All modules will be imported at this point. If running with reloading, make sure
             you fork **before** you call create.
+
+        Returns:
+            object The newly created instance
         """
 
-        pass
+        mod = importlib.import_module(self._module)
+        service_class = getattr(mod, self._class)
+        self._instance = service_class(config=self.config_for_service)
+        return self._instance
+
+    def get_instance(self):
+        """
+        Get the current instance of the service. Should only be called after
+        create.
+        """
+
+        return self._instance
 
 
 class ServiceStarter(object):
@@ -41,8 +64,8 @@ class ServiceStarter(object):
                 individual service configs can still override this.
         """
 
-        #: List[ServiceConfig]
-        self._services = []
+        #: dict[Name:ServiceWrapper]
+        self.services = {}
         #: bool
         self._reload_all = reload_all
 
@@ -55,7 +78,8 @@ class ServiceStarter(object):
             config_for_service (dict): Configuration to pass to the service upon creation.
         """
 
-        pass
+        self.services[service_config["name"]] = ServiceWrapper(
+            service_config, config_for_service)
 
     def start(self):
         """
@@ -66,4 +90,30 @@ class ServiceStarter(object):
             if this returns it means it's time to shutdown.
         """
 
-        pass
+        # Create service instances
+        for service in self.services.values():
+            service.create()
+
+        # Fix up dependancies
+        for service in self.services.values():
+            self._satisfy_dependencies(service)
+
+        # Start everything
+        start_last = None
+        for service in self.services.values():
+            if service.requires_event_loop:
+                start_last = service
+            else:
+                service.get_instance().start()
+        if start_last is not None:
+            start_last.get_instance().start()
+
+    def _satisfy_dependencies(self, service):
+        """
+        Satisfy the dependencies for a specific service.
+        """
+
+        service_instance = service.get_instance()
+        for dependancy in service.dependancies:
+            service_dep = self.services[dependancy[1]].get_instance()
+            getattr(service_instance, 'set_' + dependancy[0])(service_dep)
