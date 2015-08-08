@@ -4,6 +4,7 @@ container.
 """
 
 from deckr.game.game_loop import GameLoop
+from deckr.game.zone import Zone
 
 
 class GameRegistry(object):

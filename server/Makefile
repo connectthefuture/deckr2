@@ -1,6 +1,6 @@
 all: lint test
 lint: autolint
-	pylint deckr tests
+	pylint --rcfile=config/pylintrc deckr tests
 autolint:
 	autopep8 -r --in-place deckr tests
 test:

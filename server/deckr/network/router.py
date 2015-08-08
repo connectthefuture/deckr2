@@ -1,3 +1,8 @@
+"""
+This module provides code for the Router.
+"""
+
+
 class Router(object):
     """
     This is basically a router. It takes in protobuff objects (decoded by

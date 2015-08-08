@@ -1,3 +1,8 @@
+"""
+This module provides code related to the game loop.
+"""
+
+
 class GameLoop(object):
     """
     This handles the core game logic when players aren't acting. This will generally be called

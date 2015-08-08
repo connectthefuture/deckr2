@@ -79,22 +79,22 @@ class GameMaster(Service):
 
         pass
 
-        def load_from_file(self, file_name):
-            """
-            Attempt to load all games from a file.
+    def load_from_file(self, file_name):
+        """
+        Attempt to load all games from a file.
 
-    Args:
-        file_name (str): File to load games from.
-            """
+        Args:
+            file_name (str): File to load games from.
+        """
 
-            pass
+        pass
 
-        def save_to_file(self, file_name):
-            """
-            Save all games to a file.
+    def save_to_file(self, file_name):
+        """
+        Save all games to a file.
 
-    Args:
-        file_name (str): File to save games to.
-            """
+        Args:
+            file_name (str): File to save games to.
+        """
 
-            pass
+        pass

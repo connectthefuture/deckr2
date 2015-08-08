@@ -1,3 +1,7 @@
+"""
+This module provides code for various deckr server implementations.
+"""
+
 from deckr.network.router import Router
 from deckr.services.service import Service
 
@@ -8,7 +12,7 @@ class DeckrServer(Service):
     """
 
     def __init__(self):
-        self._proxy = Proxy()
+        self._router = Router()
         self._game_master = None
 
     def set_game_master(self, game_master):
@@ -26,11 +30,11 @@ class DeckrServer(Service):
         Start the server. This will be a blocking function call.
         """
 
-        pass
+        raise NotImplementedError
 
     def stop(self):
         """
         Stop the server and relinquish the control loop.
         """
 
-        pass
+        raise NotImplementedError

@@ -47,7 +47,7 @@ class ServiceStarter(object):
         self._reload_all = reload_all
 
     def add_service(self, service_config, config_for_service):
-		"""
+        """
         Register a service that should be added to the services list.
 
         Args:
@@ -55,13 +55,15 @@ class ServiceStarter(object):
             config_for_service (dict): Configuration to pass to the service upon creation.
         """
 
-	def start(self):
-		"""
-		Start all currently added services.
+        pass
+
+    def start(self):
+        """
+        Start all currently added services.
 
         Note:
             Most likely this will create a service that takes control of the event loop. Thus,
             if this returns it means it's time to shutdown.
-		"""
+        """
 
-		pass
+        pass

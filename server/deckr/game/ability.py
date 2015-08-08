@@ -1,3 +1,7 @@
+"""
+This module provides code relating to abilities.
+"""
+
 from deckr.game.game_object import GameObject
 
 
