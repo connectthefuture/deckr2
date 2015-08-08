@@ -59,3 +59,10 @@ message Counter {
     required int32 game_id = 1;
     required string type = 2;
 }
+
+// For activated abilities
+message Ability {
+    required int32 game_id = 1;
+    required int32 ability_on = 2;
+    required int32 ability_index = 3;
+}
