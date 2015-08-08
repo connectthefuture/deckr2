@@ -66,7 +66,7 @@ class GameMaster(Service):
 
         pass
 
-	def get_game(self, game_id):
+    def get_game(self, game_id):
         """
         Lookup a game by game_id.
 
@@ -77,7 +77,7 @@ class GameMaster(Service):
             MagicTheGathering: The game in question (will throw a KeyError if not found).
         """
 
-		pass
+        pass
 
 	def load_from_file(self, file_name):
 		"""
