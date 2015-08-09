@@ -80,7 +80,7 @@ class ReloadingServiceWrapper(ServiceWrapper):
         Signal that we should reload the service.
         """
 
-        logging.info("Reloading %s", self.name)
+        LOGGER.info("Reloading service: %s", self.name)
         self._process.terminate()
         self._process = Process(target=self._child_create)
         self._process.start()

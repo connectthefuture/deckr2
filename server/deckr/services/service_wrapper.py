@@ -3,7 +3,9 @@ This module provides the code for a simple service wrapper.
 """
 
 import importlib
+import logging
 
+LOGGER = logging.getLogger(__name__)
 
 class ServiceWrapper(object):
     """
@@ -37,6 +39,7 @@ class ServiceWrapper(object):
             object The newly created instance
         """
 
+        LOGGER.info("Creating service: %s", self.name)
         mod = importlib.import_module(self._module)
         service_class = getattr(mod, self._class)
         self._instance = service_class(config=self.config_for_service)

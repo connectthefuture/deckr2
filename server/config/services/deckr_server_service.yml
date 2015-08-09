@@ -3,7 +3,7 @@
 name: 'DeckrServer'
 
 # Module where the service is located
-module: 'src.network.deckr_server'
+module: 'deckr.network.deckr_server'
 
 # Class that implements service
 class: 'DeckrServer'
@@ -14,3 +14,10 @@ dependancies:
 
 # Does this require the event loop (should only be true of one service); defaults to false
 requires_event_loop: true
+
+reload: true
+
+watch_files:
+    - 'deckr/network/deckr_server.py'
+    - 'deckr/network/router.py'
+    - 'deckr/network/connection.py'

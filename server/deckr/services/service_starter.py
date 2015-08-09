@@ -2,9 +2,12 @@
 This module provides code that will enable a server to properly start services.
 """
 
+import logging
+
 from deckr.services.reloader import ReloadingServiceWrapper
 from deckr.services.service_wrapper import ServiceWrapper
 
+LOGGER = logging.getLogger(__name__)
 
 class ServiceStarter(object):
     """
@@ -50,14 +53,17 @@ class ServiceStarter(object):
         """
 
         # Create service instances
+        LOGGER.info("Creating all services")
         for service in self.services.values():
             service.create()
 
         # Fix up dependancies
+        LOGGER.info("Injecting service dependancies")
         for service in self.services.values():
             self._satisfy_dependencies(service)
 
         # Start everything
+        LOGGER.info("Starting services")
         start_last = None
         for service in self.services.values():
             if service.requires_event_loop:

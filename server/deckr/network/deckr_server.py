@@ -2,8 +2,14 @@
 This module provides code for various deckr server implementations.
 """
 
+import logging
+
+from twisted.internet import reactor
+
 from deckr.network.router import Router
 from deckr.services.service import Service
+
+LOGGER = logging.getLogger(__name__)
 
 
 class DeckrServer(Service):
@@ -11,7 +17,7 @@ class DeckrServer(Service):
     An interface for the deckr server.
     """
 
-    def __init__(self):
+    def __init__(self, config):
         self._router = Router()
         self._game_master = None
 
@@ -30,11 +36,12 @@ class DeckrServer(Service):
         Start the server. This will be a blocking function call.
         """
 
-        raise NotImplementedError
+        LOGGER.debug('Starting the DeckrServer')
+        reactor.run()
 
     def stop(self):
         """
         Stop the server and relinquish the control loop.
         """
 
-        raise NotImplementedError
+        pass
