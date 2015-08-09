@@ -36,7 +36,7 @@ class DeckrServer(Service):
         Start the server. This will be a blocking function call.
         """
 
-        LOGGER.debug('Starting the DeckrServer')
+        LOGGER.info('Starting the DeckrServer')
         reactor.run()
 
     def stop(self):
