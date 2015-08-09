@@ -27,7 +27,7 @@ class Connection(LineReceiver):
             response (ServerResponse): A server response that should be sent over the wire.
         """
 
-        pass
+        self.sendLine(response.SerializeToString())
 
     def recieve_message(self, message):
         """
@@ -51,7 +51,6 @@ class Connection(LineReceiver):
         Send an error.
         """
 
-        print "In here"
         response = ServerResponse()
         response.response_type = ServerResponse.ERROR
         response.error_response.message = message

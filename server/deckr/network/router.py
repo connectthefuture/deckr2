@@ -2,6 +2,10 @@
 This module provides code for the Router.
 """
 
+import logging
+
+LOGGER = logging.getLogger(__name__)
+
 
 class Router(object):
     """
@@ -33,4 +37,6 @@ class Router(object):
             connection (Connection): The connection that sent this message.
         """
 
-        print("Got message ", message, " from ", connection)
+        LOGGER.debug("Got a message %s from %s", message, connection)
+        # For now, just send back a not implemented error
+        connection.send_error("Not implemented yet")
