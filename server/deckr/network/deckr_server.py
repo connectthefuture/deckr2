@@ -44,4 +44,4 @@ class DeckrServer(Service):
         Stop the server and relinquish the control loop.
         """
 
-        pass
+        reactor.stop()
