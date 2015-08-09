@@ -73,6 +73,15 @@ class ServiceStarter(object):
         if start_last is not None:
             start_last.get_instance().start()
 
+    def stop(self):
+        """
+        Stop all of the services.
+        """
+
+        LOGGER.info("Stopping all services")
+        for service in self.services.values():
+            service.stop()
+
     def _satisfy_dependencies(self, service):
         """
         Satisfy the dependencies for a specific service.

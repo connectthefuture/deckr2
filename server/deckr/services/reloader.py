@@ -61,6 +61,7 @@ class ReloadingServiceWrapper(ServiceWrapper):
         Properly stop the reloading.
         """
 
+        LOGGER.info("Stopping service: %s", self.name)
         self._process.terminate()
         self._file_watcher.done = True
         self._watcher_thread.join()
@@ -77,13 +78,14 @@ class ReloadingServiceWrapper(ServiceWrapper):
 
     def reload(self):
         """
-        Signal that we should reload the service.
+        Signal that we should reload and restart the service.
         """
 
         LOGGER.info("Reloading service: %s", self.name)
         self._process.terminate()
         self._process = Process(target=self._child_create)
         self._process.start()
+        self._instance.start()
 
     def __del__(self):
         if not self._stopped:
@@ -111,15 +113,18 @@ class ReloaderProxy(object):
         the response into the send_queue. If we get a KILL message, leave the loop.
         """
 
-        func_name, args, kwargs = self._recieve_queue.get()
-        try:
+        while True:
+            func_name, args, kwargs = self._recieve_queue.get()
+            try:
 
-            result = getattr(self._proxy_for, func_name)(*args, **kwargs)
-            self._send_queue.put(result)
-        # Catch any exception here and bubble it up (be as transparent as
-        # possible)
-        except Exception as e:  # pylint: disable=broad-except,invalid-name
-            self._send_queue.put(e)
+                result = getattr(self._proxy_for, func_name)(*args, **kwargs)
+                self._send_queue.put(result)
+            # Catch any exception here and bubble it up (be as transparent as
+            # possible)
+            except Exception as e:  # pylint: disable=broad-except,invalid-name
+                self._send_queue.put(e)
+            if func_name == "stop":
+                break
 
     def __getattr__(self, name):
         """

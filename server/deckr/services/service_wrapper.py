@@ -52,3 +52,7 @@ class ServiceWrapper(object):
         """
 
         return self._instance
+
+    def stop(self):
+        LOGGER.info("Stopping service: %s", self.name)
+        self._instance.stop()

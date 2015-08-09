@@ -15,7 +15,7 @@ dependancies:
 # Does this require the event loop (should only be true of one service); defaults to false
 requires_event_loop: true
 
-reload: true
+reload: false # Twisted seems to fuck with the multiprocessing. No reloading :(
 
 watch_files:
     - 'deckr/network/deckr_server.py'
