@@ -7,6 +7,9 @@ setup(name='deckr',
       license='MIT',
       packages=['deckr'],
       zip_safe=False,
+      install_requires=[
+          'twisted',
+      ],
       # Test configuration
       test_suite='nose.collector',
       tests_require=['nose'],
