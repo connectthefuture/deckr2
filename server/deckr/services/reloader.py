@@ -2,6 +2,7 @@
 # broken. Since this isn't core to the game, I'm going to suspend this and focus on implementing the
 # actual server.
 
+# pylint: skip-file
 # """
 # This module provides code for relodaing services in development. Essentially we wrap each service
 # in a seperate process and then proxy between them using queues. This way, we can kill a process and

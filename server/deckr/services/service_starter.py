@@ -8,6 +8,7 @@ from deckr.services.service_wrapper import ServiceWrapper
 
 LOGGER = logging.getLogger(__name__)
 
+
 class ServiceStarter(object):
     """
     The service starter is the main entry point into the deckr server. It can take a set of
@@ -58,15 +59,15 @@ class ServiceStarter(object):
             self._satisfy_dependencies(service)
 
         # Start everything
-        LOGGER.info("Starting services")
+        LOGGER.info("Starting all services")
         start_last = None
         for service in self.services.values():
             if service.requires_event_loop:
                 start_last = service
             else:
-                service.get_instance().start()
+                service.start()
         if start_last is not None:
-            start_last.get_instance().start()
+            start_last.start()
 
     def stop(self):
         """

@@ -6,7 +6,7 @@ This module provides code for the GameMaster which manages all of the games.
 from deckr.services.service import Service
 
 
-class GameMaster(Service): 
+class GameMaster(Service):
     """
     The game master is a pretty straightforwards service. It tracks all games, allows for easy
     querying, creation, and deletion. It also has capabilities for serializing all games for

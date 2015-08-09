@@ -7,6 +7,7 @@ import logging
 
 LOGGER = logging.getLogger(__name__)
 
+
 class ServiceWrapper(object):
     """
     This class represents a service wrapper. This includes the configuration to actually
@@ -53,6 +54,18 @@ class ServiceWrapper(object):
 
         return self._instance
 
+    def start(self):
+        """
+        Start the service this is wrapping.
+        """
+
+        LOGGER.info("Starting service: %s", self.name)
+        self._instance.start()
+
     def stop(self):
+        """
+        Stop the service this is wrapping.
+        """
+
         LOGGER.info("Stopping service: %s", self.name)
         self._instance.stop()
