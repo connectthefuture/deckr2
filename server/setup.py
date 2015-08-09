@@ -12,5 +12,8 @@ setup(name='deckr',
       ],
       # Test configuration
       test_suite='nose.collector',
-      tests_require=['nose'],
+      tests_require=[
+        'nose',
+        'mock'
+      ],
       )

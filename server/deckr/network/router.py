@@ -33,4 +33,4 @@ class Router(object):
             connection (Connection): The connection that sent this message.
         """
 
-        pass
+        print("Got message ", message, " from ", connection)

@@ -4,6 +4,10 @@ This module provides code for deckr connections.
 
 from twisted.protocols.basic import LineReceiver
 
+from google.protobuf.message import DecodeError
+from proto.client_message_pb2 import ClientMessage
+from proto.server_response_pb2 import ServerResponse
+
 
 class Connection(LineReceiver):
     """
@@ -35,7 +39,23 @@ class Connection(LineReceiver):
                 and then pass off to the router.
         """
 
-        pass
+        decoded_message = ClientMessage()
+        try:
+            decoded_message.ParseFromString(message)
+        except DecodeError:
+            self.send_error("Could not parse message")
+        self._router.handle_message(decoded_message, self)
+
+    def send_error(self, message):
+        """
+        Send an error.
+        """
+
+        print "In here"
+        response = ServerResponse()
+        response.response_type = ServerResponse.ERROR
+        response.error_response.message = message
+        self.send_response(response)
 
     # Everything below this is twisted. Everything above should be able to use any backend.
     def lineReceived(self, line):
