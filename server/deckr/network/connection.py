@@ -2,8 +2,10 @@
 This module provides code for deckr connections.
 """
 
+from twisted.protocols.basic import LineReceiver
 
-class Connection(object):
+
+class Connection(LineReceiver):
     """
     This represents a single client connection. Each connection can be associated with at most
     1 game.
@@ -34,3 +36,11 @@ class Connection(object):
         """
 
         pass
+
+    # Everything below this is twisted. Everything above should be able to use any backend.
+    def lineReceived(self, line):
+        """
+        Called whenever we recieve a raw message.
+        """
+
+        self.recieve_message(line)
