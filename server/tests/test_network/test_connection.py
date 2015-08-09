@@ -30,7 +30,8 @@ class ConnectionTestCase(TestCase):
         """
 
         self.connection.recieve_message(self.message.SerializeToString())
-        self.router.handle_message.assert_called_with(self.message, self.connection)
+        self.router.handle_message.assert_called_with(
+            self.message, self.connection)
 
     def test_survives_malformed_input(self):
         """
@@ -44,3 +45,13 @@ class ConnectionTestCase(TestCase):
         self.connection.send_response = MagicMock()
         self.connection.recieve_message("foobar")
         self.connection.send_response.assert_called_with(expected_response)
+
+    def test_quit(self):
+        """
+        If we get a quit message we should lose connection.
+        """
+
+        self.message.message_type = ClientMessage.QUIT
+        self.connection.transport = MagicMock()
+        self.connection.recieve_message(self.message.SerializeToString())
+        self.connection.transport.loseConnection.assert_called_with()

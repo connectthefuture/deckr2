@@ -23,6 +23,7 @@ class ClientConnection(object):
         self.socket.connect((TCP_IP, TCP_PORT))
 
     def shutdown(self):
+        self.quit()
         self.socket.close()
 
     def send_message(self, message):
@@ -33,7 +34,11 @@ class ClientConnection(object):
         self.socket.send(message.SerializeToString() + '\r\n')
 
         while(True):
-            self.buffer += self.socket.recv(BUFFER_SIZE)
+            data = self.socket.recv(BUFFER_SIZE)
+            if not data:
+                print "Connection closed"
+                return
+            self.buffer += data
             if '\r\n' in self.buffer:
                 data, self.buffer = self.buffer.split('\r\n', 1)
                 break
@@ -43,9 +48,10 @@ class ClientConnection(object):
         print response
         return response
 
+    def quit(self):
+        message = ClientMessage()
+        message.message_type = ClientMessage.QUIT
+        self.send_message(message)
+
 connection = ClientConnection()
 connection.initalize()
-
-# Some common messages
-QUIT_MESSAGE = ClientMessage()
-QUIT_MESSAGE.message_type = ClientMessage.QUIT

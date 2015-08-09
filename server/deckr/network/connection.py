@@ -2,11 +2,15 @@
 This module provides code for deckr connections.
 """
 
+import logging
+
 from twisted.protocols.basic import LineReceiver
 
 from google.protobuf.message import DecodeError
 from proto.client_message_pb2 import ClientMessage
 from proto.server_response_pb2 import ServerResponse
+
+LOGGER = logging.getLogger(__name__)
 
 
 class Connection(LineReceiver):
@@ -44,7 +48,14 @@ class Connection(LineReceiver):
             decoded_message.ParseFromString(message)
         except DecodeError:
             self.send_error("Could not parse message")
-        self._router.handle_message(decoded_message, self)
+            return
+
+        LOGGER.debug("Got a message %s from %s", decoded_message, self)
+        if decoded_message.message_type == ClientMessage.QUIT:
+            self.transport.loseConnection()  # twisted specific
+            return
+        else:
+            self._router.handle_message(decoded_message, self)
 
     def send_error(self, message):
         """
@@ -56,7 +67,16 @@ class Connection(LineReceiver):
         response.error_response.message = message
         self.send_response(response)
 
-    # Everything below this is twisted. Everything above should be able to use any backend.
+    # Everything below this is twisted. Everything above should be able to use
+    # any backend.
+
+    def connectionMade(self):
+        """
+        We made a connection. Log it.
+        """
+
+        LOGGER.debug("Got a connection")
+
     def lineReceived(self, line):
         """
         Called whenever we recieve a raw message.

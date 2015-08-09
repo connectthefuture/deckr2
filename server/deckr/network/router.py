@@ -4,6 +4,9 @@ This module provides code for the Router.
 
 import logging
 
+from proto.client_message_pb2 import ClientMessage
+from proto.server_response_pb2 import ServerResponse
+
 LOGGER = logging.getLogger(__name__)
 
 
@@ -25,7 +28,7 @@ class Router(object):
         Called to set the game master for the Router.
         """
 
-        pass
+        self._game_master = game_master
 
     def handle_message(self, message, connection):
         """
@@ -37,6 +40,47 @@ class Router(object):
             connection (Connection): The connection that sent this message.
         """
 
-        LOGGER.debug("Got a message %s from %s", message, connection)
-        # For now, just send back a not implemented error
-        connection.send_error("Not implemented yet")
+        message_type = message.message_type
+        if message_type == ClientMessage.CREATE:
+            self._handle_create(message, connection)
+        elif message_type == ClientMessage.JOIN:
+            self._handle_join(message, connection)
+        elif message_type == ClientMessage.LEAVE:
+            self._handle_leave(message, connection)
+        else:
+            connection.send_error("Not implemented yet")
+
+    def _handle_create(self, message, connection):
+        """
+        Handle a create message. This will create a game through the game master and then return
+        a create response.
+        """
+
+        game_id = self._game_master.create()
+
+        response = ServerResponse()
+        response.response_type = ServerResponse.CREATE
+        response.create_response.game_id = game_id
+        connection.send_response(response)
+
+    def _handle_join(self, message, connection):
+        """
+        Handle a join message.
+        """
+
+        game_id = message.join_message.game_id
+        game = self._game_master.get_game(game_id)
+        player = game.create_player()
+
+        response = ServerResponse()
+        response.response_type = ServerResponse.JOIN
+        connection.send_response(response)
+
+    def _handle_leave(self, message, connection):
+        """
+        Handle a message that the user wants to leave the current game.
+        """
+
+        response = ServerResponse()
+        response.response_type = ServerResponse.LEAVE
+        connection.send_response(response)

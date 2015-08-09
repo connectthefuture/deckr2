@@ -51,7 +51,7 @@ class GameMaster(Service):
         be passed directly to the game.
 
         Returns:
-            MagicTheGathering: The newly created game instance.
+            string: The game_id of the newly created game
         """
 
         pass

@@ -41,7 +41,8 @@ class DeckrServer(Service):
 
         self._factory = DeckrFactory(self._router)
         port = 8080
-        endpoints.serverFromString(reactor, "tcp:%d" % port).listen(self._factory)
+        endpoints.serverFromString(reactor, "tcp:%d" %
+                                   port).listen(self._factory)
         LOGGER.info('Starting the DeckrServer listening on port %d', port)
         reactor.run()
 
@@ -52,6 +53,7 @@ class DeckrServer(Service):
 
         if reactor.running:
             reactor.stop()
+
 
 class DeckrFactory(protocol.Factory):
     """
