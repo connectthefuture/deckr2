@@ -40,7 +40,7 @@ class Card(GameObject):
 
     def reset(self):
         """
-        Call whenever a card changes zones to remove and modifications.
+        Call whenever a card changes zones to remove any modifications.
         (We'll deal with exceptions eventually.)
         """
 

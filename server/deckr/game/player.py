@@ -46,9 +46,9 @@ class Player(GameObject):
 
         pass
 
-    def declare_defenders(self, defenders):
+    def declare_blockers(self, blockers):
         """
-        Declare defenders. All cards will be updated to indicate they are defending.
+        Declare blockers. All cards will be updated to indicate they are defending.
         """
 
         pass
