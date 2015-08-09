@@ -1,5 +1,6 @@
 from deckr.services.service import Service
 
+# pylint: skip-file
 # Incemented whenever a service starts
 TIMES_STARTED = 0
 LAST_STARTED = None

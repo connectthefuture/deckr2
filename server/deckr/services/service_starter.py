@@ -33,8 +33,12 @@ class ServiceStarter(object):
             config_for_service (dict): Configuration to pass to the service upon creation.
         """
 
-        self.services[service_config["name"]] = ServiceWrapper(
-            service_config, config_for_service)
+        if service_config.get("reload", False) or self._reload_all:
+            wrapper = ReloadingServiceWrapper(
+                service_config, config_for_service)
+        else:
+            wrapper = ServiceWrapper(service_config, config_for_service)
+        self.services[service_config["name"]] = wrapper
 
     def start(self):
         """

@@ -116,7 +116,9 @@ class ReloaderProxy(object):
 
             result = getattr(self._proxy_for, func_name)(*args, **kwargs)
             self._send_queue.put(result)
-        except Exception as e:  # Catch any exception here and
+        # Catch any exception here and bubble it up (be as transparent as
+        # possible)
+        except Exception as e:  # pylint: disable=broad-except,invalid-name
             self._send_queue.put(e)
 
     def __getattr__(self, name):
@@ -152,10 +154,14 @@ class FileWatcher(object):
         self.done = False
 
     def watch(self):
+        """
+        Start watchin files. Will continue to watch until self.done is turned to false.
+        """
+
         # Make sure we initialze to a good state
         self._last_modification_times = self.get_modification_times()
 
-        while(not self.done):
+        while not self.done:
             time.sleep(self.FILE_POLL_SECONDS)
             modification_times = self.get_modification_times()
             if modification_times != self._last_modification_times:
@@ -163,4 +169,7 @@ class FileWatcher(object):
             self._last_modification_times = modification_times
 
     def get_modification_times(self):
+        """
+        Get the current modification times.
+        """
         return [(x, os.path.getmtime(x)) for x in self._files]

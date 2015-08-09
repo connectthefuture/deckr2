@@ -1,7 +1,11 @@
+"""
+This module tests the basic functionality of the service wrapper.
+"""
+
 from unittest import TestCase
 
 from deckr.services.service_wrapper import ServiceWrapper
-from tests.test_services.services import *
+from tests.test_services.services import SERVICE_CONFIG, TestService
 
 
 class ServiceWrapperTestCase(TestCase):
