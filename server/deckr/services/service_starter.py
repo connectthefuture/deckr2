@@ -4,6 +4,7 @@ This module provides code that will enable a server to properly start services.
 
 import logging
 
+from deckr.services.reloader import ReloadingServiceWrapper
 from deckr.services.service_wrapper import ServiceWrapper
 
 LOGGER = logging.getLogger(__name__)
@@ -36,7 +37,10 @@ class ServiceStarter(object):
             config_for_service (dict): Configuration to pass to the service upon creation.
         """
 
-        wrapper = ServiceWrapper(service_config, config_for_service)
+        if self._reload_all:
+            wrapper = ReloadingServiceWrapper(service_config, config_for_service)
+        else:
+            wrapper = ServiceWrapper(service_config, config_for_service)
         self.services[service_config["name"]] = wrapper
 
     def start(self):
