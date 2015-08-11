@@ -28,18 +28,21 @@ class RouterTestCase(TestCase):
         A create message should call create on the game master and then return a create response.
         """
 
-        self.game_master.create.return_value = 'foo'
+        game_id = 'foo'
+        self.game_master.create.return_value = game_id
 
         message = ClientMessage()
         message.message_type = ClientMessage.CREATE
 
         expected_response = ServerResponse()
         expected_response.response_type = ServerResponse.CREATE
-        expected_response.create_response.game_id = 'foo'
+        expected_response.create_response.game_id = game_id
 
         self.router.handle_message(message, self.connection)
         self.game_master.create.assert_called_with()
         self.connection.send_response.assert_called_with(expected_response)
+        # No one should be in the game yet
+        self.assertEqual(self.router.get_room_connections(game_id), [])
 
     def test_join(self):
         """
@@ -47,20 +50,26 @@ class RouterTestCase(TestCase):
         join response.
         """
 
+        game_id = 'foo'
+        self.router.create_room(game_id, None)
         self.game_master.get_game.return_value = self.game
 
         message = ClientMessage()
         message.message_type = ClientMessage.JOIN
         message.join_message.client_type = JoinMessage.PLAYER
-        message.join_message.game_id = 'foo'
+        message.join_message.game_id = game_id
 
         expected_response = ServerResponse()
         expected_response.response_type = ServerResponse.JOIN
 
         self.router.handle_message(message, self.connection)
-        self.game_master.get_game.assert_called_with('foo')
+        self.game_master.get_game.assert_called_with(game_id)
         self.game.create_player.assert_called_with()
         self.connection.send_response.assert_called_with(expected_response)
+
+        # Make sure we were added to the room
+        self.assertIn(self.connection,
+                      self.router.get_room_connections(game_id))
 
     def test_leave(self):
         """
@@ -75,3 +84,15 @@ class RouterTestCase(TestCase):
 
         self.router.handle_message(message, self.connection)
         self.connection.send_response.assert_called_with(expected_response)
+
+    def test_rooms(self):
+        """
+        Make sure that we can add a connection to a room.
+        """
+
+        room_id = 'foobar'
+        self.router.create_room(room_id, None)
+        self.router.add_to_room(self.connection, room_id)
+        self.assertIn(self.connection,
+                      self.router.get_room_connections(room_id))
+        self.assertEqual(self.connection.room_id, room_id)

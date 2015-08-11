@@ -50,6 +50,28 @@ class Router(object):
         else:
             connection.send_error("Not implemented yet")
 
+    def create_room(self, room_id, game):
+        """
+        Create a new room with the given id and game.
+        """
+
+        self._game_rooms[room_id] = (game, [])
+
+    def add_to_room(self, connection, room_id):
+        """
+        Adds the connection to the given room.
+        """
+
+        self._game_rooms[room_id][1].append(connection)
+        connection.room_id = room_id
+
+    def get_room_connections(self, room_id):
+        """
+        Get a list of connections in a room.
+        """
+
+        return self._game_rooms[room_id][1]
+
     def _handle_create(self, message, connection):
         """
         Handle a create message. This will create a game through the game master and then return
@@ -57,6 +79,8 @@ class Router(object):
         """
 
         game_id = self._game_master.create()
+        game = self._game_master.get_game(game_id)
+        self.create_room(game_id, game)
 
         response = ServerResponse()
         response.response_type = ServerResponse.CREATE
@@ -71,6 +95,7 @@ class Router(object):
         game_id = message.join_message.game_id
         game = self._game_master.get_game(game_id)
         player = game.create_player()
+        self.add_to_room(connection, game_id)
 
         response = ServerResponse()
         response.response_type = ServerResponse.JOIN
