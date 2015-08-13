@@ -4,6 +4,7 @@ This is a very simple client for debugging and testing. This is meant to be run 
 """
 
 import socket
+import threading
 
 from proto.client_message_pb2 import ClientMessage
 from proto.server_response_pb2 import ServerResponse
@@ -26,12 +27,10 @@ class ClientConnection(object):
         self.quit()
         self.socket.close()
 
-    def send_message(self, message):
+    def listen(self):
         """
-        Takes in a protobuf, waits for a response and then returns it.
+        Listen for a message.
         """
-
-        self.socket.send(message.SerializeToString() + '\r\n')
 
         while(True):
             data = self.socket.recv(BUFFER_SIZE)
@@ -41,12 +40,16 @@ class ClientConnection(object):
             self.buffer += data
             if '\r\n' in self.buffer:
                 data, self.buffer = self.buffer.split('\r\n', 1)
-                break
+                response = ServerResponse()
+                response.ParseFromString(data)
+                print response
 
-        response = ServerResponse()
-        response.ParseFromString(data)
-        print response
-        return response
+    def send_message(self, message):
+        """
+        Takes in a protobuf, waits for a response and then returns it.
+        """
+
+        self.socket.send(message.SerializeToString() + '\r\n')
 
     def quit(self):
         message = ClientMessage()
@@ -55,3 +58,7 @@ class ClientConnection(object):
 
 connection = ClientConnection()
 connection.initalize()
+
+# Start a listener thread
+listener_therad = threading.Thread(target=connection.listen)
+listener_therad.start()
