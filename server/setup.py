@@ -9,6 +9,7 @@ setup(name='deckr',
     zip_safe=False,
     install_requires=[
       'twisted',
+      'pyyaml',
     ],
     # Test configuration
     test_suite='nose.collector',
