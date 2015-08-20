@@ -14,11 +14,11 @@ class Service(object):
         Start the service.
         """
 
-        raise NotImplementedError
+        pass
 
     def stop(self):
         """
         Stop the service gracefully.
         """
 
-        raise NotImplementedError
+        pass

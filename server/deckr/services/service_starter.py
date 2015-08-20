@@ -2,30 +2,11 @@
 This module provides code that will enable a server to properly start services.
 """
 
+import logging
 
-class ServiceConfig(object):
-    """
-    This class represents a service configuration. This includes the configuration to actually
-    create the service (service_config) and the configuration that should be passed to the
-    service (config_for_service).
-    """
+from deckr.services.service_wrapper import ServiceWrapper
 
-    def __init__(self, service_config, config_for_service=None):
-        #: dict Everything needed to create the service.
-        self._service_config = service_config
-        #: dict Configuration that will be passed to the service on creation.
-        self._config_for_service = config_for_service
-
-    def create(self):
-        """
-        Create a new service using this configuration.
-
-        Note:
-            All modules will be imported at this point. If running with reloading, make sure
-            you fork **before** you call create.
-        """
-
-        pass
+LOGGER = logging.getLogger(__name__)
 
 
 class ServiceStarter(object):
@@ -41,8 +22,8 @@ class ServiceStarter(object):
                 individual service configs can still override this.
         """
 
-        #: List[ServiceConfig]
-        self._services = []
+        #: dict[Name:ServiceWrapper]
+        self.services = {}
         #: bool
         self._reload_all = reload_all
 
@@ -55,7 +36,8 @@ class ServiceStarter(object):
             config_for_service (dict): Configuration to pass to the service upon creation.
         """
 
-        pass
+        wrapper = ServiceWrapper(service_config, config_for_service)
+        self.services[service_config["name"]] = wrapper
 
     def start(self):
         """
@@ -66,4 +48,42 @@ class ServiceStarter(object):
             if this returns it means it's time to shutdown.
         """
 
-        pass
+        # Create service instances
+        LOGGER.info("Creating all services")
+        for service in self.services.values():
+            service.create()
+
+        # Fix up dependancies
+        LOGGER.info("Injecting service dependancies")
+        for service in self.services.values():
+            self._satisfy_dependencies(service)
+
+        # Start everything
+        LOGGER.info("Starting all services")
+        start_last = None
+        for service in self.services.values():
+            if service.requires_event_loop:
+                start_last = service
+            else:
+                service.start()
+        if start_last is not None:
+            start_last.start()
+
+    def stop(self):
+        """
+        Stop all of the services.
+        """
+
+        LOGGER.info("Stopping all services")
+        for service in self.services.values():
+            service.stop()
+
+    def _satisfy_dependencies(self, service):
+        """
+        Satisfy the dependencies for a specific service.
+        """
+
+        service_instance = service.get_instance()
+        for dependancy in service.dependancies:
+            service_dep = self.services[dependancy[1]].get_instance()
+            getattr(service_instance, 'set_' + dependancy[0])(service_dep)
