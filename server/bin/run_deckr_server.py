@@ -12,7 +12,7 @@ def main():
     logging.basicConfig(level=logging.DEBUG)
 
     starter = ServiceStarter(False)
-    starter.add_service(yaml.load(open('config/services/deckr_server_service.yml')), {'websockets': True})
+    starter.add_service(yaml.load(open('config/services/deckr_server_service.yml')), {})
     starter.add_service(yaml.load(open('config/services/game_master_service.yml')), {})
     starter.start()
     starter.stop() # At this point we've finished everything, since start should block.

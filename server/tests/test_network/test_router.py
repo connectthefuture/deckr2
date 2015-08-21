@@ -28,7 +28,7 @@ class RouterTestCase(TestCase):
         A create message should call create on the game master and then return a create response.
         """
 
-        game_id = 'foo'
+        game_id = 0
         self.game_master.create.return_value = game_id
 
         message = ClientMessage()
@@ -50,7 +50,7 @@ class RouterTestCase(TestCase):
         join response.
         """
 
-        game_id = 'foo'
+        game_id = 0
         self.router.create_room(game_id, None)
         self.game_master.get_game.return_value = self.game
 

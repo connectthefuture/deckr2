@@ -6,7 +6,7 @@ This is a very simple client for debugging and testing. This is meant to be run 
 import socket
 import threading
 
-from proto.client_message_pb2 import ClientMessage
+from proto.client_message_pb2 import ClientMessage, JoinMessage
 from proto.server_response_pb2 import ServerResponse
 
 TCP_IP = '127.0.0.1'
@@ -51,6 +51,22 @@ class ClientConnection(object):
 
         self.socket.send(message.SerializeToString() + '\r\n')
 
+    def create(self):
+        """
+        Send a create message.
+        """
+        
+        message = ClientMessage()
+        message.message_type = ClientMessage.CREATE
+        self.send_message(message)
+        
+    def join(self, game_id, client_type=JoinMessage.PLAYER):
+        message = ClientMessage()
+        message.message_type = ClientMessage.JOIN
+        message.join_message.game_id = game_id
+        message.join_message.client_type = client_type
+        self.send_message(message)
+        
     def quit(self):
         message = ClientMessage()
         message.message_type = ClientMessage.QUIT

@@ -3,6 +3,7 @@ This module provides code for deckr connections.
 """
 
 import logging
+import traceback
 
 from twisted.protocols.basic import LineReceiver
 
@@ -56,14 +57,22 @@ class Connection(LineReceiver):
         if decoded_message.message_type == ClientMessage.QUIT:
             self.transport.loseConnection()  # twisted specific
             return
-        else:
+        
+        # We use a bare try except clause here because we don't want any lower level exception
+        # to kill the connection. Hopefully we don't hit this very often.
+        try:
             self._router.handle_message(decoded_message, self)
+        except Exception:
+            LOGGER.exception("Encountered unexpected exception")
+            self.send_error(traceback.format_exc()) # Potentially hide this behind a debug flag.
+            
 
     def send_error(self, message):
         """
         Send an error.
         """
 
+        LOGGER.warn("Sending error message %s", message)
         response = ServerResponse()
         response.response_type = ServerResponse.ERROR
         response.error_response.message = message
