@@ -55,14 +55,15 @@ class ConnectionTestCase(TestCase):
         self.connection.transport = MagicMock()
         self.connection.recieve_message(self.message.SerializeToString())
         self.connection.transport.loseConnection.assert_called_with()
-        
+
     def test_survives_exception(self):
         """
         If we encounter an exception processing a message, we should catch it and let the 
         end user know.
         """
-        
-        self.router.handle_message.side_effect = Exception("Never should happen")
+
+        self.router.handle_message.side_effect = Exception(
+            "Never should happen")
         self.connection.send_error = MagicMock()
         self.connection.recieve_message(self.message.SerializeToString())
         self.connection.send_error.called_once()
