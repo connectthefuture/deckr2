@@ -1,4 +1,4 @@
-import 'proto/util.proto';
+import 'util.proto';
 
 message GameState {
     required string current_phase = 1;

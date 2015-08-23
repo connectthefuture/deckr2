@@ -2,8 +2,13 @@
 This module provides code for the GameMaster which manages all of the games.
 """
 
+import logging
+import pickle
 
+from deckr.game.game import MagicTheGathering
 from deckr.services.service import Service
+
+LOGGER = logging.getLogger(__name__)
 
 
 class GameMaster(Service):
@@ -17,8 +22,9 @@ class GameMaster(Service):
         if config is None:
             config = {}
 
+        self._next_game_id = 0
         self._games = {}
-        self._save_on_quit = config.get('save_on_quit', False)
+        self._save_file = config.get('save_file', None)
 
         # Services
         self._action_validator = None
@@ -28,14 +34,16 @@ class GameMaster(Service):
         Start the game master.
         """
 
-        pass
+        if self._save_file is not None:
+            self.load_from_file(self._save_file)
 
     def stop(self):
         """
         Stop the game master and do any associated cleanup.
         """
 
-        pass
+        if self._save_file is not None:
+            self.save_to_file(self._save_file)
 
     def set_action_validator(self, action_validator):
         """
@@ -45,26 +53,32 @@ class GameMaster(Service):
             action_validator (ActionValidator):
         """
 
+        self._action_validator = action_validator
+
     def create(self, options=None):
         """
         Create a new game. Takes in an optional dictionary for configuration. This will just
         be passed directly to the game.
 
         Returns:
-            MagicTheGathering: The newly created game instance.
+            int: The game_id of the newly created game
         """
 
-        pass
+        game_id = self._next_game_id
+        self._next_game_id += 1
+        self._games[game_id] = MagicTheGathering(self._action_validator)
+        return game_id
 
     def destroy(self, game_id):
         """
         Destroy a game. This will delete all players from that game.
 
         Args:
-            game_id (string): The game_id of the game to be destroyed.
+            game_id (int): The game_id of the game to be destroyed.
         """
 
-        pass
+        if game_id in self._games:
+            del self._games[game_id]
 
     def get_game(self, game_id):
         """
@@ -77,7 +91,7 @@ class GameMaster(Service):
             MagicTheGathering: The game in question (will throw a KeyError if not found).
         """
 
-        pass
+        return self._games[game_id]
 
     def load_from_file(self, file_name):
         """
@@ -87,7 +101,9 @@ class GameMaster(Service):
             file_name (str): File to load games from.
         """
 
-        pass
+        LOGGER.info("Loading games from %s", file_name)
+        with open(file_name, "rb") as fin:
+            self._games = pickle.load(fin)
 
     def save_to_file(self, file_name):
         """
@@ -97,4 +113,6 @@ class GameMaster(Service):
             file_name (str): File to save games to.
         """
 
-        pass
+        LOGGER.info("Saving games to %s", file_name)
+        with open(file_name, "wb") as fout:
+            pickle.dump(self._games, fout)

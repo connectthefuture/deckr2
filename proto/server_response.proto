@@ -1,4 +1,4 @@
-import 'proto/game.proto';
+import 'game.proto';
 
 // Collection of all messages that can be sent by the server to
 // the client.
@@ -23,7 +23,7 @@ message ServerResponse {
 
 // Next Field: 2
 message CreateResponse {
-    required string game_id = 1;
+    required int32 game_id = 1;
 }
 
 // Next Field: 2
