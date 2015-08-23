@@ -5,11 +5,11 @@ This module provides code for various deckr server implementations.
 import logging
 
 from twisted.internet import endpoints, protocol, reactor
-from txsockjs.factory import SockJSFactory
 
 from deckr.network.connection import Connection
 from deckr.network.router import Router
 from deckr.services.service import Service
+from txsockjs.factory import SockJSFactory
 
 LOGGER = logging.getLogger(__name__)
 
@@ -23,7 +23,9 @@ class DeckrServer(Service):
         self._router = Router()
         self._game_master = None
         self._factory = None
+        # Load values from config
         self._websockets = config.get('websockets', False)
+        self._port = config.get('port', 8080)
 
     def set_game_master(self, game_master):
         """
@@ -46,10 +48,9 @@ class DeckrServer(Service):
             LOGGER.info("Starting with websocket support")
             self._factory = SockJSFactory(self._factory)
 
-        port = 8080
         endpoints.serverFromString(reactor, "tcp:%d" %
-                                   port).listen(self._factory)
-        LOGGER.info('Starting the DeckrServer listening on port %d', port)
+                                   self._port).listen(self._factory)
+        LOGGER.info('Starting the DeckrServer listening on port %d', self._port)
         reactor.run()
 
     def stop(self):

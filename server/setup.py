@@ -8,13 +8,14 @@ setup(name='deckr',
     packages=['deckr'],
     zip_safe=False,
     install_requires=[
-      'twisted',
-      'pyyaml',
+        'twisted',
+        'pyyaml',
+        'txsockjs',
     ],
     # Test configuration
     test_suite='nose.collector',
     tests_require=[
-    'nose',
-    'mock'
+        'nose',
+        'mock'
     ],
 )

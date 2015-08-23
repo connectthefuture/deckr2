@@ -2,10 +2,13 @@
 This module provides code for the GameMaster which manages all of the games.
 """
 
+import logging
 import pickle
 
-from deckr.services.service import Service
 from deckr.game.game import MagicTheGathering
+from deckr.services.service import Service
+
+LOGGER = logging.getLogger(__name__)
 
 
 class GameMaster(Service):
@@ -58,7 +61,7 @@ class GameMaster(Service):
         be passed directly to the game.
 
         Returns:
-            string: The game_id of the newly created game
+            int: The game_id of the newly created game
         """
 
         game_id = self._next_game_id
@@ -71,7 +74,7 @@ class GameMaster(Service):
         Destroy a game. This will delete all players from that game.
 
         Args:
-            game_id (string): The game_id of the game to be destroyed.
+            game_id (int): The game_id of the game to be destroyed.
         """
 
         if game_id in self._games:
@@ -98,6 +101,7 @@ class GameMaster(Service):
             file_name (str): File to load games from.
         """
 
+        LOGGER.info("Loading games from %s", file_name)
         with open(file_name, "rb") as fin:
             self._games = pickle.load(fin)
 
@@ -109,5 +113,6 @@ class GameMaster(Service):
             file_name (str): File to save games to.
         """
 
+        LOGGER.info("Saving games to %s", file_name)
         with open(file_name, "wb") as fout:
             pickle.dump(self._games, fout)
