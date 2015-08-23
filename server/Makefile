@@ -4,4 +4,4 @@ lint: autolint
 autolint:
 	autopep8 -r --in-place deckr tests
 test:
-	nosetests tests
+	python setup.py test
