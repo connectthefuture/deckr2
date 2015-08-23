@@ -1,0 +1,17 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>{% block title %}Deckr{% endblock %}</title>
+    <!-- JS -->
+    <script src="//cdn.jsdelivr.net/sockjs/0.3.4/sockjs.min.js"></script>
+    <script src="//cdn.rawgit.com/dcodeIO/ProtoBuf.js/master/dist/ProtoBuf.js"></script>
+    {% block morejs %}{% endblock %}
+    <!-- CSS -->
+    {% block morecss %}{% endblock %}
+    {% load staticfiles %}
+  </head>
+  <body>
+    {% block body %}{% endblock %}
+  </body>
+</html>
