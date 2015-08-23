@@ -1,0 +1,6 @@
+PyYAML==3.11
+Twisted==15.3.0
+autopep8==1.2
+protobuf==2.6.1
+pylint==1.4.4
+txsockjs==1.2.2
