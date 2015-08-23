@@ -7,7 +7,7 @@ from unittest import TestCase
 from mock import MagicMock
 
 from deckr.network.router import Router
-from proto.client_message_pb2 import ClientMessage, JoinMessage
+from proto.client_message_pb2 import ActionMessage, ClientMessage, JoinMessage
 from proto.server_response_pb2 import ServerResponse
 
 
@@ -22,6 +22,14 @@ class RouterTestCase(TestCase):
         self.connection = MagicMock()
         self.game = MagicMock()
         self.router.set_game_master(self.game_master)
+
+    def _create_and_join_game(self):
+        """
+        Utility to make sure that the client is part of a game.
+        """
+
+        self.router.create_room(0, self.game)
+        self.router.add_to_room(self.connection, 0)
 
     def test_create(self):
         """
@@ -71,6 +79,8 @@ class RouterTestCase(TestCase):
         self.assertIn(self.connection,
                       self.router.get_room_connections(game_id))
 
+        self.assertIsNotNone(self.connection.player)
+
     def test_leave(self):
         """
         Make sure that we can properly handle a leave message.
@@ -96,3 +106,17 @@ class RouterTestCase(TestCase):
         self.assertIn(self.connection,
                       self.router.get_room_connections(room_id))
         self.assertEqual(self.connection.room_id, room_id)
+
+    def test_game_action_start(self):
+        """
+        Make sure that we can pass a start action on to the game.
+        """
+
+        message = ClientMessage()
+        message.message_type = ClientMessage.ACTION
+        message.action_message.action_type = ActionMessage.START
+
+        self._create_and_join_game()
+
+        self.router.handle_message(message, self.connection)
+        self.game.start.assert_called_with()

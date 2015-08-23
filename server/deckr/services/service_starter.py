@@ -38,7 +38,8 @@ class ServiceStarter(object):
         """
 
         if self._reload_all:
-            wrapper = ReloadingServiceWrapper(service_config, config_for_service)
+            wrapper = ReloadingServiceWrapper(
+                service_config, config_for_service)
         else:
             wrapper = ServiceWrapper(service_config, config_for_service)
         self.services[service_config["name"]] = wrapper

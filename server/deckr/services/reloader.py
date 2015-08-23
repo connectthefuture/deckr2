@@ -14,7 +14,7 @@ Note:
 import logging
 import os.path
 import sys
-import threading  
+import threading
 import time
 import xmlrpclib
 from multiprocessing import Process
@@ -24,7 +24,8 @@ from deckr.services.service_wrapper import ServiceWrapper
 
 LOGGER = logging.getLogger(__name__)
 
-NEXT_PORT = 10000 # Port to start the next service XMLRPC server on
+NEXT_PORT = 10000  # Port to start the next service XMLRPC server on
+
 
 class ReloadingServiceWrapper(ServiceWrapper):
     """
@@ -55,10 +56,12 @@ class ReloadingServiceWrapper(ServiceWrapper):
 
         self._process = Process(target=self._child_create)
         self._process.start()
-        time.sleep(0.1) # Make sure we give the proxy time to start up.
+        time.sleep(0.1)  # Make sure we give the proxy time to start up.
 
-        self._instance = xmlrpclib.ServerProxy("http://localhost:%d/" % self._port, allow_none=True)
-        self._watcher_thread = threading.Thread(target=self._file_watcher.watch)
+        self._instance = xmlrpclib.ServerProxy(
+            "http://localhost:%d/" % self._port, allow_none=True)
+        self._watcher_thread = threading.Thread(
+            target=self._file_watcher.watch)
         self._watcher_thread.start()
         self._stopped = False
 
@@ -82,10 +85,10 @@ class ReloadingServiceWrapper(ServiceWrapper):
 
         instance = super(ReloadingServiceWrapper, self).create()
         LOGGER.info("Starting XMLRPCServer on localhost:%s", self._port)
-        server = SimpleXMLRPCServer(("localhost", self._port), allow_none=True, logRequests=False)
+        server = SimpleXMLRPCServer(
+            ("localhost", self._port), allow_none=True, logRequests=False)
         server.register_instance(instance)
         server.serve_forever()
-
 
     def reload(self):
         """
@@ -96,13 +99,14 @@ class ReloadingServiceWrapper(ServiceWrapper):
         self._process.terminate()
         self._process = Process(target=self._child_create)
         self._process.start()
-        time.sleep(0.1) # Give the server time to start up
+        time.sleep(0.1)  # Give the server time to start up
 
-        self._instance.start() # Restart our instance
+        self._instance.start()  # Restart our instance
 
     def __del__(self):
         if not self._stopped:
             self.stop()
+
 
 class FileWatcher(object):
     """
@@ -138,4 +142,3 @@ class FileWatcher(object):
         Get the current modification times.
         """
         return [(x, os.path.getmtime(x)) for x in self._files]
-

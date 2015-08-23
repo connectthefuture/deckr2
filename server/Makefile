@@ -4,4 +4,6 @@ lint: autolint
 autolint:
 	autopep8 -r --in-place deckr tests
 test:
-	python setup.py test
+	../env/bin/nosetests -a '!integration'
+integration:
+	../env/bin/nosetests -a 'integration'

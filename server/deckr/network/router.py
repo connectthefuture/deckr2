@@ -4,7 +4,7 @@ This module provides code for the Router.
 
 import logging
 
-from proto.client_message_pb2 import ClientMessage
+from proto.client_message_pb2 import ActionMessage, ClientMessage
 from proto.server_response_pb2 import ServerResponse
 
 LOGGER = logging.getLogger(__name__)
@@ -47,6 +47,8 @@ class Router(object):
             self._handle_join(message, connection)
         elif message_type == ClientMessage.LEAVE:
             self._handle_leave(message, connection)
+        elif message_type == ClientMessage.ACTION:
+            self._handle_action(message.action_message, connection)
         else:
             connection.send_error("Not implemented yet")
 
@@ -94,7 +96,7 @@ class Router(object):
 
         game_id = message.join_message.game_id
         game = self._game_master.get_game(game_id)
-        player = game.create_player()
+        connection.player = game.create_player()
         self.add_to_room(connection, game_id)
 
         response = ServerResponse()
@@ -109,3 +111,25 @@ class Router(object):
         response = ServerResponse()
         response.response_type = ServerResponse.LEAVE
         connection.send_response(response)
+
+    def _handle_action(self, message, connection):
+        """
+        Handle an action message. Mainly this just figures out where to dispatch the call.
+        """
+
+        game = self._game_rooms[connection.room_id][0]
+        player = connection.player
+
+        assert game is not None and player is not None
+
+        if message.action_type == ActionMessage.START:
+            game.start()
+
+        # Assuming the action was completed, we broadcast the current state
+        # to all clients.
+        # TODO: Compute deltas instead of just sending out the whole state.
+        response = ServerResponse()
+        response.response_type = ServerResponse.GAME_STATE
+        game.update_proto(response.game_state_response.game_state)
+        for conn in self.get_room_connections(connection.room_id):
+            conn.send_response(response)

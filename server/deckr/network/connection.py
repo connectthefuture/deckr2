@@ -23,6 +23,8 @@ class Connection(LineReceiver):
     def __init__(self, router):
         # What room this connection is part of
         self.room_id = None
+        # The player assocaited with this connection, if any
+        self.player = None
         #: Router The central router for deckr messages.
         self._router = router
 
