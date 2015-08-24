@@ -6,3 +6,10 @@ def index(request):
     """
 
     return render(request, "webclient/index.html", {})
+
+def lobby(request):
+    """
+    Returns the lobby, where players can start, join, or watch games.
+    """
+
+    return render(request, "webclient/lobby.html", {})

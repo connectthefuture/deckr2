@@ -3,13 +3,16 @@
   <head>
     <meta charset="utf-8">
     <title>{% block title %}Deckr{% endblock %}</title>
+    {% load staticfiles %}
     <!-- JS -->
-    <script src="//cdn.jsdelivr.net/sockjs/0.3.4/sockjs.min.js"></script>
-    <script src="//cdn.rawgit.com/dcodeIO/ProtoBuf.js/master/dist/ProtoBuf.js"></script>
+    <script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="{% static 'js/sockjs/sockjs.js' %}"></script>
+    <script src="{% static 'js/protobuf/ByteBuffer.js' %}"></script>
+    <script src="{% static 'js/protobuf/ProtoBuf.js' %}"></script>
+    <!-- <script src="//cdn.rawgit.com/dcodeIO/ProtoBuf.js/master/dist/ProtoBuf.js"></script> -->
     {% block morejs %}{% endblock %}
     <!-- CSS -->
     {% block morecss %}{% endblock %}
-    {% load staticfiles %}
   </head>
   <body>
     {% block body %}{% endblock %}

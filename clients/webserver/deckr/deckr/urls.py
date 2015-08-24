@@ -20,7 +20,12 @@ INDEX = url(r'^$',
             'webclient.views.index',
             name='webclient.index')
 
+LOBBY = url(r'^lobby/',
+            'webclient.views.lobby',
+            name='webclient.lobby')
+
 urlpatterns = [
     INDEX,
+    LOBBY,
     url(r'^admin/', include(admin.site.urls)),
 ]

@@ -1,0 +1,31 @@
+{% extends 'webclient/base.html' %}
+{% block morejs %}
+  {% load staticfiles %}
+  <script type="text/javascript" src="{% static 'js/sockets.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/lobby.js' %}"></script>
+{% endblock %}
+{% block body %}
+
+<div class="wrapper">
+  <h1>Deckr Lobby</h1>
+  <a href="#">Start Game</a>
+  <a href="#">Join Game</a>
+  <table class="games">
+    <thead>
+      <tr>
+        <th>Player</th>
+        <th>Format</th>
+        <th>Play/Watch</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>...</td>
+        <td>...</td>
+        <td>...</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}
