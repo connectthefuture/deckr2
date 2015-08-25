@@ -8,7 +8,9 @@ module: 'deckr.core.game_master'
 # Class that implements service
 class: 'GameMaster'
 
-reload: true
+dependancies:
+    - ['card_library', 'CardLibrary']
+    - ['action_validator', 'ActionValidator']
 
 watch_files:
     - 'deckr/core/game_master.py'

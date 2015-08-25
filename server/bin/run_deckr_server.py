@@ -13,6 +13,8 @@ def main():
 
     starter = ServiceStarter(False)
     starter.add_service(yaml.load(open('config/services/deckr_server_service.yml')), {})
+    starter.add_service(yaml.load(open('config/services/card_library_service.yml')), {})
+    starter.add_service(yaml.load(open('config/services/action_validator_service.yml')), {})
     starter.add_service(yaml.load(open('config/services/game_master_service.yml')), {})
     starter.start()
     starter.stop() # At this point we've finished everything, since start should block.

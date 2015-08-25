@@ -1,0 +1,9 @@
+---
+name: 'CardLibrary'
+
+module: 'deckr.game.card'
+
+class: 'CardLibrary'
+
+watch_files:
+    - 'deckr/game/card.py'

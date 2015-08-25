@@ -21,7 +21,7 @@ class ActionValidator(Service):
     is mostly stateless and so is reused across games.
     """
 
-    def __init__(self):
+    def __init__(self, config=None):
         pass
 
     def start(self):
