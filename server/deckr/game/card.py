@@ -16,7 +16,12 @@ def create_card_from_dict(card_data):
         Card The newly created card.
     """
 
-    pass
+    card = Card()
+    card.name = card_data['name']
+    card.types = card_data['types']
+    card.subtypes = card_data.get('subtypes', [])
+    card.supertypes = card_data.get('supertypes', [])
+    return card
 
 
 class Card(GameObject):
@@ -45,3 +50,31 @@ class Card(GameObject):
         """
 
         pass
+
+
+class CardLibrary(object):
+    """
+    A card library contains all of the cards that can be used, and the ability to create
+    instances.
+    """
+
+    def __init__(self):
+        super(CardLibrary, self).__init__()
+
+        self._cards = {}
+
+    def load_from_dict(self, data):
+        """
+        Load all of the cards in the given dictionary into the card library. If there
+        are conflicting cards the new one will win.
+        """
+
+        for key in data:
+            self._cards[key] = data[key]
+
+    def create(self, card_name):
+        """
+        Create a new card.
+        """
+
+        return create_card_from_dict(self._cards[card_name])

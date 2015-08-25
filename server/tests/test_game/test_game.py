@@ -19,6 +19,7 @@ class MagicTheGatheringTestCase(TestCase):
 
     def setUp(self):
         self.mock_action_validator = MagicMock()
+        self.card_library = MagicMock()
         self.game = MagicTheGathering(self.mock_action_validator)
 
     def test_create_player(self):
@@ -26,7 +27,7 @@ class MagicTheGatheringTestCase(TestCase):
         Make sure we can create a player. It should be registered with the game.
         """
 
-        player = self.game.create_player()
+        player = self.game.create_player({})
         self.assertIsNotNone(player)
         self.assertTrue(isinstance(player, Player))
         self.assertIn(player, self.game.players)
@@ -37,7 +38,6 @@ class MagicTheGatheringTestCase(TestCase):
                          player.hand)
         self.assertEqual(self.game.game_registry.lookup(player.graveyard.game_id),
                          player.graveyard)
-
 
 class GameRegistryTestCase(TestCase):
     """

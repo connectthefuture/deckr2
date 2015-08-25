@@ -53,9 +53,10 @@ class SimpleServer(object):
 
 
 @attr('integration')
-class IntegrationTestCase(TestCase):
+class SinglePlayerTestCase(TestCase):
     """
-    Run integration tests.
+    Integration tests for a single player. Generally, this is more related
+    to the network stack than the gaming stack.
     """
 
     def setUp(self):
