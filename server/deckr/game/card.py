@@ -2,7 +2,10 @@
 This module provides the base code for cards.
 """
 
+import json
+
 from deckr.game.game_object import GameObject
+from deckr.services.service import Service
 
 
 def create_card_from_dict(card_data):
@@ -52,16 +55,28 @@ class Card(GameObject):
         pass
 
 
-class CardLibrary(object):
+class CardLibrary(Service):
     """
     A card library contains all of the cards that can be used, and the ability to create
     instances.
     """
 
-    def __init__(self):
+    def __init__(self, config=None):
         super(CardLibrary, self).__init__()
 
+        if config is None:
+            config = {}
+
         self._cards = {}
+        self._load_file = config.get('load_from', None)
+
+    def start(self):
+        """
+        Load up any cards if configured.
+        """
+
+        if self._load_file:
+            self.load_from_dict(json.load(open(self._load_file)))
 
     def load_from_dict(self, data):
         """
@@ -78,3 +93,10 @@ class CardLibrary(object):
         """
 
         return create_card_from_dict(self._cards[card_name])
+
+    def create_from_list(self, card_list):
+        """
+        A utility method to create cards from a card list.
+        """
+
+        return [self.create(x) for x in card_list]

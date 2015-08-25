@@ -28,6 +28,7 @@ class GameMaster(Service):
 
         # Services
         self._action_validator = None
+        self._card_library = None
 
     def start(self):
         """
@@ -55,6 +56,13 @@ class GameMaster(Service):
 
         self._action_validator = action_validator
 
+    def set_card_library(self, card_library):
+        """
+        Set up the card library.
+        """
+
+        self._card_library = card_library
+
     def create(self, options=None):
         """
         Create a new game. Takes in an optional dictionary for configuration. This will just
@@ -66,7 +74,8 @@ class GameMaster(Service):
 
         game_id = self._next_game_id
         self._next_game_id += 1
-        self._games[game_id] = MagicTheGathering(self._action_validator)
+        self._games[game_id] = MagicTheGathering(
+            self._action_validator, self._card_library)
         return game_id
 
     def destroy(self, game_id):

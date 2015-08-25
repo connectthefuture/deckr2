@@ -67,11 +67,10 @@ class MagicTheGathering(object):
     directly relating to the game.
     """
 
-    def __init__(self, action_validator):
-        self._game_master = None
-
+    def __init__(self, action_validator, card_library):
         # Objects inherited from the game_master
         self.action_validator = action_validator
+        self.card_library = card_library
 
         # Local objects
         self.game_registry = GameRegistry()
@@ -100,7 +99,7 @@ class MagicTheGathering(object):
         # Private bookkeeping
         self._started = False
 
-    def create_player(self, deck_list):
+    def create_player(self, deck_list=None):
         """
         Create a new player and register it with this game.
 

@@ -20,7 +20,8 @@ class MagicTheGatheringTestCase(TestCase):
     def setUp(self):
         self.mock_action_validator = MagicMock()
         self.card_library = MagicMock()
-        self.game = MagicTheGathering(self.mock_action_validator)
+        self.game = MagicTheGathering(
+            self.mock_action_validator, self.card_library)
 
     def test_create_player(self):
         """
@@ -38,6 +39,7 @@ class MagicTheGatheringTestCase(TestCase):
                          player.hand)
         self.assertEqual(self.game.game_registry.lookup(player.graveyard.game_id),
                          player.graveyard)
+
 
 class GameRegistryTestCase(TestCase):
     """

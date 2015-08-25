@@ -33,13 +33,25 @@ class CardLibraryTestCase(TestCase):
 
     def setUp(self):
         self.card_library = CardLibrary()
-
-    def test_load_from_dict(self):
-        """
-        Try to load a card library from a dict and create a card.
-        """
-
         self.card_library.load_from_dict(SIMPLE_CARD_LIBRARY)
+
+    def test_create(self):
+        """
+        Make sure we can create a single card.
+        """
+
         card = self.card_library.create("Forest")
         self.assertIsNotNone(card)
-        self.assertEqual(card.name, "Forest") # We do more extensive checking above
+        # We do more extensive checking above
+        self.assertEqual(card.name, "Forest")
+
+    def test_create_from_card_list(self):
+        """
+        Make sure we can create from a card list.
+        """
+
+        cards = self.card_library.create_from_list(
+            ["Forest", "Forest", "Forest"])
+        self.assertEqual(len(cards), 3)
+        for card in cards:
+            self.assertEqual(card.name, "Forest")
