@@ -99,7 +99,7 @@ class MagicTheGathering(object):
         # Private bookkeeping
         self._started = False
 
-    def create_player(self, deck_list=None):
+    def create_player(self, deck_list):
         """
         Create a new player and register it with this game.
 
@@ -114,6 +114,12 @@ class MagicTheGathering(object):
         self.game_registry.register(player.hand)
         self.game_registry.register(player.library)
         self.game_registry.register(player.graveyard)
+        # Create the deck
+        cards = self.card_library.create_from_list(deck_list)
+        for card in cards:
+            self.game_registry.register(card)
+            player.library.append(card)
+
         return player
 
     def start(self):

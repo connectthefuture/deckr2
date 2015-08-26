@@ -28,7 +28,7 @@ class MagicTheGatheringTestCase(TestCase):
         Make sure we can create a player. It should be registered with the game.
         """
 
-        player = self.game.create_player({})
+        player = self.game.create_player([])
         self.assertIsNotNone(player)
         self.assertTrue(isinstance(player, Player))
         self.assertIn(player, self.game.players)
@@ -39,6 +39,17 @@ class MagicTheGatheringTestCase(TestCase):
                          player.hand)
         self.assertEqual(self.game.game_registry.lookup(player.graveyard.game_id),
                          player.graveyard)
+
+    def test_create_player_deck(self):
+        """
+        Make sure we can create a player and their deck.
+        """
+
+        card = GameObject()
+        self.card_library.create_from_list.return_value = [card]
+        player = self.game.create_player(["Forest"])
+        self.assertIn(card, player.library)
+        self.assertIsNotNone(card.game_id)
 
 
 class GameRegistryTestCase(TestCase):

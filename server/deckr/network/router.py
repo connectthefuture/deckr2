@@ -96,7 +96,9 @@ class Router(object):
 
         game_id = message.join_message.game_id
         game = self._game_master.get_game(game_id)
-        connection.player = game.create_player()
+
+        player_config = message.join_message.player_config
+        connection.player = game.create_player(player_config.deck)
         self.add_to_room(connection, game_id)
 
         response = ServerResponse()

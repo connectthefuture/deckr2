@@ -15,7 +15,7 @@ import util_pb2
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='client_message.proto',
   package='',
-  serialized_pb='\n\x14\x63lient_message.proto\x1a\x11game_action.proto\x1a\nutil.proto\"\x89\x02\n\rClientMessage\x12\x37\n\x0cmessage_type\x18\x01 \x02(\x0e\x32!.ClientMessage.ClientMessageTypes\x12&\n\x0e\x63reate_message\x18\x02 \x01(\x0b\x32\x0e.CreateMessage\x12\"\n\x0cjoin_message\x18\x03 \x01(\x0b\x32\x0c.JoinMessage\x12&\n\x0e\x61\x63tion_message\x18\x04 \x01(\x0b\x32\x0e.ActionMessage\"K\n\x12\x43lientMessageTypes\x12\n\n\x06\x43REATE\x10\x00\x12\x08\n\x04JOIN\x10\x01\x12\n\n\x06\x41\x43TION\x10\x02\x12\t\n\x05LEAVE\x10\x03\x12\x08\n\x04QUIT\x10\x04\"5\n\rCreateMessage\x12\x0f\n\x07variant\x18\x01 \x01(\t\x12\x13\n\x0bmax_players\x18\x02 \x01(\x05\"\x9b\x01\n\x0bJoinMessage\x12\x0f\n\x07game_id\x18\x01 \x02(\x05\x12,\n\x0b\x63lient_type\x18\x02 \x02(\x0e\x32\x17.JoinMessage.ClientType\x12$\n\rplayer_config\x18\x03 \x01(\x0b\x32\r.PlayerConfig\"\'\n\nClientType\x12\n\n\x06PLAYER\x10\x00\x12\r\n\tSPECTATOR\x10\x01\"\xdc\x02\n\rActionMessage\x12.\n\x0b\x61\x63tion_type\x18\x01 \x02(\x0e\x32\x19.ActionMessage.ActionType\x12\x19\n\x04play\x18\x02 \x01(\x0b\x32\x0b.PlayAction\x12)\n\x10\x61\x63tivate_ability\x18\x03 \x01(\x0b\x32\x0f.ActivateAction\x12\x32\n\x11\x64\x65\x63lare_attackers\x18\x04 \x01(\x0b\x32\x17.DeclareAttackersAction\x12\x30\n\x10\x64\x65\x63lare_blockers\x18\x05 \x01(\x0b\x32\x16.DeclareBlockersAction\"o\n\nActionType\x12\t\n\x05START\x10\x00\x12\x08\n\x04PLAY\x10\x01\x12\x0c\n\x08\x41\x43TIVATE\x10\x02\x12\x15\n\x11\x44\x45\x43LARE_ATTACKERS\x10\x03\x12\x14\n\x10\x44\x45\x43LARE_BLOCKERS\x10\x04\x12\x11\n\rPASS_PRIORITY\x10\x05\"k\n\x0cPlayerConfig\x12$\n\x04\x64\x65\x63k\x18\x01 \x03(\x0b\x32\x16.PlayerConfig.CardInfo\x1a\x35\n\x08\x43\x61rdInfo\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\x1b\n\x04meta\x18\x02 \x03(\x0b\x32\r.KeyValuePair')
+  serialized_pb='\n\x14\x63lient_message.proto\x1a\x11game_action.proto\x1a\nutil.proto\"\x89\x02\n\rClientMessage\x12\x37\n\x0cmessage_type\x18\x01 \x02(\x0e\x32!.ClientMessage.ClientMessageTypes\x12&\n\x0e\x63reate_message\x18\x02 \x01(\x0b\x32\x0e.CreateMessage\x12\"\n\x0cjoin_message\x18\x03 \x01(\x0b\x32\x0c.JoinMessage\x12&\n\x0e\x61\x63tion_message\x18\x04 \x01(\x0b\x32\x0e.ActionMessage\"K\n\x12\x43lientMessageTypes\x12\n\n\x06\x43REATE\x10\x00\x12\x08\n\x04JOIN\x10\x01\x12\n\n\x06\x41\x43TION\x10\x02\x12\t\n\x05LEAVE\x10\x03\x12\x08\n\x04QUIT\x10\x04\"5\n\rCreateMessage\x12\x0f\n\x07variant\x18\x01 \x01(\t\x12\x13\n\x0bmax_players\x18\x02 \x01(\x05\"\x9b\x01\n\x0bJoinMessage\x12\x0f\n\x07game_id\x18\x01 \x02(\x05\x12,\n\x0b\x63lient_type\x18\x02 \x02(\x0e\x32\x17.JoinMessage.ClientType\x12$\n\rplayer_config\x18\x03 \x01(\x0b\x32\r.PlayerConfig\"\'\n\nClientType\x12\n\n\x06PLAYER\x10\x00\x12\r\n\tSPECTATOR\x10\x01\"\xdc\x02\n\rActionMessage\x12.\n\x0b\x61\x63tion_type\x18\x01 \x02(\x0e\x32\x19.ActionMessage.ActionType\x12\x19\n\x04play\x18\x02 \x01(\x0b\x32\x0b.PlayAction\x12)\n\x10\x61\x63tivate_ability\x18\x03 \x01(\x0b\x32\x0f.ActivateAction\x12\x32\n\x11\x64\x65\x63lare_attackers\x18\x04 \x01(\x0b\x32\x17.DeclareAttackersAction\x12\x30\n\x10\x64\x65\x63lare_blockers\x18\x05 \x01(\x0b\x32\x16.DeclareBlockersAction\"o\n\nActionType\x12\t\n\x05START\x10\x00\x12\x08\n\x04PLAY\x10\x01\x12\x0c\n\x08\x41\x43TIVATE\x10\x02\x12\x15\n\x11\x44\x45\x43LARE_ATTACKERS\x10\x03\x12\x14\n\x10\x44\x45\x43LARE_BLOCKERS\x10\x04\x12\x11\n\rPASS_PRIORITY\x10\x05\"\x1c\n\x0cPlayerConfig\x12\x0c\n\x04\x64\x65\x63k\x18\x01 \x03(\t')
 
 
 
@@ -296,23 +296,16 @@ _ACTIONMESSAGE = _descriptor.Descriptor(
 )
 
 
-_PLAYERCONFIG_CARDINFO = _descriptor.Descriptor(
-  name='CardInfo',
-  full_name='PlayerConfig.CardInfo',
+_PLAYERCONFIG = _descriptor.Descriptor(
+  name='PlayerConfig',
+  full_name='PlayerConfig',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='name', full_name='PlayerConfig.CardInfo.name', index=0,
-      number=1, type=9, cpp_type=9, label=2,
-      has_default_value=False, default_value=unicode("", "utf-8"),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    _descriptor.FieldDescriptor(
-      name='meta', full_name='PlayerConfig.CardInfo.meta', index=1,
-      number=2, type=11, cpp_type=10, label=3,
+      name='deck', full_name='PlayerConfig.deck', index=0,
+      number=1, type=9, cpp_type=9, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -326,35 +319,8 @@ _PLAYERCONFIG_CARDINFO = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=941,
-  serialized_end=994,
-)
-
-_PLAYERCONFIG = _descriptor.Descriptor(
-  name='PlayerConfig',
-  full_name='PlayerConfig',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='deck', full_name='PlayerConfig.deck', index=0,
-      number=1, type=11, cpp_type=10, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-  ],
-  extensions=[
-  ],
-  nested_types=[_PLAYERCONFIG_CARDINFO, ],
-  enum_types=[
-  ],
-  options=None,
-  is_extendable=False,
-  extension_ranges=[],
   serialized_start=887,
-  serialized_end=994,
+  serialized_end=915,
 )
 
 _CLIENTMESSAGE.fields_by_name['message_type'].enum_type = _CLIENTMESSAGE_CLIENTMESSAGETYPES
@@ -371,9 +337,6 @@ _ACTIONMESSAGE.fields_by_name['activate_ability'].message_type = game_action_pb2
 _ACTIONMESSAGE.fields_by_name['declare_attackers'].message_type = game_action_pb2._DECLAREATTACKERSACTION
 _ACTIONMESSAGE.fields_by_name['declare_blockers'].message_type = game_action_pb2._DECLAREBLOCKERSACTION
 _ACTIONMESSAGE_ACTIONTYPE.containing_type = _ACTIONMESSAGE;
-_PLAYERCONFIG_CARDINFO.fields_by_name['meta'].message_type = util_pb2._KEYVALUEPAIR
-_PLAYERCONFIG_CARDINFO.containing_type = _PLAYERCONFIG;
-_PLAYERCONFIG.fields_by_name['deck'].message_type = _PLAYERCONFIG_CARDINFO
 DESCRIPTOR.message_types_by_name['ClientMessage'] = _CLIENTMESSAGE
 DESCRIPTOR.message_types_by_name['CreateMessage'] = _CREATEMESSAGE
 DESCRIPTOR.message_types_by_name['JoinMessage'] = _JOINMESSAGE
@@ -406,12 +369,6 @@ class ActionMessage(_message.Message):
 
 class PlayerConfig(_message.Message):
   __metaclass__ = _reflection.GeneratedProtocolMessageType
-
-  class CardInfo(_message.Message):
-    __metaclass__ = _reflection.GeneratedProtocolMessageType
-    DESCRIPTOR = _PLAYERCONFIG_CARDINFO
-
-    # @@protoc_insertion_point(class_scope:PlayerConfig.CardInfo)
   DESCRIPTOR = _PLAYERCONFIG
 
   # @@protoc_insertion_point(class_scope:PlayerConfig)

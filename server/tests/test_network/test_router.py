@@ -66,13 +66,14 @@ class RouterTestCase(TestCase):
         message.message_type = ClientMessage.JOIN
         message.join_message.client_type = JoinMessage.PLAYER
         message.join_message.game_id = game_id
+        message.join_message.player_config.deck.append("Forest")
 
         expected_response = ServerResponse()
         expected_response.response_type = ServerResponse.JOIN
 
         self.router.handle_message(message, self.connection)
         self.game_master.get_game.assert_called_with(game_id)
-        self.game.create_player.assert_called_with()
+        self.game.create_player.assert_called_with(["Forest"])
         self.connection.send_response.assert_called_with(expected_response)
 
         # Make sure we were added to the room

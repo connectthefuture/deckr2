@@ -58,10 +58,5 @@ message ActionMessage {
 }
 
 message PlayerConfig {
-    message CardInfo {
-		required string name = 1;
-		repeated KeyValuePair meta = 2;
-	}
-
-	repeated CardInfo deck = 1;
+  repeated string deck = 1;
 }

@@ -26,7 +26,7 @@ class Zone(GameObject):
             obj (object): Object to append to the zone
         """
 
-        pass
+        self._objs.append(obj)
 
     def pop(self, index=0):
         """
@@ -59,3 +59,6 @@ class Zone(GameObject):
             obj (object): Object to remove.
         """
         pass
+
+    def __contains__(self, obj):
+        return obj in self._objs

@@ -45,10 +45,14 @@ class SimpleServer(object):
         """
 
         starter = ServiceStarter()
-        starter.add_service(yaml.load(open('config/services/deckr_server_service.yml')), {})
-        starter.add_service(yaml.load(open('config/services/card_library_service.yml')), {})
-        starter.add_service(yaml.load(open('config/services/action_validator_service.yml')), {})
-        starter.add_service(yaml.load(open('config/services/game_master_service.yml')), {})
+        starter.add_service(
+            yaml.load(open('config/services/deckr_server_service.yml')), {})
+        starter.add_service(
+            yaml.load(open('config/services/card_library_service.yml')), {})
+        starter.add_service(
+            yaml.load(open('config/services/action_validator_service.yml')), {})
+        starter.add_service(
+            yaml.load(open('config/services/game_master_service.yml')), {})
         starter.start()
 
 
