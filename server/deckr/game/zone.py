@@ -28,7 +28,7 @@ class Zone(GameObject):
 
         self._objs.append(obj)
 
-    def pop(self, index=0):
+    def pop(self, index=None):
         """
         Pop an object by index.
 
@@ -38,7 +38,10 @@ class Zone(GameObject):
         Returns:
             object The popped object.
         """
-        pass
+
+        if index is not None:
+            return self._objs.pop(index)
+        return self._objs.pop()
 
     def insert(self, index, obj):
         """
@@ -62,3 +65,6 @@ class Zone(GameObject):
 
     def __contains__(self, obj):
         return obj in self._objs
+
+    def __len__(self):
+        return len(self._objs)

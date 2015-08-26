@@ -133,6 +133,11 @@ class MagicTheGathering(object):
         self.game_state['current_step'] = 'untap'
         self.game_state['current_phase'] = 'beginning'
 
+        # Draw starting hands
+        for player in self.players:
+            for _ in range(7):
+                player.hand.append(player.library.pop())
+
     def update_proto(self, game_state_proto):
         """
         Update a game state proto to reflect the current game state.

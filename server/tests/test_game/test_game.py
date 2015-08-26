@@ -51,6 +51,17 @@ class MagicTheGatheringTestCase(TestCase):
         self.assertIn(card, player.library)
         self.assertIsNotNone(card.game_id)
 
+    def test_start(self):
+        """
+        Make sure that when we start a game each player draws a hand of 7 cards.
+        """
+
+        cards = [GameObject() for _ in range(10)]
+        self.card_library.create_from_list.return_value = cards
+        player = self.game.create_player(["Forest"] * 10)
+        self.game.start()
+        self.assertEqual(len(player.hand), 7)
+
 
 class GameRegistryTestCase(TestCase):
     """
