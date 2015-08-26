@@ -52,7 +52,7 @@ class Zone(GameObject):
             obj (object): Object to insert
         """
 
-        pass
+        self._objs.insert(index, obj)
 
     def remove(self, obj):
         """
@@ -61,10 +61,14 @@ class Zone(GameObject):
         Args:
             obj (object): Object to remove.
         """
-        pass
+
+        self._objs.remove(obj)
 
     def __contains__(self, obj):
         return obj in self._objs
 
     def __len__(self):
         return len(self._objs)
+
+    def __getitem__(self, key):
+        return self._objs[key]
