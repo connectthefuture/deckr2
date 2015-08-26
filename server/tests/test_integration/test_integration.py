@@ -13,6 +13,7 @@ from nose.plugins.attrib import attr
 from deckr.services.service_starter import ServiceStarter
 from proto.server_response_pb2 import ServerResponse
 from tests.test_integration.simple_client import SimpleClient
+from tests.utils import SIMPLE_CARD_LIBRARY
 
 
 class SimpleServer(object):
@@ -48,7 +49,8 @@ class SimpleServer(object):
         starter.add_service(
             yaml.load(open('config/services/deckr_server_service.yml')), {})
         starter.add_service(
-            yaml.load(open('config/services/card_library_service.yml')), {})
+            yaml.load(open('config/services/card_library_service.yml')),
+            {'library': SIMPLE_CARD_LIBRARY})
         starter.add_service(
             yaml.load(open('config/services/action_validator_service.yml')), {})
         starter.add_service(
@@ -106,7 +108,8 @@ class SinglePlayerTestCase(TestCase):
 
         self.client.create()
         response = self._check_response()
-        self.client.join(response.create_response.game_id, deck=["Forest"] * 10)
+        self.client.join(response.create_response.game_id,
+                         deck=["Forest"] * 10)
         response = self._check_response()
         self.client.start()
         response = self._check_response()

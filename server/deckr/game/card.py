@@ -69,6 +69,9 @@ class CardLibrary(Service):
 
         self._cards = {}
         self._load_file = config.get('load_from', None)
+        library = config.get('library', None)
+        if library:
+            self.load_from_dict(library)
 
     def start(self):
         """
