@@ -36,7 +36,6 @@ class ZoneAsContainerTestCase(TestCase):
             count += 1
         self.assertEqual(count, 2)
 
-
     def test_modification(self):
         """
         Make sure we can modify the zone with append, pop, insert, and remove.

@@ -10,6 +10,7 @@ from mock import MagicMock
 from deckr.game.game import GameRegistry, MagicTheGathering
 from deckr.game.game_object import GameObject
 from deckr.game.player import Player
+import proto.game_pb2 as game_proto
 
 
 class MagicTheGatheringTestCase(TestCase):
@@ -63,6 +64,28 @@ class MagicTheGatheringTestCase(TestCase):
         self.game.start()
         self.assertEqual(len(player1.hand), 7)
         self.assertEqual(len(player2.hand), 7)
+
+    def test_update_proto(self):
+        """
+        Make sure that we properly update the game state proto.
+        """
+
+        proto = game_proto.GameState()
+        mock_game_object = GameObject()
+        mock_game_object.update_proto = MagicMock()
+
+        # Set up the game
+        self.game.game_state = {
+            'current_step': 'untap',
+            'current_phase': 'beginning'
+        }
+        self.game.game_registry.register(mock_game_object)
+
+        self.game.update_proto(proto)
+        self.assertEqual(proto.current_step, 'untap')
+        self.assertEqual(proto.current_phase, 'beginning')
+        self.assertTrue(mock_game_object.update_proto.called)
+        self.assertEqual(len(proto.game_objects), 4)
 
 
 class GameRegistryTestCase(TestCase):

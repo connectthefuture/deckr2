@@ -60,6 +60,12 @@ class GameRegistry(object):
 
         return self._game_objects[game_id]
 
+    def __getitem__(self, key):
+        return self.lookup(key)
+
+    def __iter__(self):
+        return self._game_objects.values().__iter__()
+
 
 class MagicTheGathering(object):
     """
@@ -146,3 +152,6 @@ class MagicTheGathering(object):
         # Grab the simple global stuff
         game_state_proto.current_step = self.game_state['current_step']
         game_state_proto.current_phase = self.game_state['current_phase']
+        for obj in self.game_registry:
+            proto = game_state_proto.game_objects.add()
+            obj.update_proto(proto)
