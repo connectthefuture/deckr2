@@ -106,7 +106,7 @@ class SinglePlayerTestCase(TestCase):
 
         self.client.create()
         response = self._check_response()
-        self.client.join(response.create_response.game_id)
+        self.client.join(response.create_response.game_id, deck=["Forest"] * 10)
         response = self._check_response()
         self.client.start()
         response = self._check_response()

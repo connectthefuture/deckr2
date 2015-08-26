@@ -83,7 +83,7 @@ class SimpleClient(object):
         message.message_type = ClientMessage.CREATE
         self.send_message(message)
 
-    def join(self, game_id, client_type=JoinMessage.PLAYER):
+    def join(self, game_id, client_type=JoinMessage.PLAYER, deck=None):
         """
         Send a join message.
         """
@@ -92,6 +92,9 @@ class SimpleClient(object):
         message.message_type = ClientMessage.JOIN
         message.join_message.game_id = game_id
         message.join_message.client_type = client_type
+        if deck is not None:
+            for card in deck:
+                message.join_message.player_config.deck.append(card)
         self.send_message(message)
 
     def quit(self):
