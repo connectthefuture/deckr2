@@ -4,6 +4,7 @@ Test the zone.
 
 from unittest import TestCase
 
+import proto.game_pb2 as proto_lib
 from deckr.game.game_object import GameObject
 from deckr.game.zone import Zone
 
@@ -15,9 +16,14 @@ class ZoneAsContainerTestCase(TestCase):
 
     def setUp(self):
         self.zone = Zone("test_zone", None)
+        self.zone.game_id = 0
         self.object1 = GameObject()
         self.object2 = GameObject()
         self.object3 = GameObject()
+
+        self.object1.game_id = 1
+        self.object2.game_id = 2
+        self.object3.game_id = 3
 
     def test_magic(self):
         """
@@ -59,3 +65,18 @@ class ZoneAsContainerTestCase(TestCase):
 
         self.zone.remove(self.object1)
         self.assertNotIn(self.object1, self.zone)
+
+    def test_update_proto(self):
+        """
+        Make sure we can properly update a protobuf.
+        """
+
+        proto = proto_lib.GameObject()
+        self.zone.append(self.object1)
+        self.zone.append(self.object2)
+        self.zone.update_proto(proto)
+
+        self.assertEqual(proto.game_object_type, proto_lib.GameObject.ZONE)
+        self.assertEqual(len(proto.zone.objs), 2)
+        self.assertIn(self.object1.game_id, proto.zone.objs)
+        self.assertIn(self.object2.game_id, proto.zone.objs)

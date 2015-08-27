@@ -20,4 +20,4 @@ class GameObject(object):
 
         # TODO: Make this raise notimplementederror and actually implement
         # in subcalsses.
-        proto.game_object_type = proto_lib.GameObject.CARD
+        proto.game_id = self.game_id

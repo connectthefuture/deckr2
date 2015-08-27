@@ -2,6 +2,7 @@
 This module provides the code for zones.
 """
 
+import proto.game_pb2 as proto_lib
 from deckr.game.game_object import GameObject
 
 
@@ -63,6 +64,18 @@ class Zone(GameObject):
         """
 
         self._objs.remove(obj)
+
+    def update_proto(self, proto):
+        """
+        Update a protobuff.
+        """
+
+        super(Zone, self).update_proto(proto)
+        proto.game_object_type = proto_lib.GameObject.ZONE
+
+        for obj in self._objs:
+            assert obj.game_id is not None
+            proto.zone.objs.append(obj.game_id)
 
     def __contains__(self, obj):
         return obj in self._objs
