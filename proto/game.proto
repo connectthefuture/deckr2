@@ -25,9 +25,9 @@ message GameObject {
 }
 
 message Player {
-    required Zone hand = 1;
-    required Zone graveyard = 2;
-    required Zone library = 3;
+    required int32 hand = 1;
+    required int32 graveyard = 2;
+    required int32 library = 3;
     required int32 life = 4;
 }
 

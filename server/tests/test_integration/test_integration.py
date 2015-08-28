@@ -113,3 +113,5 @@ class SinglePlayerTestCase(TestCase):
         response = self._check_response()
         self.client.start()
         response = self._check_response()
+        # Check the starting hand
+        game_state = response.game_state_response.game_state

@@ -2,6 +2,7 @@
 This module provides the code for Players.
 """
 
+import proto.game_pb2 as proto_lib
 from deckr.game.game_object import GameObject
 from deckr.game.zone import Zone
 
@@ -67,3 +68,15 @@ class Player(GameObject):
         """
 
         pass
+
+    def update_proto(self, proto):
+        """
+        Update a player proto.
+        """
+
+        super(Player, self).update_proto(proto)
+        proto.game_object_type = proto_lib.GameObject.PLAYER
+        proto.player.graveyard = self.graveyard.game_id
+        proto.player.library = self.library.game_id
+        proto.player.hand = self.hand.game_id
+        proto.player.life = self.life

@@ -4,6 +4,7 @@ This module provides the base code for cards.
 
 import json
 
+import proto.game_pb2 as proto_lib
 from deckr.game.game_object import GameObject
 from deckr.services.service import Service
 
@@ -53,6 +54,15 @@ class Card(GameObject):
         """
 
         pass
+
+    def update_proto(self, proto):
+        """
+        Update a protobuf.
+        """
+
+        super(Card, self).update_proto(proto)
+        proto.game_object_type = proto_lib.GameObject.CARD
+
 
 
 class CardLibrary(Service):
