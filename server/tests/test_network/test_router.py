@@ -125,3 +125,15 @@ class RouterTestCase(TestCase):
 
         self.router.handle_message(message, self.connection)
         self.game.start.assert_called_with()
+
+    def test_pass_priority(self):
+        """
+        Make sure a pass priority action is properly relayed.
+        """
+
+        message = ClientMessage()
+        message.message_type = ClientMessage.ACTION
+        message.action_message.action_type = ActionMessage.PASS_PRIORITY
+        self._create_and_join_game()
+        self.router.handle_message(message, self.connection)
+        self.connection.player.pass_priority.assert_called_with()

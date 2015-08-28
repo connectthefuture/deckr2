@@ -80,7 +80,7 @@ class MagicTheGathering(object):
 
         # Local objects
         self.game_registry = GameRegistry()
-        self.game_loop = GameLoop()
+        self.game_loop = GameLoop(self)
 
         # Each game has a set of shared zones
         self.battlefield = Zone('battlefield', None)
@@ -127,6 +127,18 @@ class MagicTheGathering(object):
             player.library.append(card)
 
         return player
+
+    def next_player(self, player):
+        """
+        Returns the next player in turn order.
+        """
+
+        assert player in self.players
+        index = self.players.index(player)
+        if index == len(self.players) - 1:
+            return self.players[0]
+        else:
+            return self.players[index + 1]
 
     def start(self):
         """

@@ -67,7 +67,7 @@ class Player(GameObject):
         Pass priority to the next player.
         """
 
-        pass
+        self.game.game_loop.pass_priority()
 
     def update_proto(self, proto):
         """

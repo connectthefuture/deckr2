@@ -127,6 +127,8 @@ class Router(object):
 
         if message.action_type == ActionMessage.START:
             game.start()
+        elif message.action_type == ActionMessage.PASS_PRIORITY:
+            player.pass_priority()
 
         # Assuming the action was completed, we broadcast the current state
         # to all clients.
