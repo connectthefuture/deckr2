@@ -59,8 +59,11 @@ class RouterTestCase(TestCase):
         """
 
         game_id = 0
+        player = MagicMock()
         self.router.create_room(game_id, None)
         self.game_master.get_game.return_value = self.game
+        self.game.create_player.return_value = player
+        player.game_id = 1
 
         message = ClientMessage()
         message.message_type = ClientMessage.JOIN
@@ -70,6 +73,7 @@ class RouterTestCase(TestCase):
 
         expected_response = ServerResponse()
         expected_response.response_type = ServerResponse.JOIN
+        expected_response.join_response.player_id = player.game_id
 
         self.router.handle_message(message, self.connection)
         self.game_master.get_game.assert_called_with(game_id)

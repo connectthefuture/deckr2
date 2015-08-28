@@ -11,9 +11,32 @@ import yaml
 from nose.plugins.attrib import attr
 
 from deckr.services.service_starter import ServiceStarter
+from proto.game_pb2 import GameObject
 from proto.server_response_pb2 import ServerResponse
 from tests.test_integration.simple_client import SimpleClient
 from tests.utils import SIMPLE_CARD_LIBRARY
+
+
+def parse_game_state(game_state):
+    """
+    Parse the game state into something with a little more structure.
+    """
+
+    players = {x.game_id : x.player for x in game_state.game_objects
+               if x.game_object_type == GameObject.PLAYER}
+    zones = {x.game_id : x.zone for x in game_state.game_objects
+             if x.game_object_type == GameObject.ZONE}
+    cards = {x.game_id : x.card for x in game_state.game_objects
+             if x.game_object_type == GameObject.CARD}
+    game = {}
+
+    for game_id, player in players.items():
+        game[game_id] = {
+            'library': zones[player.library].objs,
+            'graveyard': zones[player.graveyard].objs,
+            'hand': zones[player.hand].objs
+        }
+    return game
 
 
 class SimpleServer(object):
@@ -111,7 +134,9 @@ class SinglePlayerTestCase(TestCase):
         self.client.join(response.create_response.game_id,
                          deck=["Forest"] * 10)
         response = self._check_response()
+        player = response.join_response.player_id
         self.client.start()
         response = self._check_response()
         # Check the starting hand
-        game_state = response.game_state_response.game_state
+        game_state = parse_game_state(response.game_state_response.game_state)
+        self.assertEqual(len(game_state[player]['hand']), 7)

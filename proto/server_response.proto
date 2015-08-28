@@ -16,9 +16,10 @@ message ServerResponse {
     required ServerResponseType response_type = 1;
 
     optional CreateResponse create_response = 2;
-    optional ErrorResponse error_response = 3;
-    optional GameStateResponse game_state_response = 4;
-    optional GameUpdateResponse game_update_response = 5;
+    optional JoinResponse join_response = 3;
+    optional ErrorResponse error_response = 4;
+    optional GameStateResponse game_state_response = 5;
+    optional GameUpdateResponse game_update_response = 6;
 }
 
 // Next Field: 2
@@ -34,6 +35,10 @@ message ErrorResponse {
 
 message GameStateResponse {
     required GameState game_state = 1;
+}
+
+message JoinResponse {
+    required int32 player_id = 1;
 }
 
 // Update a single game object instead of the entire state. If the game_object

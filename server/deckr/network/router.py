@@ -103,6 +103,7 @@ class Router(object):
 
         response = ServerResponse()
         response.response_type = ServerResponse.JOIN
+        response.join_response.player_id = connection.player.game_id
         connection.send_response(response)
 
     def _handle_leave(self, message, connection):
