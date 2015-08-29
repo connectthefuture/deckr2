@@ -63,7 +63,7 @@ class Connection(twisted.protocols.basic.LineReceiver):
         # to kill the connection. Hopefully we don't hit this very often.
         try:
             self._router.handle_message(decoded_message, self)
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             LOGGER.exception("Encountered unexpected exception")
             # Potentially hide this behind a debug flag.
             self.send_error(traceback.format_exc())

@@ -4,7 +4,6 @@ and send messages from the client to the server with expected responses.
 """
 
 import multiprocessing
-import time
 import unittest
 
 import nose.plugins.attrib

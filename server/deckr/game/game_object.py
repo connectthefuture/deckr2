@@ -2,8 +2,6 @@
 This module provides the base GameObject and the Zone and Ability game objects
 """
 
-import proto.game_pb2 as proto_lib
-
 
 class GameObject(object):
     """
@@ -18,6 +16,4 @@ class GameObject(object):
         Get a protobuf representation of this game object.
         """
 
-        # TODO: Make this raise notimplementederror and actually implement
-        # in subcalsses.
         proto.game_id = self.game_id

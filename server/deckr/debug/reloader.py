@@ -10,7 +10,6 @@ Note:
     if you want a full shutdown.
 """
 
-
 import logging
 import multiprocessing
 import os.path
@@ -59,7 +58,8 @@ class ReloadingServiceWrapper(deckr.core.service_wrapper.ServiceWrapper):
         time.sleep(0.1)  # Make sure we give the proxy time to start up.
 
         self._instance = xmlrpclib.ServerProxy(
-            "http://localhost:%d/" % self._port, allow_none=True)
+            "http://localhost:%d/" % self._port,
+            allow_none=True)
         self._watcher_thread = threading.Thread(
             target=self._file_watcher.watch)
         self._watcher_thread.start()
@@ -86,7 +86,9 @@ class ReloadingServiceWrapper(deckr.core.service_wrapper.ServiceWrapper):
         instance = super(ReloadingServiceWrapper, self).create()
         LOGGER.info("Starting XMLRPCServer on localhost:%s", self._port)
         server = SimpleXMLRPCServer.SimpleXMLRPCServer(
-            ("localhost", self._port), allow_none=True, logRequests=False)
+            ("localhost", self._port),
+            allow_none=True,
+            logRequests=False)
         server.register_instance(instance)
         server.serve_forever()
 

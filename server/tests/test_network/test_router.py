@@ -61,7 +61,7 @@ class RouterTestCase(unittest.TestCase):
         player = mock.MagicMock()
         self.router.create_room(game_id, None)
         self.game_master.get_game.return_value = self.game
-        self.game.create_player.return_value = player
+        self.game.player_manager.create_player.return_value = player
         player.game_id = 1
 
         message = proto.client_message_pb2.ClientMessage()
@@ -76,7 +76,7 @@ class RouterTestCase(unittest.TestCase):
 
         self.router.handle_message(message, self.connection)
         self.game_master.get_game.assert_called_with(game_id)
-        self.game.create_player.assert_called_with(["Forest"])
+        self.game.player_manager.create_player.assert_called_with(["Forest"])
         self.connection.send_response.assert_called_with(expected_response)
 
         # Make sure we were added to the room

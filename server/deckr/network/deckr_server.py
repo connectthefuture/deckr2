@@ -48,9 +48,11 @@ class DeckrServer(deckr.core.service.Service):
             LOGGER.info("Starting with websocket support")
             self._factory = txsockjs.factory.SockJSFactory(self._factory)
 
-        twisted.internet.endpoints.serverFromString(twisted.internet.reactor, "tcp:%d" %
-                                                    self._port).listen(self._factory)
-        LOGGER.info('Starting the DeckrServer listening on port %d', self._port)
+        twisted.internet.endpoints.serverFromString(
+            twisted.internet.reactor,
+            "tcp:%d" % self._port).listen(self._factory)
+        LOGGER.info('Starting the DeckrServer listening on port %d',
+                    self._port)
         twisted.internet.reactor.run()
 
     def stop(self):

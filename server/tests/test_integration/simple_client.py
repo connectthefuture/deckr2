@@ -34,15 +34,15 @@ class SimpleClient(object):
 
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         retry_count = 0
-        while(True):
+        while True:
             try:
                 self._socket.connect((self._ip, self._port))
                 break
-            except IOError as e:  # Retry if we can't connect.
+            except IOError as ex:  # Retry if we can't connect.
                 retry_count += 1
                 if retry_count >= retry:
                     print str(retry_count) + "retry attempts failed"
-                    raise e
+                    raise ex
                 time.sleep(0.1)
 
         if not sync:
@@ -66,7 +66,7 @@ class SimpleClient(object):
         while True:
             data = self._socket.recv(BUFFER_SIZE)
             if not data:
-                print("Connection closed")
+                print "Connection closed"
                 return
             self._buffer += data
             if '\r\n' in self._buffer:
@@ -74,7 +74,7 @@ class SimpleClient(object):
                 response = proto.server_response_pb2.ServerResponse()
                 response.ParseFromString(data)
                 if listen_forever:
-                    print(response)
+                    print response
                 else:
                     return response
 
@@ -94,7 +94,9 @@ class SimpleClient(object):
         message.message_type = proto.client_message_pb2.ClientMessage.CREATE
         self.send_message(message)
 
-    def join(self, game_id, client_type=proto.client_message_pb2.JoinMessage.PLAYER, deck=None):
+    def join(self, game_id,
+             client_type=proto.client_message_pb2.JoinMessage.PLAYER,
+             deck=None):
         """
         Send a join message.
         """
