@@ -70,7 +70,46 @@ class TurnManagerTestCase(unittest.TestCase):
     """
 
     def setUp(self):
-        self.turn_manager = deckr.game.game.TurnManager()
+        self.game = mock.MagicMock()
+        self.player1 = mock.MagicMock()
+        self.player2 = mock.MagicMock()
+
+        self.turn_manager = deckr.game.game.TurnManager(self.game)
+
+        def fake_next_player(player):
+            """Fake call to next player."""
+            return self.player2 if player == self.player1 else self.player1
+        self.game.player_manager.next_player.side_effect = fake_next_player
+
+        self.turn_manager.phase = 'beginning'
+        self.turn_manager.step = 'upkeep'
+        self.turn_manager.active_player = self.player1
+        self.turn_manager.priority_player = self.player1
+
+    def assert_turn_state(self, step, phase, active, priority):
+        """
+        Assert on the step, phase, active and priority players.
+        """
+
+        self.assertEqual(self.turn_manager.step, step)
+        self.assertEqual(self.turn_manager.phase, phase)
+        self.assertEqual(self.turn_manager.active_player, active)
+        self.assertEqual(self.turn_manager.priority_player, priority)
+
+    def test_full_turn(self):
+        """
+        Test a full turn.
+        """
+
+        self.turn_manager.advance()
+        self.assert_turn_state('upkeep', 'beginning', self.player1, self.player2)
+        self.turn_manager.advance()
+        self.assert_turn_state('draw', 'beginning', self.player1, self.player1)
+        self.turn_manager.advance()
+        self.assert_turn_state('draw', 'beginning', self.player1, self.player2)
+        self.turn_manager.advance()
+        self.assert_turn_state('precombat main', 'precombat main', self.player1, self.player1)
+
 
 
 class MagicTheGatheringTestCase(unittest.TestCase):
@@ -94,8 +133,8 @@ class MagicTheGatheringTestCase(unittest.TestCase):
         mock_game_object.update_proto = mock.MagicMock()
 
         # Set up the game
-        self.game.turn_manager.current_step = 'untap'
-        self.game.turn_manager.current_phase = 'beginning'
+        self.game.turn_manager.step = 'untap'
+        self.game.turn_manager.phase = 'beginning'
         self.game.registry.register(mock_game_object)
 
         self.game.update_proto(proto)

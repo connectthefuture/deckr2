@@ -118,26 +118,84 @@ class PlayerManager(object):
         for player in self.players:
             player.start()
 
+    def first_player(self):
+        """
+        Get the first player.
+        """
+
+        return self.players[0]
+
 
 class TurnManager(object):
     """
     Manage the turn (phase, priority player, etc.).
     """
 
-    def __init__(self):
-        self.current_step = None
-        self.current_phase = None
+    PHASES = {
+        'beginning': [
+            'untap',
+            'upkeep',
+            'draw'
+        ],
+        'precombat main': [
+            'precombat main'
+        ]
+    }
+    PHASE_ORDER = ['beginning', 'precombat main']
+
+    def __init__(self, game):
+        self.step = None
+        self.phase = None
+        self.priority_player = None
+        self.active_player = None
+
+        self._game = game
 
     def start(self):
         """
         Called to start the game.
         """
 
-        self.current_step = 'untap'
-        self.current_phase = 'beginning'
+        self.step = 'untap'
+        self.phase = 'beginning'
+        self.active_player = self._game.player_manager.first_player()
+        self.priority_player = self.active_player
+
+    def advance(self):
+        """
+        Advance the turn. Either change priority, change step, change phase,
+        or change active player (or all).
+        """
+
+        next_player = self._game.player_manager.next_player(self.priority_player)
+        if next_player == self.active_player:
+            self._next_step()
+
+        self.priority_player = next_player
+
+    def _next_step(self):
+        """
+        Advance to the next step.
+        """
+
+        if self.step == self.PHASES[self.phase][-1]:
+            self._next_phase()
+        else:
+            steps = self.PHASES[self.phase]
+            self.step = steps[steps.index(self.step) + 1]
+
+    def _next_phase(self):
+        """
+        Advance to the next phase.
+        """
+
+        self.phase = self.PHASE_ORDER[self.PHASE_ORDER.index(self.phase) + 1]
+        self.step = self.PHASES[self.phase][0]
 
 
-class MagicTheGathering(object):
+
+
+class MagicTheGathering(object): # pylint: disable=too-many-instance-attributes
     """
     This is the actual game class. Really this should just coordinate conversation between
     various subclasses. Almost all of the logic should be kept out of this class.
@@ -151,7 +209,7 @@ class MagicTheGathering(object):
         # Local objects
         self.registry = GameRegistry()
         self.player_manager = PlayerManager(self)
-        self.turn_manager = TurnManager()
+        self.turn_manager = TurnManager(self)
 
         # Each game has a set of shared zones
         self.battlefield = deckr.game.zone.Zone('battlefield', None)
@@ -183,8 +241,8 @@ class MagicTheGathering(object):
         """
 
         # Grab the simple global stuff
-        game_state_proto.current_step = self.turn_manager.current_step
-        game_state_proto.current_phase = self.turn_manager.current_phase
+        game_state_proto.current_step = self.turn_manager.step
+        game_state_proto.current_phase = self.turn_manager.phase
         for obj in self.registry:
             proto = game_state_proto.game_objects.add()
             obj.update_proto(proto)

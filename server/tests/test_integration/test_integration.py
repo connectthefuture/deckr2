@@ -16,6 +16,23 @@ import tests.test_integration.simple_client
 import tests.utils
 
 
+def start_server():
+    """
+    Start a lightweight server.
+    """
+    
+    starter = deckr.core.service.ServiceStarter()
+    starter.add_service(
+        yaml.load(open('config/services/deckr_server_service.yml')), {})
+    starter.add_service(
+        yaml.load(open('config/services/card_library_service.yml')),
+        {'library': tests.utils.SIMPLE_CARD_LIBRARY})
+    starter.add_service(
+        yaml.load(open('config/services/action_validator_service.yml')), {})
+    starter.add_service(
+        yaml.load(open('config/services/game_master_service.yml')), {})
+    starter.start()
+
 def parse_game_state(game_state):
     """
     Parse the game state into something with a little more structure.
@@ -25,8 +42,8 @@ def parse_game_state(game_state):
                if x.game_object_type == proto.game_pb2.GameObject.PLAYER}
     zones = {x.game_id: x.zone for x in game_state.game_objects
              if x.game_object_type == proto.game_pb2.GameObject.ZONE}
-    cards = {x.game_id: x.card for x in game_state.game_objects
-             if x.game_object_type == proto.game_pb2.GameObject.CARD}
+    # cards = {x.game_id: x.card for x in game_state.game_objects
+    #         if x.game_object_type == proto.game_pb2.GameObject.CARD}
     game = {}
 
     for game_id, player in players.items():
@@ -52,7 +69,7 @@ class SimpleServer(object):
         """
 
         self._server_process = multiprocessing.Process(
-            target=self._start_server)
+            target=start_server)
         self._server_process.start()
 
     def stop(self):
@@ -61,24 +78,6 @@ class SimpleServer(object):
         """
 
         self._server_process.terminate()
-
-    def _start_server(self):
-        """
-        Actually start the server. Main target for multiprocessing.
-        """
-
-        starter = deckr.core.service.ServiceStarter()
-        starter.add_service(
-            yaml.load(open('config/services/deckr_server_service.yml')), {})
-        starter.add_service(
-            yaml.load(open('config/services/card_library_service.yml')),
-            {'library': tests.utils.SIMPLE_CARD_LIBRARY})
-        starter.add_service(
-            yaml.load(open('config/services/action_validator_service.yml')), {})
-        starter.add_service(
-            yaml.load(open('config/services/game_master_service.yml')), {})
-        starter.start()
-
 
 @nose.plugins.attrib.attr('integration')
 class SinglePlayerTestCase(unittest.TestCase):
