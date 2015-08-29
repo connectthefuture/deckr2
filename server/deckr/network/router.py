@@ -98,7 +98,8 @@ class Router(object):
         game = self._game_master.get_game(game_id)
 
         player_config = message.join_message.player_config
-        connection.player = game.create_player(player_config.deck)
+        connection.player = game.player_manager.create_player(
+            player_config.deck)
         self.add_to_room(connection, game_id)
 
         response = proto.server_response_pb2.ServerResponse()

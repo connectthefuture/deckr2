@@ -25,6 +25,14 @@ class Player(deckr.game.game_object.GameObject):
 
         self._game = game
 
+    def start(self):
+        """
+        Start the game. Draw the initial hand of 7 cards.
+        """
+
+        for _ in range(7):
+            self.hand.append(self.library.pop())
+
     def play_card(self, card):
         """
         Play a card. This will either put the card directly onto the field

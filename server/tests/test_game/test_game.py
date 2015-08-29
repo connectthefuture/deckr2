@@ -12,6 +12,67 @@ import mock
 import proto.game_pb2 as game_proto
 
 
+class PlayerManagerTestCase(unittest.TestCase):
+    """
+    Test the player manager.
+    """
+
+    def setUp(self):
+        self.game = mock.MagicMock()
+        self.player_manager = deckr.game.game.PlayerManager(self.game)
+
+    def assert_registered(self, obj):
+        """
+        Assert that an object was registered with the game.
+        """
+
+        self.game.registry.register.assert_any_call(obj)
+
+    def test_create_player(self):
+        """
+        Make sure we can create a player. It should be registered with the game.
+        """
+
+        player = self.player_manager.create_player([])
+        self.assertIsNotNone(player)
+        self.assertTrue(isinstance(player, deckr.game.player.Player))
+        self.assertIn(player, self.player_manager.players)
+        self.assert_registered(player)
+        self.assert_registered(player.hand)
+        self.assert_registered(player.library)
+        self.assert_registered(player.graveyard)
+
+    def test_create_player_deck(self):
+        """
+        Make sure we can create a player and their deck.
+        """
+
+        card = deckr.game.game_object.GameObject()
+        self.game.card_library.create_from_list.return_value = [card]
+        player = self.player_manager.create_player(["Forest"])
+        self.assertIn(card, player.library)
+        self.assert_registered(card)
+
+    def test_start(self):
+        """
+        Make sure we properly start each player.
+        """
+
+        player = self.player_manager.create_player([])
+        player.start = mock.MagicMock()
+        self.player_manager.start()
+        player.start.assert_called_with()
+
+
+class TurnManagerTestCase(unittest.TestCase):
+    """
+    Test the turn manager.
+    """
+
+    def setUp(self):
+        self.turn_manager = deckr.game.game.TurnManager()
+
+
 class MagicTheGatheringTestCase(unittest.TestCase):
     """
     Test the core game logic
@@ -23,47 +84,6 @@ class MagicTheGatheringTestCase(unittest.TestCase):
         self.game = deckr.game.game.MagicTheGathering(
             self.mock_action_validator, self.card_library)
 
-    def test_create_player(self):
-        """
-        Make sure we can create a player. It should be registered with the game.
-        """
-
-        player = self.game.create_player([])
-        self.assertIsNotNone(player)
-        self.assertTrue(isinstance(player, deckr.game.player.Player))
-        self.assertIn(player, self.game.players)
-        self.assertEqual(
-            player, self.game.game_registry.lookup(player.game_id))
-        # All player zones should be registered
-        self.assertEqual(self.game.game_registry.lookup(player.hand.game_id),
-                         player.hand)
-        self.assertEqual(self.game.game_registry.lookup(player.graveyard.game_id),
-                         player.graveyard)
-
-    def test_create_player_deck(self):
-        """
-        Make sure we can create a player and their deck.
-        """
-
-        card = deckr.game.game_object.GameObject()
-        self.card_library.create_from_list.return_value = [card]
-        player = self.game.create_player(["Forest"])
-        self.assertIn(card, player.library)
-        self.assertIsNotNone(card.game_id)
-
-    def test_starting_hand(self):
-        """
-        Make sure that when we start a game each player draws a hand of 7 cards.
-        """
-
-        cards = [deckr.game.game_object.GameObject() for _ in range(10)]
-        self.card_library.create_from_list.return_value = cards
-        player1 = self.game.create_player(["Forest"] * 10)
-        player2 = self.game.create_player(["Forest"] * 10)
-        self.game.start()
-        self.assertEqual(len(player1.hand), 7)
-        self.assertEqual(len(player2.hand), 7)
-
     def test_update_proto(self):
         """
         Make sure that we properly update the game state proto.
@@ -74,11 +94,9 @@ class MagicTheGatheringTestCase(unittest.TestCase):
         mock_game_object.update_proto = mock.MagicMock()
 
         # Set up the game
-        self.game.game_state = {
-            'current_step': 'untap',
-            'current_phase': 'beginning'
-        }
-        self.game.game_registry.register(mock_game_object)
+        self.game.turn_manager.current_step = 'untap'
+        self.game.turn_manager.current_phase = 'beginning'
+        self.game.registry.register(mock_game_object)
 
         self.game.update_proto(proto)
         self.assertEqual(proto.current_step, 'untap')

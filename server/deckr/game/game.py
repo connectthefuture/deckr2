@@ -5,7 +5,6 @@ container.
 
 import logging
 
-import deckr.game.game_loop
 import deckr.game.game_object
 import deckr.game.player
 import deckr.game.zone
@@ -67,43 +66,14 @@ class GameRegistry(object):
         return self._game_objects.values().__iter__()
 
 
-class MagicTheGathering(object):
+class PlayerManager(object):
     """
-    This is the actual game class. Most of the logic is kept out of this class except things
-    directly relating to the game.
+    Manage players.
     """
 
-    def __init__(self, action_validator, card_library):
-        # Objects inherited from the game_master
-        self.action_validator = action_validator
-        self.card_library = card_library
-
-        # Local objects
-        self.game_registry = GameRegistry()
-        self.game_loop = deckr.game.game_loop.GameLoop(self)
-
-        # Each game has a set of shared zones
-        self.battlefield = deckr.game.zone.Zone('battlefield', None)
-        self.exile = deckr.game.zone.Zone('exile', None)
-        self.stack = deckr.game.zone.Zone('stack', None)
+    def __init__(self, game):
         self.players = []
-
-        # Global game stat that doesn't really belong elsewhere.
-        self.game_state = {
-            'current_phase': None,
-            'current_step': None,
-            'active_player': None,
-            'priority_player': None,
-            'turn_number': 1
-        }
-
-        # Register all game objects
-        self.game_registry.register(self.battlefield)
-        self.game_registry.register(self.exile)
-        self.game_registry.register(self.stack)
-
-        # Private bookkeeping
-        self._started = False
+        self._game = game
 
     def create_player(self, deck_list):
         """
@@ -114,18 +84,18 @@ class MagicTheGathering(object):
         """
 
         player = deckr.game.player.Player(self)
-        self.game_registry.register(player)
-        self.players.append(player)
-        # Register zones
-        self.game_registry.register(player.hand)
-        self.game_registry.register(player.library)
-        self.game_registry.register(player.graveyard)
-        # Create the deck
-        cards = self.card_library.create_from_list(deck_list)
-        for card in cards:
-            self.game_registry.register(card)
-            player.library.append(card)
 
+        self.players.append(player)
+        # Register the player zones and cards
+        self._game.registry.register(player)
+        self._game.registry.register(player.hand)
+        self._game.registry.register(player.library)
+        self._game.registry.register(player.graveyard)
+        # Create the deck
+        cards = self._game.card_library.create_from_list(deck_list)
+        for card in cards:
+            self._game.registry.register(card)
+            player.library.append(card)
         return player
 
     def next_player(self, player):
@@ -142,19 +112,70 @@ class MagicTheGathering(object):
 
     def start(self):
         """
+        Start the game. Lock out any further players.
+        """
+
+        for player in self.players:
+            player.start()
+
+
+class TurnManager(object):
+    """
+    Manage the turn (phase, priority player, etc.).
+    """
+
+    def __init__(self):
+        self.current_step = None
+        self.current_phase = None
+
+    def start(self):
+        """
+        Called to start the game.
+        """
+
+        self.current_step = 'untap'
+        self.current_phase = 'beginning'
+
+
+class MagicTheGathering(object):
+    """
+    This is the actual game class. Really this should just coordinate conversation between
+    various subclasses. Almost all of the logic should be kept out of this class.
+    """
+
+    def __init__(self, action_validator, card_library):
+        # Objects inherited from the game_master
+        self.action_validator = action_validator
+        self.card_library = card_library
+
+        # Local objects
+        self.registry = GameRegistry()
+        self.player_manager = PlayerManager(self)
+        self.turn_manager = TurnManager()
+
+        # Each game has a set of shared zones
+        self.battlefield = deckr.game.zone.Zone('battlefield', None)
+        self.exile = deckr.game.zone.Zone('exile', None)
+        self.stack = deckr.game.zone.Zone('stack', None)
+
+        # Register all game objects
+        self.registry.register(self.battlefield)
+        self.registry.register(self.exile)
+        self.registry.register(self.stack)
+
+        # Private bookkeeping
+        self._started = False
+
+    def start(self):
+        """
         Start the game.
         """
 
         LOGGER.info("Starting game")
         self._started = True
 
-        self.game_state['current_step'] = 'untap'
-        self.game_state['current_phase'] = 'beginning'
-
-        # Draw starting hands
-        for player in self.players:
-            for _ in range(7):
-                player.hand.append(player.library.pop())
+        self.turn_manager.start()
+        self.player_manager.start()
 
     def update_proto(self, game_state_proto):
         """
@@ -162,8 +183,8 @@ class MagicTheGathering(object):
         """
 
         # Grab the simple global stuff
-        game_state_proto.current_step = self.game_state['current_step']
-        game_state_proto.current_phase = self.game_state['current_phase']
-        for obj in self.game_registry:
+        game_state_proto.current_step = self.turn_manager.current_step
+        game_state_proto.current_phase = self.turn_manager.current_phase
+        for obj in self.registry:
             proto = game_state_proto.game_objects.add()
             obj.update_proto(proto)
