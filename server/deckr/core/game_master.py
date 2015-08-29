@@ -6,12 +6,14 @@ import logging
 import pickle
 
 from deckr.game.game import MagicTheGathering
-from deckr.services.service import Service
+
+import deckr.core.service
+
 
 LOGGER = logging.getLogger(__name__)
 
 
-class GameMaster(Service):
+class GameMaster(deckr.core.service.Service):
     """
     The game master is a pretty straightforwards service. It tracks all games, allows for easy
     querying, creation, and deletion. It also has capabilities for serializing all games for

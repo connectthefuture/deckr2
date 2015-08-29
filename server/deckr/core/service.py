@@ -1,14 +1,73 @@
 """
-This module provides code that will enable a server to properly start services.
+This module provides code for services.
 """
 
+import importlib
 import logging
-
-from deckr.services.reloader import ReloadingServiceWrapper
-from deckr.services.service_wrapper import ServiceWrapper
 
 LOGGER = logging.getLogger(__name__)
 
+class ServiceWrapper(object):
+    """
+    This class represents a service wrapper. This includes the configuration to actually
+    create the service (service_config) and the configuration that should be passed to the
+    service (config_for_service).
+    """
+
+    def __init__(self, service_config, config_for_service=None):
+        super(ServiceWrapper, self).__init__()
+        self.name = service_config["name"]
+        self.dependancies = service_config.get("dependancies", [])
+        self.requires_event_loop = service_config.get(
+            "requires_event_loop", False)
+        self._module = service_config["module"]
+        self._class = service_config["class"]
+
+        self._instance = None
+        #: dict Configuration that will be passed to the service on creation.
+        self.config_for_service = config_for_service
+
+    def create(self):
+        """
+        Create a new service using this configuration.
+
+        Note:
+            All modules will be imported at this point. If running with reloading, make sure
+            you fork **before** you call create.
+
+        Returns:
+            object The newly created instance
+        """
+
+        LOGGER.info("Creating service: %s", self.name)
+        mod = importlib.import_module(self._module)
+        service_class = getattr(mod, self._class)
+        self._instance = service_class(config=self.config_for_service)
+        return self._instance
+
+    def get_instance(self):
+        """
+        Get the current instance of the service. Should only be called after
+        create.
+        """
+
+        return self._instance
+
+    def start(self):
+        """
+        Start the service this is wrapping.
+        """
+
+        LOGGER.info("Starting service: %s", self.name)
+        self._instance.start()
+
+    def stop(self):
+        """
+        Stop the service this is wrapping.
+        """
+
+        LOGGER.info("Stopping service: %s", self.name)
+        self._instance.stop()
 
 class ServiceStarter(object):
     """
@@ -92,3 +151,23 @@ class ServiceStarter(object):
         for dependancy in service.dependancies:
             service_dep = self.services[dependancy[1]].get_instance()
             getattr(service_instance, 'set_' + dependancy[0])(service_dep)
+
+class Service(object):
+    """
+    A service is pretty simple. It just has a start and a stop method. Additionally, it takes an
+    optional init argument called 'config'.
+    """
+
+    def start(self):
+        """
+        Start the service.
+        """
+
+        pass
+
+    def stop(self):
+        """
+        Stop the service gracefully.
+        """
+
+        pass
