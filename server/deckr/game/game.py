@@ -5,10 +5,10 @@ container.
 
 import logging
 
-from deckr.game.game_loop import GameLoop
-from deckr.game.game_object import GameObject
-from deckr.game.player import Player
-from deckr.game.zone import Zone
+import deckr.game.game_loop
+import deckr.game.game_object
+import deckr.game.player
+import deckr.game.zone
 
 LOGGER = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ class GameRegistry(object):
             game_object GameObject: The object to register.
         """
 
-        assert isinstance(game_object, GameObject)
+        assert isinstance(game_object, deckr.game.game_object.GameObject)
         game_id = self._next_game_id
         game_object.game_id = game_id
         self._next_game_id += 1
@@ -80,12 +80,12 @@ class MagicTheGathering(object):
 
         # Local objects
         self.game_registry = GameRegistry()
-        self.game_loop = GameLoop(self)
+        self.game_loop = deckr.game.game_loop.GameLoop(self)
 
         # Each game has a set of shared zones
-        self.battlefield = Zone('battlefield', None)
-        self.exile = Zone('exile', None)
-        self.stack = Zone('stack', None)
+        self.battlefield = deckr.game.zone.Zone('battlefield', None)
+        self.exile = deckr.game.zone.Zone('exile', None)
+        self.stack = deckr.game.zone.Zone('stack', None)
         self.players = []
 
         # Global game stat that doesn't really belong elsewhere.
@@ -113,7 +113,7 @@ class MagicTheGathering(object):
             Player The newly created player
         """
 
-        player = Player(self)
+        player = deckr.game.player.Player(self)
         self.game_registry.register(player)
         self.players.append(player)
         # Register zones

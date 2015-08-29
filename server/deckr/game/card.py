@@ -4,9 +4,9 @@ This module provides the base code for cards.
 
 import json
 
+import deckr.core.service
+import deckr.game.game_object
 import proto.game_pb2 as proto_lib
-from deckr.game.game_object import GameObject
-from deckr.services.service import Service
 
 
 def create_card_from_dict(card_data):
@@ -28,7 +28,7 @@ def create_card_from_dict(card_data):
     return card
 
 
-class Card(GameObject):
+class Card(deckr.game.game_object.GameObject):
     """
     A card represents a card in magic. Instead of having subclasses we implement all card
     functionality on this class (since basically any card can become any other card type).
@@ -65,7 +65,7 @@ class Card(GameObject):
 
 
 
-class CardLibrary(Service):
+class CardLibrary(deckr.core.service.Service):
     """
     A card library contains all of the cards that can be used, and the ability to create
     instances.

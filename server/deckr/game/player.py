@@ -2,12 +2,12 @@
 This module provides the code for Players.
 """
 
+import deckr.game.game_object
+import deckr.game.zone
 import proto.game_pb2 as proto_lib
-from deckr.game.game_object import GameObject
-from deckr.game.zone import Zone
 
 
-class Player(GameObject):
+class Player(deckr.game.game_object.GameObject):
     """
     A player has a number of attributes associated with them (life, etc.) and also is able to
     perform actions.
@@ -19,9 +19,9 @@ class Player(GameObject):
         self.life = 20
         self.poison_counters = 0
 
-        self.hand = Zone('hand', self)
-        self.graveyard = Zone('graveyard', self)
-        self.library = Zone('library', self)
+        self.hand = deckr.game.zone.Zone('hand', self)
+        self.graveyard = deckr.game.zone.Zone('graveyard', self)
+        self.library = deckr.game.zone.Zone('library', self)
 
         self._game = game
 

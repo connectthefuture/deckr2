@@ -3,7 +3,7 @@ This module provides all of the code to test if actions are legal, and respond i
 Note that the action validator is implemented as a service to allow for easier reloading.
 """
 
-from deckr.services.service import Service
+import deckr.services.service
 
 
 class InvalidActionException(Exception):
@@ -15,7 +15,7 @@ class InvalidActionException(Exception):
     pass
 
 
-class ActionValidator(Service):
+class ActionValidator(deckr.services.service.Service):
     """
     Makes sure that actions are legal and if not gives a descriptive error message. Note that this
     is mostly stateless and so is reused across games.

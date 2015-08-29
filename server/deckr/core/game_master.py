@@ -5,10 +5,8 @@ This module provides code for the GameMaster which manages all of the games.
 import logging
 import pickle
 
-from deckr.game.game import MagicTheGathering
-
 import deckr.core.service
-
+import deckr.game.game
 
 LOGGER = logging.getLogger(__name__)
 
@@ -76,7 +74,7 @@ class GameMaster(deckr.core.service.Service):
 
         game_id = self._next_game_id
         self._next_game_id += 1
-        self._games[game_id] = MagicTheGathering(
+        self._games[game_id] = deckr.game.game.MagicTheGathering(
             self._action_validator, self._card_library)
         return game_id
 
