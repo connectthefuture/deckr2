@@ -11,6 +11,7 @@ GAME_ORDER = {
     ]
 }
 
+
 class GameLoop(object):
     """
     This handles the core game logic when players aren't acting. This will generally be called
@@ -36,12 +37,14 @@ class GameLoop(object):
 
         # Update priority
         active_player = self._game.game_state['active_player']
-        next_player = self._game.next_player(self._game.game_state['priority_player'])
+        next_player = self._game.next_player(
+            self._game.game_state['priority_player'])
         self._game.game_state['priority_player'] = next_player
 
         if next_player == active_player:
             # We've come full circle, either resolve the top item on the stack
             # or move to the next step.
             current_phase = GAME_ORDER[self._game.game_state['current_phase']]
-            next_step = current_phase[current_phase.index(self._game.game_state['current_step']) + 1]
+            next_step = current_phase[current_phase.index(
+                self._game.game_state['current_step']) + 1]
             self._game.game_state['current_step'] = next_step

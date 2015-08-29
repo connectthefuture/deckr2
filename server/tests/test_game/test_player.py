@@ -2,19 +2,18 @@
 This module contains player tests.
 """
 
-from unittest import TestCase
+import unittest
 
-from mock import MagicMock
-
+import deckr.game.player
+import mock
 import proto.game_pb2 as proto_lib
-from deckr.game.player import Player
 
 
-class PlayerTestCase(TestCase):
+class PlayerTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.game = MagicMock()
-        self.player = Player(self.game)
+        self.game = mock.MagicMock()
+        self.player = deckr.game.player.Player(self.game)
 
         # Mock out game ids
         self.player.game_id = 0

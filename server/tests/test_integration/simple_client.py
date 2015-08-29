@@ -5,9 +5,10 @@ This is a very simple client for debugging and testing.
 
 import socket
 import threading
+import time
 
-from proto.client_message_pb2 import ActionMessage, ClientMessage, JoinMessage
-from proto.server_response_pb2 import ServerResponse
+import proto.client_message_pb2
+import proto.server_response_pb2
 
 BUFFER_SIZE = 2048
 
@@ -25,14 +26,24 @@ class SimpleClient(object):
         self._ip = ip_addr
         self._port = port
 
-    def initalize(self, sync=True):
+    def initalize(self, retry=3, sync=True):
         """
         Initialize the client. If sync is not true it will spin up a thread
         to listen for responses.
         """
 
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self._socket.connect((self._ip, self._port))
+        retry_count = 0
+        while(True):
+            try:
+                self._socket.connect((self._ip, self._port))
+                break
+            except IOError as e:  # Retry if we can't connect.
+                retry_count += 1
+                if retry_count >= retry:
+                    print str(retry_count) + "retry attempts failed"
+                    raise e
+                time.sleep(0.1)
 
         if not sync:
             self._listen_thread = threading.Thread(
@@ -60,7 +71,7 @@ class SimpleClient(object):
             self._buffer += data
             if '\r\n' in self._buffer:
                 data, self._buffer = self._buffer.split('\r\n', 1)
-                response = ServerResponse()
+                response = proto.server_response_pb2.ServerResponse()
                 response.ParseFromString(data)
                 if listen_forever:
                     print(response)
@@ -79,17 +90,17 @@ class SimpleClient(object):
         Send a create message.
         """
 
-        message = ClientMessage()
-        message.message_type = ClientMessage.CREATE
+        message = proto.client_message_pb2.ClientMessage()
+        message.message_type = proto.client_message_pb2.ClientMessage.CREATE
         self.send_message(message)
 
-    def join(self, game_id, client_type=JoinMessage.PLAYER, deck=None):
+    def join(self, game_id, client_type=proto.client_message_pb2.JoinMessage.PLAYER, deck=None):
         """
         Send a join message.
         """
 
-        message = ClientMessage()
-        message.message_type = ClientMessage.JOIN
+        message = proto.client_message_pb2.ClientMessage()
+        message.message_type = proto.client_message_pb2.ClientMessage.JOIN
         message.join_message.game_id = game_id
         message.join_message.client_type = client_type
         if deck is not None:
@@ -102,8 +113,8 @@ class SimpleClient(object):
         Send the quit message.
         """
 
-        message = ClientMessage()
-        message.message_type = ClientMessage.QUIT
+        message = proto.client_message_pb2.ClientMessage()
+        message.message_type = proto.client_message_pb2.ClientMessage.QUIT
         self.send_message(message)
 
     def start(self):
@@ -111,7 +122,7 @@ class SimpleClient(object):
         Send a start message.
         """
 
-        message = ClientMessage()
-        message.message_type = ClientMessage.ACTION
-        message.action_message.action_type = ActionMessage.START
+        message = proto.client_message_pb2.ClientMessage()
+        message.message_type = proto.client_message_pb2.ClientMessage.ACTION
+        message.action_message.action_type = proto.client_message_pb2.ActionMessage.START
         self.send_message(message)

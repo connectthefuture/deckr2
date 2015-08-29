@@ -4,10 +4,11 @@ This module provides code for various deckr server implementations.
 
 import logging
 
+import deckr.core.service
 import deckr.network.connection
 import deckr.network.router
-import deckr.services.service
-import twisted.internet
+import twisted.internet.endpoints
+import twisted.internet.reactor
 import txsockjs.factory
 
 LOGGER = logging.getLogger(__name__)
@@ -48,7 +49,7 @@ class DeckrServer(deckr.core.service.Service):
             self._factory = txsockjs.factory.SockJSFactory(self._factory)
 
         twisted.internet.endpoints.serverFromString(twisted.internet.reactor, "tcp:%d" %
-                                   self._port).listen(self._factory)
+                                                    self._port).listen(self._factory)
         LOGGER.info('Starting the DeckrServer listening on port %d', self._port)
         twisted.internet.reactor.run()
 

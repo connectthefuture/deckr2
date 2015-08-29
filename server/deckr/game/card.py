@@ -64,7 +64,6 @@ class Card(deckr.game.game_object.GameObject):
         proto.game_object_type = proto_lib.GameObject.CARD
 
 
-
 class CardLibrary(deckr.core.service.Service):
     """
     A card library contains all of the cards that can be used, and the ability to create

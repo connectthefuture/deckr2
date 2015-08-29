@@ -3,25 +3,24 @@ This contains all of the tests directly related to the MagicTheGathering game an
 classes.
 """
 
-from unittest import TestCase
+import unittest
 
-from mock import MagicMock
-
-from deckr.game.game import GameRegistry, MagicTheGathering
-from deckr.game.game_object import GameObject
-from deckr.game.player import Player
+import deckr.game.game
+import deckr.game.game_object
+import deckr.game.player
+import mock
 import proto.game_pb2 as game_proto
 
 
-class MagicTheGatheringTestCase(TestCase):
+class MagicTheGatheringTestCase(unittest.TestCase):
     """
     Test the core game logic
     """
 
     def setUp(self):
-        self.mock_action_validator = MagicMock()
-        self.card_library = MagicMock()
-        self.game = MagicTheGathering(
+        self.mock_action_validator = mock.MagicMock()
+        self.card_library = mock.MagicMock()
+        self.game = deckr.game.game.MagicTheGathering(
             self.mock_action_validator, self.card_library)
 
     def test_create_player(self):
@@ -31,7 +30,7 @@ class MagicTheGatheringTestCase(TestCase):
 
         player = self.game.create_player([])
         self.assertIsNotNone(player)
-        self.assertTrue(isinstance(player, Player))
+        self.assertTrue(isinstance(player, deckr.game.player.Player))
         self.assertIn(player, self.game.players)
         self.assertEqual(
             player, self.game.game_registry.lookup(player.game_id))
@@ -46,7 +45,7 @@ class MagicTheGatheringTestCase(TestCase):
         Make sure we can create a player and their deck.
         """
 
-        card = GameObject()
+        card = deckr.game.game_object.GameObject()
         self.card_library.create_from_list.return_value = [card]
         player = self.game.create_player(["Forest"])
         self.assertIn(card, player.library)
@@ -57,7 +56,7 @@ class MagicTheGatheringTestCase(TestCase):
         Make sure that when we start a game each player draws a hand of 7 cards.
         """
 
-        cards = [GameObject() for _ in range(10)]
+        cards = [deckr.game.game_object.GameObject() for _ in range(10)]
         self.card_library.create_from_list.return_value = cards
         player1 = self.game.create_player(["Forest"] * 10)
         player2 = self.game.create_player(["Forest"] * 10)
@@ -71,8 +70,8 @@ class MagicTheGatheringTestCase(TestCase):
         """
 
         proto = game_proto.GameState()
-        mock_game_object = GameObject()
-        mock_game_object.update_proto = MagicMock()
+        mock_game_object = deckr.game.game_object.GameObject()
+        mock_game_object.update_proto = mock.MagicMock()
 
         # Set up the game
         self.game.game_state = {
@@ -88,15 +87,15 @@ class MagicTheGatheringTestCase(TestCase):
         self.assertEqual(len(proto.game_objects), 4)
 
 
-class GameRegistryTestCase(TestCase):
+class GameRegistryTestCase(unittest.TestCase):
     """
     Tests directly related to the game registry.
     """
 
     def setUp(self):
-        self.game_object1 = GameObject()
-        self.game_object2 = GameObject()
-        self.registry = GameRegistry()
+        self.game_object1 = deckr.game.game_object.GameObject()
+        self.game_object2 = deckr.game.game_object.GameObject()
+        self.registry = deckr.game.game.GameRegistry()
 
     def test_register(self):
         """

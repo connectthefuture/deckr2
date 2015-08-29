@@ -4,14 +4,14 @@ import logging
 
 import yaml
 
-from deckr.services.service_starter import ServiceStarter
+import deckr.core.service
 
 
 def main():
     # Any basic config for logging goes here
     logging.basicConfig(level=logging.DEBUG)
 
-    starter = ServiceStarter(False)
+    starter = deckr.core.service.ServiceStarter(False)
     starter.add_service(yaml.load(open('config/services/deckr_server_service.yml')), {})
     starter.add_service(yaml.load(open('config/services/card_library_service.yml')), {})
     starter.add_service(yaml.load(open('config/services/action_validator_service.yml')), {})

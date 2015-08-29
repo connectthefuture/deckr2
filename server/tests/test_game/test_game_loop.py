@@ -2,18 +2,17 @@
 This module provides some simple tests for the game loop.
 """
 
-from unittest import TestCase
+import unittest
 
-from mock import MagicMock
+import deckr.game.game
+import deckr.game.game_loop
 
-from deckr.game.game import MagicTheGathering
-from deckr.game.game_loop import GameLoop
 
-class GameLoopTestCase(TestCase):
+class GameLoopTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.game = MagicTheGathering(None, None)
-        self.game_loop = GameLoop(self.game)
+        self.game = deckr.game.game.MagicTheGathering(None, None)
+        self.game_loop = deckr.game.game_loop.GameLoop(self.game)
 
     def assert_player_step_phase(self, priority_player,
                                  active_player, step, phase):
@@ -21,7 +20,8 @@ class GameLoopTestCase(TestCase):
         Check the priority player, active player, step and phase.
         """
 
-        self.assertEqual(self.game.game_state['priority_player'], priority_player)
+        self.assertEqual(self.game.game_state[
+                         'priority_player'], priority_player)
         self.assertEqual(self.game.game_state['active_player'], active_player)
         self.assertEqual(self.game.game_state['current_step'], step)
         self.assertEqual(self.game.game_state['current_phase'], phase)

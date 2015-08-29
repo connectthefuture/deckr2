@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 Run the simple client. Run this interactivily with python -i ./bin/run_simple_client.py
 """

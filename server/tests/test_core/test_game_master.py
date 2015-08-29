@@ -2,18 +2,17 @@
 This module tests the game master functionality.
 """
 
-from unittest import TestCase
+import unittest
 
-from mock import MagicMock
+import deckr.core.game_master
+import deckr.game.game
+import mock
 
-from deckr.core.game_master import GameMaster
-from deckr.game.game import MagicTheGathering
 
-
-class GameMasterTestCase(TestCase):
+class GameMasterTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.game_master = GameMaster()
+        self.game_master = deckr.core.game_master.GameMaster()
 
     def test_create(self):
         """
@@ -41,7 +40,8 @@ class GameMasterTestCase(TestCase):
         instance1 = self.game_master.get_game(result)
         instance2 = self.game_master.get_game(result)
         self.assertIsNotNone(instance1)
-        self.assertTrue(isinstance(instance1, MagicTheGathering))
+        self.assertTrue(isinstance(
+            instance1, deckr.game.game.MagicTheGathering))
         # Make sure we get the same object back
         self.assertEqual(instance1, instance2)
 
@@ -67,9 +67,10 @@ class GameMasterTestCase(TestCase):
         properly.
         """
 
-        game_master = GameMaster({'save_file': 'foobar'})
-        game_master.save_to_file = MagicMock()
-        game_master.load_from_file = MagicMock()
+        game_master = deckr.core.game_master.GameMaster(
+            {'save_file': 'foobar'})
+        game_master.save_to_file = mock.MagicMock()
+        game_master.load_from_file = mock.MagicMock()
         game_master.start()
         game_master.load_from_file.assert_called_with('foobar')
         game_master.stop()

@@ -2,13 +2,13 @@
 This module provides unittests for the card and card library logic.
 """
 
-from unittest import TestCase
+import unittest
 
-from deckr.game.card import Card, CardLibrary, create_card_from_dict
-from tests.utils import FOREST_CARD_DATA, SIMPLE_CARD_LIBRARY
+import deckr.game.card
+import tests.utils
 
 
-class CardUtilityFunctionsTestCase(TestCase):
+class CardUtilityFunctionsTestCase(unittest.TestCase):
     """
     Test the utility functions.
     """
@@ -18,7 +18,8 @@ class CardUtilityFunctionsTestCase(TestCase):
         Make sure we can create a basic land from a dict.
         """
 
-        card = create_card_from_dict(FOREST_CARD_DATA)
+        card = deckr.game.card.create_card_from_dict(
+            tests.utils.FOREST_CARD_DATA)
         self.assertIsNotNone(card)
         self.assertEqual(card.name, "Forest")
         self.assertIn("Land", card.types)
@@ -26,14 +27,14 @@ class CardUtilityFunctionsTestCase(TestCase):
         self.assertIn("Forest", card.subtypes)
 
 
-class CardLibraryTestCase(TestCase):
+class CardLibraryTestCase(unittest.TestCase):
     """
     Test the card library.
     """
 
     def setUp(self):
-        self.card_library = CardLibrary()
-        self.card_library.load_from_dict(SIMPLE_CARD_LIBRARY)
+        self.card_library = deckr.game.card.CardLibrary()
+        self.card_library.load_from_dict(tests.utils.SIMPLE_CARD_LIBRARY)
 
     def test_create(self):
         """

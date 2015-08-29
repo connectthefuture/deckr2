@@ -2,24 +2,24 @@
 Test the zone.
 """
 
-from unittest import TestCase
+import unittest
 
+import deckr.game.game_object
+import deckr.game.zone
 import proto.game_pb2 as proto_lib
-from deckr.game.game_object import GameObject
-from deckr.game.zone import Zone
 
 
-class ZoneAsContainerTestCase(TestCase):
+class ZoneAsContainerTestCase(unittest.TestCase):
     """
     Make sure the zone works as a container.
     """
 
     def setUp(self):
-        self.zone = Zone("test_zone", None)
+        self.zone = deckr.game.zone.Zone("test_zone", None)
         self.zone.game_id = 0
-        self.object1 = GameObject()
-        self.object2 = GameObject()
-        self.object3 = GameObject()
+        self.object1 = deckr.game.game_object.GameObject()
+        self.object2 = deckr.game.game_object.GameObject()
+        self.object3 = deckr.game.game_object.GameObject()
 
         self.object1.game_id = 1
         self.object2.game_id = 2
@@ -38,7 +38,7 @@ class ZoneAsContainerTestCase(TestCase):
         self.assertEqual(len(self.zone), 2)
         self.assertEqual(self.zone[0], self.object1)
         count = 0
-        for obj in self.zone:
+        for _ in self.zone:
             count += 1
         self.assertEqual(count, 2)
 

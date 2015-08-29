@@ -9,6 +9,7 @@ import deckr.debug.reloader
 
 LOGGER = logging.getLogger(__name__)
 
+
 class ServiceStarter(object):
     """
     The service starter is the main entry point into the deckr server. It can take a set of
@@ -40,7 +41,8 @@ class ServiceStarter(object):
             wrapper = deckr.debug.reloader.ReloadingServiceWrapper(
                 service_config, config_for_service)
         else:
-            wrapper = deckr.core.service_wrapper.ServiceWrapper(service_config, config_for_service)
+            wrapper = deckr.core.service_wrapper.ServiceWrapper(
+                service_config, config_for_service)
         self.services[service_config["name"]] = wrapper
 
     def start(self):
@@ -91,6 +93,7 @@ class ServiceStarter(object):
         for dependancy in service.dependancies:
             service_dep = self.services[dependancy[1]].get_instance()
             getattr(service_instance, 'set_' + dependancy[0])(service_dep)
+
 
 class Service(object):
     """
