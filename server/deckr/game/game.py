@@ -139,9 +139,22 @@ class TurnManager(object):
         ],
         'precombat main': [
             'precombat main'
+        ],
+        'combat': [
+            'beginning of combat',
+            'declare attackers',
+            'declare blockers',
+            'combat damage',
+            'end of combat'
+        ],
+        'postcombat main': [
+            'postcombat main'
+        ],
+        'end': [
+            'end'
         ]
     }
-    PHASE_ORDER = ['beginning', 'precombat main']
+    PHASE_ORDER = ['beginning', 'precombat main', 'combat', 'postcombat main', 'end']
 
     def __init__(self, game):
         self.step = None
@@ -170,8 +183,8 @@ class TurnManager(object):
         next_player = self._game.player_manager.next_player(self.priority_player)
         if next_player == self.active_player:
             self._next_step()
-
-        self.priority_player = next_player
+        else:
+            self.priority_player = next_player
 
     def _next_step(self):
         """
@@ -183,13 +196,26 @@ class TurnManager(object):
         else:
             steps = self.PHASES[self.phase]
             self.step = steps[steps.index(self.step) + 1]
+        self.priority_player = self.active_player
 
     def _next_phase(self):
         """
         Advance to the next phase.
         """
 
-        self.phase = self.PHASE_ORDER[self.PHASE_ORDER.index(self.phase) + 1]
+        if self.phase == self.PHASE_ORDER[-1]:
+            self._next_turn()
+        else:
+            self.phase = self.PHASE_ORDER[self.PHASE_ORDER.index(self.phase) + 1]
+            self.step = self.PHASES[self.phase][0]
+
+    def _next_turn(self):
+        """
+        Go to the next turn.
+        """
+
+        self.active_player = self._game.player_manager.next_player(self.active_player)
+        self.phase = self.PHASE_ORDER[0]
         self.step = self.PHASES[self.phase][0]
 
 
