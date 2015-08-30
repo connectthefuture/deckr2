@@ -120,6 +120,15 @@ class SimpleClient(object):
         message.message_type = proto.client_message_pb2.ClientMessage.QUIT
         self.send_message(message)
 
+    def leave(self):
+        """
+        Send the leave message.
+        """
+
+        message = proto.client_message_pb2.ClientMessage()
+        message.message_type = proto.client_message_pb2.ClientMessage.LEAVE
+        self.send_message(message)
+
     def start(self):
         """
         Send a start message.

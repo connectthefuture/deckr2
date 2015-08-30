@@ -93,15 +93,21 @@ class SinglePlayerTestCase(unittest.TestCase):
     to the network stack than the gaming stack.
     """
 
+    @classmethod
+    def setUpClass(cls):
+        cls.server = SimpleServer()
+        cls.server.start()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.server.stop()
+
     def setUp(self):
-        self.server = SimpleServer()
         self.client = tests.test_integration.simple_client.SimpleClient()
-        self.server.start()
         self.client.initalize()
 
     def tearDown(self):
         self.client.shutdown()
-        self.server.stop()
 
     def _check_response(self):
         """
