@@ -61,6 +61,21 @@ def parse_game_state(game_state):
         }
     return game
 
+def get_game_object(game_state, game_id):
+    """
+    Get a game object by game_id.
+    """
+
+    for obj in game_state.game_objects:
+        if obj.game_id == game_id:
+            if obj.game_object_type == proto.game_pb2.GameObject.PLAYER:
+                return obj.player
+            elif obj.game_object_type == proto.game_pb2.GameObject.CARD:
+                return obj.card
+            elif obj.game_object_type == proto.game_pb2.GameObject.ZONE:
+                return obj.zone
+    raise ValueError("{} not in game state response".format(game_id))
+
 
 class SimpleServer(object):
     """
@@ -105,6 +120,7 @@ class SinglePlayerTestCase(unittest.TestCase):
     def setUp(self):
         self.client = tests.test_integration.simple_client.SimpleClient()
         self.client.initalize()
+        self.last_response = None
 
     def tearDown(self):
         self.client.shutdown()
@@ -118,9 +134,10 @@ class SinglePlayerTestCase(unittest.TestCase):
         self.assertIsNotNone(response)
         if response.response_type == proto.server_response_pb2.ServerResponse.ERROR:
             raise AssertionError("Unexpected error response: " + str(response))
+        self.last_response = response
         return response
 
-    def _create_join_start(self):
+    def _create_join_start(self, card_count=10):
         """
         Create, join, and start a game. Returns the player that we joined as.
         """
@@ -128,7 +145,7 @@ class SinglePlayerTestCase(unittest.TestCase):
         self.client.create()
         response = self._check_response()
         self.client.join(response.create_response.game_id,
-                         deck=["Forest"] * 10)
+                         deck=["Forest"] * card_count)
         response = self._check_response()
         player = response.join_response.player_id
         self.client.start()
@@ -143,6 +160,18 @@ class SinglePlayerTestCase(unittest.TestCase):
 
         self.assertEqual(game_state.current_step, step)
         self.assertEqual(game_state.current_phase, phase)
+
+    def _pass_until(self, test, max_passes=100):
+        """
+        Pass priority until a test or until we've passed too many times.
+        """
+
+        for _ in range(max_passes):
+            self.client.pass_priority()
+            response = self._check_response()
+            if test(response.game_state_response.game_state):
+                return
+        raise ValueError("Should not have reached {} passes".format(max_passes))
 
     def test_create(self):
         """
@@ -234,3 +263,18 @@ class SinglePlayerTestCase(unittest.TestCase):
         # Make sure we actually drew a card
         game_state = parse_game_state(response.game_state_response.game_state)
         self.assertEqual(len(game_state[player]['hand']), 8)
+
+
+    def test_lost(self):
+        """
+        Make sure if we can't draw than we lose the game.
+        """
+
+        player_id, _ = self._create_join_start(7)
+        player = get_game_object(self.last_response.game_state_response.game_state, player_id)
+        self.assertFalse(player.lost)
+        self._pass_until(lambda game_state: game_state.current_step == 'draw')
+        # Don't draw until the start of the second turn
+        self._pass_until(lambda game_state: game_state.current_step == 'draw')
+        player = get_game_object(self.last_response.game_state_response.game_state, player_id)
+        self.assertTrue(player.lost)

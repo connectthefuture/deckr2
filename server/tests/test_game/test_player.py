@@ -32,6 +32,18 @@ class PlayerTestCase(unittest.TestCase):
         self.player.pass_priority()
         self.game.turn_manager.advance.assert_called_with()
 
+    def test_draw(self):
+        """
+        Make sure we can draw a card, and we lose if we can't
+        """
+
+        self.player.library.append(object())
+        self.player.draw()
+        self.assertEqual(len(self.player.hand), 1)
+
+        self.player.draw()
+        self.assertTrue(self.player.lost)
+
     def test_update_proto(self):
         """
         Make sure we can properly update a protobuf.
@@ -43,3 +55,4 @@ class PlayerTestCase(unittest.TestCase):
         self.assertEqual(proto.player.graveyard, self.player.graveyard.game_id)
         self.assertEqual(proto.player.library, self.player.library.game_id)
         self.assertEqual(proto.player.hand, self.player.hand.game_id)
+        self.assertEqual(proto.player.lost, self.player.lost)

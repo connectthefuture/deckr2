@@ -29,6 +29,7 @@ message Player {
     required int32 graveyard = 2;
     required int32 library = 3;
     required int32 life = 4;
+    required bool lost = 5;
 }
 
 message Zone {

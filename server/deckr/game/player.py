@@ -23,6 +23,8 @@ class Player(deckr.game.game_object.GameObject):
         self.graveyard = deckr.game.zone.Zone('graveyard', self)
         self.library = deckr.game.zone.Zone('library', self)
 
+        self.lost = False
+
         self._game = game
 
     def draw(self):
@@ -30,7 +32,10 @@ class Player(deckr.game.game_object.GameObject):
         Draw a card.
         """
 
-        self.hand.append(self.library.pop())
+        if len(self.library) == 0:
+            self.lost = True
+        else:
+            self.hand.append(self.library.pop())
 
     def start(self):
         """
@@ -95,3 +100,4 @@ class Player(deckr.game.game_object.GameObject):
         proto.player.library = self.library.game_id
         proto.player.hand = self.hand.game_id
         proto.player.life = self.life
+        proto.player.lost = self.lost

@@ -19,7 +19,7 @@ import util_pb2
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='game.proto',
   package='',
-  serialized_pb=_b('\n\ngame.proto\x1a\nutil.proto\"[\n\tGameState\x12\x15\n\rcurrent_phase\x18\x01 \x02(\t\x12\x14\n\x0c\x63urrent_step\x18\x02 \x02(\t\x12!\n\x0cgame_objects\x18\x03 \x03(\x0b\x32\x0b.GameObject\"\xf0\x01\n\nGameObject\x12\x34\n\x10game_object_type\x18\x01 \x02(\x0e\x32\x1a.GameObject.GameObjectType\x12\x0f\n\x07game_id\x18\x02 \x02(\x05\x12\x17\n\x06player\x18\x03 \x01(\x0b\x32\x07.Player\x12\x13\n\x04zone\x18\x04 \x01(\x0b\x32\x05.Zone\x12\x13\n\x04\x63\x61rd\x18\x05 \x01(\x0b\x32\x05.Card\x12\x19\n\x07\x63ounter\x18\x06 \x01(\x0b\x32\x08.Counter\"=\n\x0eGameObjectType\x12\n\n\x06PLAYER\x10\x00\x12\x08\n\x04ZONE\x10\x01\x12\x08\n\x04\x43\x41RD\x10\x02\x12\x0b\n\x07\x43OUNTER\x10\x03\"H\n\x06Player\x12\x0c\n\x04hand\x18\x01 \x02(\x05\x12\x11\n\tgraveyard\x18\x02 \x02(\x05\x12\x0f\n\x07library\x18\x03 \x02(\x05\x12\x0c\n\x04life\x18\x04 \x02(\x05\"\x14\n\x04Zone\x12\x0c\n\x04objs\x18\x01 \x03(\x05\"\xd3\x01\n\x04\x43\x61rd\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\x11\n\tmana_cost\x18\x02 \x01(\t\x12\r\n\x05\x63olor\x18\x03 \x01(\t\x12\x13\n\x0bsuper_types\x18\x04 \x03(\t\x12\r\n\x05types\x18\x05 \x03(\t\x12\x10\n\x08subtypes\x18\x06 \x03(\t\x12\x11\n\tabilities\x18\x07 \x03(\t\x12\x13\n\x0b\x66lavor_text\x18\x08 \x01(\t\x12\r\n\x05power\x18\t \x01(\x05\x12\x11\n\ttoughness\x18\n \x01(\x05\x12\x1b\n\x04meta\x18\x0b \x03(\x0b\x32\r.KeyValuePair\"\x17\n\x07\x43ounter\x12\x0c\n\x04type\x18\x01 \x02(\t\"4\n\x07\x41\x62ility\x12\x12\n\nability_on\x18\x01 \x02(\x05\x12\x15\n\rability_index\x18\x02 \x02(\x05')
+  serialized_pb=_b('\n\ngame.proto\x1a\nutil.proto\"[\n\tGameState\x12\x15\n\rcurrent_phase\x18\x01 \x02(\t\x12\x14\n\x0c\x63urrent_step\x18\x02 \x02(\t\x12!\n\x0cgame_objects\x18\x03 \x03(\x0b\x32\x0b.GameObject\"\xf0\x01\n\nGameObject\x12\x34\n\x10game_object_type\x18\x01 \x02(\x0e\x32\x1a.GameObject.GameObjectType\x12\x0f\n\x07game_id\x18\x02 \x02(\x05\x12\x17\n\x06player\x18\x03 \x01(\x0b\x32\x07.Player\x12\x13\n\x04zone\x18\x04 \x01(\x0b\x32\x05.Zone\x12\x13\n\x04\x63\x61rd\x18\x05 \x01(\x0b\x32\x05.Card\x12\x19\n\x07\x63ounter\x18\x06 \x01(\x0b\x32\x08.Counter\"=\n\x0eGameObjectType\x12\n\n\x06PLAYER\x10\x00\x12\x08\n\x04ZONE\x10\x01\x12\x08\n\x04\x43\x41RD\x10\x02\x12\x0b\n\x07\x43OUNTER\x10\x03\"V\n\x06Player\x12\x0c\n\x04hand\x18\x01 \x02(\x05\x12\x11\n\tgraveyard\x18\x02 \x02(\x05\x12\x0f\n\x07library\x18\x03 \x02(\x05\x12\x0c\n\x04life\x18\x04 \x02(\x05\x12\x0c\n\x04lost\x18\x05 \x02(\x08\"\x14\n\x04Zone\x12\x0c\n\x04objs\x18\x01 \x03(\x05\"\xd3\x01\n\x04\x43\x61rd\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\x11\n\tmana_cost\x18\x02 \x01(\t\x12\r\n\x05\x63olor\x18\x03 \x01(\t\x12\x13\n\x0bsuper_types\x18\x04 \x03(\t\x12\r\n\x05types\x18\x05 \x03(\t\x12\x10\n\x08subtypes\x18\x06 \x03(\t\x12\x11\n\tabilities\x18\x07 \x03(\t\x12\x13\n\x0b\x66lavor_text\x18\x08 \x01(\t\x12\r\n\x05power\x18\t \x01(\x05\x12\x11\n\ttoughness\x18\n \x01(\x05\x12\x1b\n\x04meta\x18\x0b \x03(\x0b\x32\r.KeyValuePair\"\x17\n\x07\x43ounter\x12\x0c\n\x04type\x18\x01 \x02(\t\"4\n\x07\x41\x62ility\x12\x12\n\nability_on\x18\x01 \x02(\x05\x12\x15\n\rability_index\x18\x02 \x02(\x05')
   ,
   dependencies=[util_pb2.DESCRIPTOR,])
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
@@ -202,6 +202,13 @@ _PLAYER = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
+    _descriptor.FieldDescriptor(
+      name='lost', full_name='Player.lost', index=4,
+      number=5, type=8, cpp_type=7, label=2,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
   ],
   extensions=[
   ],
@@ -214,7 +221,7 @@ _PLAYER = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=362,
-  serialized_end=434,
+  serialized_end=448,
 )
 
 
@@ -243,8 +250,8 @@ _ZONE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=436,
-  serialized_end=456,
+  serialized_start=450,
+  serialized_end=470,
 )
 
 
@@ -343,8 +350,8 @@ _CARD = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=459,
-  serialized_end=670,
+  serialized_start=473,
+  serialized_end=684,
 )
 
 
@@ -373,8 +380,8 @@ _COUNTER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=672,
-  serialized_end=695,
+  serialized_start=686,
+  serialized_end=709,
 )
 
 
@@ -410,8 +417,8 @@ _ABILITY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=697,
-  serialized_end=749,
+  serialized_start=711,
+  serialized_end=763,
 )
 
 _GAMESTATE.fields_by_name['game_objects'].message_type = _GAMEOBJECT
