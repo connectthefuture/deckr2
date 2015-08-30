@@ -46,7 +46,7 @@ class Router(object):
         elif message_type == proto.client_message_pb2.ClientMessage.JOIN:
             self._handle_join(message, connection)
         elif message_type == proto.client_message_pb2.ClientMessage.LEAVE:
-            self._handle_leave(message, connection)
+            self._handle_leave(connection)
         elif message_type == proto.client_message_pb2.ClientMessage.ACTION:
             self._handle_action(message.action_message, connection)
         else:
@@ -74,7 +74,7 @@ class Router(object):
 
         return self._game_rooms[room_id][1]
 
-    def _handle_create(self, message, connection):
+    def _handle_create(self, message, connection):  # pylint: disable=unused-argument
         """
         Handle a create message. This will create a game through the game master and then return
         a create response.
@@ -107,7 +107,7 @@ class Router(object):
         response.join_response.player_id = connection.player.game_id
         connection.send_response(response)
 
-    def _handle_leave(self, message, connection):
+    def _handle_leave(self, connection):  # pylint: disable=no-self-use
         """
         Handle a message that the user wants to leave the current game.
         """
@@ -133,7 +133,6 @@ class Router(object):
 
         # Assuming the action was completed, we broadcast the current state
         # to all clients.
-        # TODO: Compute deltas instead of just sending out the whole state.
         response = proto.server_response_pb2.ServerResponse()
         response.response_type = proto.server_response_pb2.ServerResponse.GAME_STATE
         game.update_proto(response.game_state_response.game_state)
