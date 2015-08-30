@@ -114,6 +114,30 @@ class SinglePlayerTestCase(unittest.TestCase):
             raise AssertionError("Unexpected error response: " + str(response))
         return response
 
+    def _create_join_start(self):
+        """
+        Create, join, and start a game. Returns the player that we joined as.
+        """
+
+        self.client.create()
+        response = self._check_response()
+        self.client.join(response.create_response.game_id,
+                         deck=["Forest"] * 10)
+        response = self._check_response()
+        player = response.join_response.player_id
+        self.client.start()
+        response = self._check_response()
+        return player, response
+
+    def _assert_phase_step(self, phase, step, game_state):
+        """
+        Takes in a game state response and makes sure that the phase and step
+        are correct.
+        """
+
+        self.assertEqual(game_state.current_step, step)
+        self.assertEqual(game_state.current_phase, phase)
+
     def test_create(self):
         """
         Make sure that create gets a create response back.
@@ -133,14 +157,74 @@ class SinglePlayerTestCase(unittest.TestCase):
         errors.
         """
 
-        self.client.create()
-        response = self._check_response()
-        self.client.join(response.create_response.game_id,
-                         deck=["Forest"] * 10)
-        response = self._check_response()
-        player = response.join_response.player_id
-        self.client.start()
-        response = self._check_response()
+        player, response = self._create_join_start()
         # Check the starting hand
         game_state = parse_game_state(response.game_state_response.game_state)
         self.assertEqual(len(game_state[player]['hand']), 7)
+
+    def test_pass_turn_draw(self):
+        """
+        Create/join/start a game. Then pass through the turn and make sure you
+        draw again when the next turn starts.
+        """
+
+        player, response = self._create_join_start()
+        self._assert_phase_step('beginning', 'upkeep',
+                                response.game_state_response.game_state)
+        self.client.pass_priority()
+        response = self._check_response()
+        self._assert_phase_step('beginning', 'draw',
+                                response.game_state_response.game_state)
+        self.client.pass_priority()
+        response = self._check_response()
+        self._assert_phase_step('precombat main', 'precombat main',
+                                response.game_state_response.game_state)
+        self.client.pass_priority()
+        response = self._check_response()
+        self._assert_phase_step('combat', 'beginning of combat',
+                                response.game_state_response.game_state)
+        self.client.pass_priority()
+        response = self._check_response()
+        self._assert_phase_step('combat', 'declare attackers',
+                                response.game_state_response.game_state)
+        self.client.pass_priority()
+        response = self._check_response()
+        self._assert_phase_step('combat', 'declare blockers',
+                                response.game_state_response.game_state)
+        self.client.pass_priority()
+        response = self._check_response()
+        self._assert_phase_step('combat', 'combat damage',
+                                response.game_state_response.game_state)
+        self.client.pass_priority()
+        response = self._check_response()
+        self._assert_phase_step('combat', 'end of combat',
+                                response.game_state_response.game_state)
+        self.client.pass_priority()
+        response = self._check_response()
+        self._assert_phase_step('postcombat main', 'postcombat main',
+                                response.game_state_response.game_state)
+        self.client.pass_priority()
+        response = self._check_response()
+        self._assert_phase_step('end', 'end',
+                                response.game_state_response.game_state)
+        self.client.pass_priority()
+        response = self._check_response()
+        # Remove this eventually.
+        self._assert_phase_step('end', 'cleanup',
+                                response.game_state_response.game_state)
+        self.client.pass_priority()
+        response = self._check_response()
+        # Now we should be bakc to the untap
+        self._assert_phase_step('beginning', 'untap',
+                                response.game_state_response.game_state)
+        self.client.pass_priority()
+        response = self._check_response()
+        self._assert_phase_step('beginning', 'upkeep',
+                                response.game_state_response.game_state)
+        self.client.pass_priority()
+        response = self._check_response()
+        self._assert_phase_step('beginning', 'draw',
+                                response.game_state_response.game_state)
+        # Make sure we actually drew a card
+        game_state = parse_game_state(response.game_state_response.game_state)
+        self.assertEqual(len(game_state[player]['hand']), 8)

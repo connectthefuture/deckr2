@@ -10,6 +10,10 @@ import proto.game_pb2 as proto_lib
 
 
 class PlayerTestCase(unittest.TestCase):
+    """
+    Simple tests around the player.
+    """
+
     def setUp(self):
         self.game = mock.MagicMock()
         self.player = deckr.game.player.Player(self.game)
@@ -19,6 +23,14 @@ class PlayerTestCase(unittest.TestCase):
         self.player.library.game_id = 1
         self.player.graveyard.game_id = 2
         self.player.hand.game_id = 3
+
+    def test_pass_priority(self):
+        """
+        Make sure that we can properly pass priority.
+        """
+
+        self.player.pass_priority()
+        self.game.turn_manager.advance.assert_called_with()
 
     def test_update_proto(self):
         """

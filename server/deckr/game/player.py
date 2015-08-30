@@ -25,13 +25,20 @@ class Player(deckr.game.game_object.GameObject):
 
         self._game = game
 
+    def draw(self):
+        """
+        Draw a card.
+        """
+
+        self.hand.append(self.library.pop())
+
     def start(self):
         """
         Start the game. Draw the initial hand of 7 cards.
         """
 
         for _ in range(7):
-            self.hand.append(self.library.pop())
+            self.draw()
 
     def play_card(self, card):
         """
@@ -75,7 +82,7 @@ class Player(deckr.game.game_object.GameObject):
         Pass priority to the next player.
         """
 
-        self.game.game_loop.pass_priority()
+        self._game.turn_manager.advance()
 
     def update_proto(self, proto):
         """

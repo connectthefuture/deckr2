@@ -86,6 +86,7 @@ class TurnManagerTestCase(unittest.TestCase):
         self.turn_manager.step = 'upkeep'
         self.turn_manager.active_player = self.player1
         self.turn_manager.priority_player = self.player1
+        self.turn_manager.turn = 1
 
     def assert_turn_state(self, step, phase, active, priority):
         """
@@ -103,6 +104,8 @@ class TurnManagerTestCase(unittest.TestCase):
         """
 
         turns = deckr.game.game.TurnManager
+        # Suppress turn based actions
+        self.turn_manager.turn_based_actions = lambda: None
         self.turn_manager.advance()
         self.assert_turn_state(turns.UPKEEP_STEP, turns.BEGINNING_PHASE,
                                self.player1, self.player2)
@@ -169,6 +172,27 @@ class TurnManagerTestCase(unittest.TestCase):
         self.turn_manager.advance()
         self.assert_turn_state(turns.UNTAP_STEP, turns.BEGINNING_PHASE,
                                self.player2, self.player2)
+        self.assertEqual(self.turn_manager.turn, 2)
+
+    def test_draw_action(self):
+        """
+        Make sure at the start of the draw step we actually draw a card.
+        """
+
+        self.turn_manager.step = self.turn_manager.DRAW_STEP
+        self.turn_manager.phase = self.turn_manager.BEGINNING_PHASE
+
+        # Make sure we suppress if first player, first turn
+        self.turn_manager.turn = 1
+        self.game.player_manager.first_player.return_value = self.player1
+
+        self.turn_manager.turn_based_actions()
+        self.player1.draw.assert_not_called()
+
+        # Make sure we actually draw otherwise
+        self.turn_manager.turn = 2
+        self.turn_manager.turn_based_actions()
+        self.player1.draw.assert_called_with()
 
 
 class MagicTheGatheringTestCase(unittest.TestCase):

@@ -83,7 +83,7 @@ class PlayerManager(object):
             Player The newly created player
         """
 
-        player = deckr.game.player.Player(self)
+        player = deckr.game.player.Player(self._game)
 
         self.players.append(player)
         # Register the player zones and cards
@@ -151,17 +151,13 @@ class TurnManager(object):
 
     # An orderd list of step, phase tuples
     TURN_ORDER = [
-        (UNTAP_STEP, BEGINNING_PHASE),
-        (UPKEEP_STEP, BEGINNING_PHASE),
-        (DRAW_STEP, BEGINNING_PHASE),
-        (PRECOMBAT_MAIN, PRECOMBAT_MAIN),
+        (UNTAP_STEP, BEGINNING_PHASE), (UPKEEP_STEP, BEGINNING_PHASE),
+        (DRAW_STEP, BEGINNING_PHASE), (PRECOMBAT_MAIN, PRECOMBAT_MAIN),
         (BEGIN_COMBAT_STEP, COMBAT_PHASE),
         (DECLARE_ATTACKERS_STEP, COMBAT_PHASE),
         (DECLARE_BLOCKERS_STEP, COMBAT_PHASE),
-        (COMBAT_DAMAGE_STEP, COMBAT_PHASE),
-        (END_OF_COMBAT_STEP, COMBAT_PHASE),
-        (POSTCOMBAT_MAIN, POSTCOMBAT_MAIN),
-        (END_STEP, END_PHASE),
+        (COMBAT_DAMAGE_STEP, COMBAT_PHASE), (END_OF_COMBAT_STEP, COMBAT_PHASE),
+        (POSTCOMBAT_MAIN, POSTCOMBAT_MAIN), (END_STEP, END_PHASE),
         (CLEANUP_STEP, END_PHASE)
     ]
 
@@ -170,6 +166,7 @@ class TurnManager(object):
         self.phase = None
         self.priority_player = None
         self.active_player = None
+        self.turn = 0
 
         self._game = game
 
@@ -178,8 +175,9 @@ class TurnManager(object):
         Called to start the game.
         """
 
-        self.step = 'untap'
+        self.step = 'upkeep'  # Nobody gets priority during untap; just skip it.
         self.phase = 'beginning'
+        self.turn = 1
         self.active_player = self._game.player_manager.first_player()
         self.priority_player = self.active_player
 
@@ -189,7 +187,8 @@ class TurnManager(object):
         or change active player (or all).
         """
 
-        next_player = self._game.player_manager.next_player(self.priority_player)
+        next_player = self._game.player_manager.next_player(
+            self.priority_player)
         if next_player == self.active_player:
             self._next_step()
         else:
@@ -197,15 +196,18 @@ class TurnManager(object):
 
     def _next_step(self):
         """
-        Advance to the next step/phase
+        Advance to the next step/phase. Run any turn based actions and give
+        the active player priority.
         """
 
         step_phase = (self.step, self.phase)
         if step_phase == self.TURN_ORDER[-1]:
             self._next_turn()
         else:
-            self.step, self.phase = self.TURN_ORDER[self.TURN_ORDER.index(step_phase) + 1]
-        # At the beginnig of each step/phase the active player gets priority.
+            self.step, self.phase = self.TURN_ORDER[self.TURN_ORDER.index(
+                step_phase) + 1]
+        # First, we run an turn based actions
+        self.turn_based_actions()
         self.priority_player = self.active_player
 
     def _next_turn(self):
@@ -213,8 +215,21 @@ class TurnManager(object):
         Go to the next turn.
         """
 
-        self.active_player = self._game.player_manager.next_player(self.active_player)
+        self.active_player = self._game.player_manager.next_player(
+            self.active_player)
         self.step, self.phase = self.TURN_ORDER[0]
+        self.turn += 1
+
+    def turn_based_actions(self):
+        """
+        Run any turn based actions.
+        """
+
+        if self.step == self.DRAW_STEP:
+            # Suppress the draw on the very first turn
+            if self.turn != 1 or self.active_player != self._game.player_manager.first_player(
+            ):
+                self.active_player.draw()
 
 
 class MagicTheGathering(object):  # pylint: disable=too-many-instance-attributes

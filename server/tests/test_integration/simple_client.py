@@ -129,3 +129,13 @@ class SimpleClient(object):
         message.message_type = proto.client_message_pb2.ClientMessage.ACTION
         message.action_message.action_type = proto.client_message_pb2.ActionMessage.START
         self.send_message(message)
+
+    def pass_priority(self):
+        """
+        Pass prioirty.
+        """
+
+        message = proto.client_message_pb2.ClientMessage()
+        message.message_type = proto.client_message_pb2.ClientMessage.ACTION
+        message.action_message.action_type = proto.client_message_pb2.ActionMessage.PASS_PRIORITY
+        self.send_message(message)
