@@ -79,6 +79,7 @@ class TurnManagerTestCase(unittest.TestCase):
         def fake_next_player(player):
             """Fake call to next player."""
             return self.player2 if player == self.player1 else self.player1
+
         self.game.player_manager.next_player.side_effect = fake_next_player
 
         self.turn_manager.phase = 'beginning'
@@ -101,47 +102,73 @@ class TurnManagerTestCase(unittest.TestCase):
         Test a full turn.
         """
 
+        turns = deckr.game.game.TurnManager
         self.turn_manager.advance()
-        self.assert_turn_state('upkeep', 'beginning', self.player1, self.player2)
+        self.assert_turn_state(turns.UPKEEP_STEP, turns.BEGINNING_PHASE,
+                               self.player1, self.player2)
         self.turn_manager.advance()
-        self.assert_turn_state('draw', 'beginning', self.player1, self.player1)
+        self.assert_turn_state(turns.DRAW_STEP, turns.BEGINNING_PHASE,
+                               self.player1, self.player1)
         self.turn_manager.advance()
-        self.assert_turn_state('draw', 'beginning', self.player1, self.player2)
+        self.assert_turn_state(turns.DRAW_STEP, turns.BEGINNING_PHASE,
+                               self.player1, self.player2)
         self.turn_manager.advance()
-        self.assert_turn_state('precombat main', 'precombat main', self.player1, self.player1)
+        self.assert_turn_state(turns.PRECOMBAT_MAIN, turns.PRECOMBAT_MAIN,
+                               self.player1, self.player1)
         self.turn_manager.advance()
-        self.assert_turn_state('precombat main', 'precombat main', self.player1, self.player2)
+        self.assert_turn_state(turns.PRECOMBAT_MAIN, turns.PRECOMBAT_MAIN,
+                               self.player1, self.player2)
         self.turn_manager.advance()
-        self.assert_turn_state('beginning of combat', 'combat', self.player1, self.player1)
+        self.assert_turn_state(turns.BEGIN_COMBAT_STEP, turns.COMBAT_PHASE,
+                               self.player1, self.player1)
         self.turn_manager.advance()
-        self.assert_turn_state('beginning of combat', 'combat', self.player1, self.player2)
+        self.assert_turn_state(turns.BEGIN_COMBAT_STEP, turns.COMBAT_PHASE,
+                               self.player1, self.player2)
         self.turn_manager.advance()
-        self.assert_turn_state('declare attackers', 'combat', self.player1, self.player1)
+        self.assert_turn_state(turns.DECLARE_ATTACKERS_STEP,
+                               turns.COMBAT_PHASE, self.player1, self.player1)
         self.turn_manager.advance()
-        self.assert_turn_state('declare attackers', 'combat', self.player1, self.player2)
+        self.assert_turn_state(turns.DECLARE_ATTACKERS_STEP,
+                               turns.COMBAT_PHASE, self.player1, self.player2)
         self.turn_manager.advance()
-        self.assert_turn_state('declare blockers', 'combat', self.player1, self.player1)
+        self.assert_turn_state(turns.DECLARE_BLOCKERS_STEP, turns.COMBAT_PHASE,
+                               self.player1, self.player1)
         self.turn_manager.advance()
-        self.assert_turn_state('declare blockers', 'combat', self.player1, self.player2)
+        self.assert_turn_state(turns.DECLARE_BLOCKERS_STEP, turns.COMBAT_PHASE,
+                               self.player1, self.player2)
         self.turn_manager.advance()
-        self.assert_turn_state('combat damage', 'combat', self.player1, self.player1)
+        self.assert_turn_state(turns.COMBAT_DAMAGE_STEP, turns.COMBAT_PHASE,
+                               self.player1, self.player1)
         self.turn_manager.advance()
-        self.assert_turn_state('combat damage', 'combat', self.player1, self.player2)
+        self.assert_turn_state(turns.COMBAT_DAMAGE_STEP, turns.COMBAT_PHASE,
+                               self.player1, self.player2)
         self.turn_manager.advance()
-        self.assert_turn_state('end of combat', 'combat', self.player1, self.player1)
+        self.assert_turn_state(turns.END_OF_COMBAT_STEP, turns.COMBAT_PHASE,
+                               self.player1, self.player1)
         self.turn_manager.advance()
-        self.assert_turn_state('end of combat', 'combat', self.player1, self.player2)
+        self.assert_turn_state(turns.END_OF_COMBAT_STEP, turns.COMBAT_PHASE,
+                               self.player1, self.player2)
         self.turn_manager.advance()
-        self.assert_turn_state('postcombat main', 'postcombat main', self.player1, self.player1)
+        self.assert_turn_state(turns.POSTCOMBAT_MAIN, turns.POSTCOMBAT_MAIN,
+                               self.player1, self.player1)
         self.turn_manager.advance()
-        self.assert_turn_state('postcombat main', 'postcombat main', self.player1, self.player2)
+        self.assert_turn_state(turns.POSTCOMBAT_MAIN, turns.POSTCOMBAT_MAIN,
+                               self.player1, self.player2)
         self.turn_manager.advance()
-        self.assert_turn_state('end', 'end', self.player1, self.player1)
+        self.assert_turn_state(turns.END_STEP, turns.END_PHASE, self.player1,
+                               self.player1)
         self.turn_manager.advance()
-        self.assert_turn_state('end', 'end', self.player1, self.player2)
+        self.assert_turn_state(turns.END_STEP, turns.END_PHASE, self.player1,
+                               self.player2)
         self.turn_manager.advance()
-        self.assert_turn_state('untap', 'beginning', self.player2, self.player2)
-
+        self.assert_turn_state(turns.CLEANUP_STEP, turns.END_PHASE,
+                               self.player1, self.player1)
+        self.turn_manager.advance()
+        self.assert_turn_state(turns.CLEANUP_STEP, turns.END_PHASE,
+                               self.player1, self.player2)
+        self.turn_manager.advance()
+        self.assert_turn_state(turns.UNTAP_STEP, turns.BEGINNING_PHASE,
+                               self.player2, self.player2)
 
 
 class MagicTheGatheringTestCase(unittest.TestCase):

@@ -10,7 +10,6 @@ import proto.game_pb2 as proto_lib
 
 
 class PlayerTestCase(unittest.TestCase):
-
     def setUp(self):
         self.game = mock.MagicMock()
         self.player = deckr.game.player.Player(self.game)

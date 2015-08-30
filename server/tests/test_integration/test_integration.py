@@ -20,7 +20,7 @@ def start_server():
     """
     Start a lightweight server.
     """
-    
+
     starter = deckr.core.service.ServiceStarter()
     starter.add_service(
         yaml.load(open('config/services/deckr_server_service.yml')), {})
@@ -33,15 +33,22 @@ def start_server():
         yaml.load(open('config/services/game_master_service.yml')), {})
     starter.start()
 
+
 def parse_game_state(game_state):
     """
     Parse the game state into something with a little more structure.
     """
 
-    players = {x.game_id: x.player for x in game_state.game_objects
-               if x.game_object_type == proto.game_pb2.GameObject.PLAYER}
-    zones = {x.game_id: x.zone for x in game_state.game_objects
-             if x.game_object_type == proto.game_pb2.GameObject.ZONE}
+    players = {
+        x.game_id: x.player
+        for x in game_state.game_objects
+        if x.game_object_type == proto.game_pb2.GameObject.PLAYER
+    }
+    zones = {
+        x.game_id: x.zone
+        for x in game_state.game_objects
+        if x.game_object_type == proto.game_pb2.GameObject.ZONE
+    }
     # cards = {x.game_id: x.card for x in game_state.game_objects
     #         if x.game_object_type == proto.game_pb2.GameObject.CARD}
     game = {}
@@ -68,8 +75,7 @@ class SimpleServer(object):
         Start the server in a subprocess and return.
         """
 
-        self._server_process = multiprocessing.Process(
-            target=start_server)
+        self._server_process = multiprocessing.Process(target=start_server)
         self._server_process.start()
 
     def stop(self):
@@ -78,6 +84,7 @@ class SimpleServer(object):
         """
 
         self._server_process.terminate()
+
 
 @nose.plugins.attrib.attr('integration')
 class SinglePlayerTestCase(unittest.TestCase):

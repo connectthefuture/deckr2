@@ -28,7 +28,7 @@ def create_card_from_dict(card_data):
     return card
 
 
-class Card(deckr.game.game_object.GameObject):
+class Card(deckr.game.game_object.GameObject):  # pylint: disable=too-many-instance-attributes
     """
     A card represents a card in magic. Instead of having subclasses we implement all card
     functionality on this class (since basically any card can become any other card type).

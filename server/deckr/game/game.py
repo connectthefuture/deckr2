@@ -131,30 +131,39 @@ class TurnManager(object):
     Manage the turn (phase, priority player, etc.).
     """
 
-    PHASES = {
-        'beginning': [
-            'untap',
-            'upkeep',
-            'draw'
-        ],
-        'precombat main': [
-            'precombat main'
-        ],
-        'combat': [
-            'beginning of combat',
-            'declare attackers',
-            'declare blockers',
-            'combat damage',
-            'end of combat'
-        ],
-        'postcombat main': [
-            'postcombat main'
-        ],
-        'end': [
-            'end'
-        ]
-    }
-    PHASE_ORDER = ['beginning', 'precombat main', 'combat', 'postcombat main', 'end']
+    # Names for steps and phases
+    UNTAP_STEP = 'untap'
+    UPKEEP_STEP = 'upkeep'
+    DRAW_STEP = 'draw'
+    BEGIN_COMBAT_STEP = 'beginning of combat'
+    DECLARE_ATTACKERS_STEP = 'declare attackers'
+    DECLARE_BLOCKERS_STEP = 'declare blockers'
+    COMBAT_DAMAGE_STEP = 'combat damage'
+    END_OF_COMBAT_STEP = 'end of combat'
+    END_STEP = 'end'
+    CLEANUP_STEP = 'cleanup'
+
+    BEGINNING_PHASE = 'beginning'
+    PRECOMBAT_MAIN = 'precombat main'
+    COMBAT_PHASE = 'combat'
+    POSTCOMBAT_MAIN = 'postcombat main'
+    END_PHASE = 'end'
+
+    # An orderd list of step, phase tuples
+    TURN_ORDER = [
+        (UNTAP_STEP, BEGINNING_PHASE),
+        (UPKEEP_STEP, BEGINNING_PHASE),
+        (DRAW_STEP, BEGINNING_PHASE),
+        (PRECOMBAT_MAIN, PRECOMBAT_MAIN),
+        (BEGIN_COMBAT_STEP, COMBAT_PHASE),
+        (DECLARE_ATTACKERS_STEP, COMBAT_PHASE),
+        (DECLARE_BLOCKERS_STEP, COMBAT_PHASE),
+        (COMBAT_DAMAGE_STEP, COMBAT_PHASE),
+        (END_OF_COMBAT_STEP, COMBAT_PHASE),
+        (POSTCOMBAT_MAIN, POSTCOMBAT_MAIN),
+        (END_STEP, END_PHASE),
+        (CLEANUP_STEP, END_PHASE)
+    ]
 
     def __init__(self, game):
         self.step = None
@@ -188,26 +197,16 @@ class TurnManager(object):
 
     def _next_step(self):
         """
-        Advance to the next step.
+        Advance to the next step/phase
         """
 
-        if self.step == self.PHASES[self.phase][-1]:
-            self._next_phase()
-        else:
-            steps = self.PHASES[self.phase]
-            self.step = steps[steps.index(self.step) + 1]
-        self.priority_player = self.active_player
-
-    def _next_phase(self):
-        """
-        Advance to the next phase.
-        """
-
-        if self.phase == self.PHASE_ORDER[-1]:
+        step_phase = (self.step, self.phase)
+        if step_phase == self.TURN_ORDER[-1]:
             self._next_turn()
         else:
-            self.phase = self.PHASE_ORDER[self.PHASE_ORDER.index(self.phase) + 1]
-            self.step = self.PHASES[self.phase][0]
+            self.step, self.phase = self.TURN_ORDER[self.TURN_ORDER.index(step_phase) + 1]
+        # At the beginnig of each step/phase the active player gets priority.
+        self.priority_player = self.active_player
 
     def _next_turn(self):
         """
@@ -215,13 +214,10 @@ class TurnManager(object):
         """
 
         self.active_player = self._game.player_manager.next_player(self.active_player)
-        self.phase = self.PHASE_ORDER[0]
-        self.step = self.PHASES[self.phase][0]
+        self.step, self.phase = self.TURN_ORDER[0]
 
 
-
-
-class MagicTheGathering(object): # pylint: disable=too-many-instance-attributes
+class MagicTheGathering(object):  # pylint: disable=too-many-instance-attributes
     """
     This is the actual game class. Really this should just coordinate conversation between
     various subclasses. Almost all of the logic should be kept out of this class.

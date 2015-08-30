@@ -15,8 +15,8 @@ class ServiceWrapperTestCase(unittest.TestCase):
 
     def setUp(self):
         self.config_for_service = {'foo': 'bar'}
-        self.service_wrapper = deckr.core.service_wrapper.ServiceWrapper(tests.services.SERVICE_CONFIG,
-                                                                         self.config_for_service)
+        self.service_wrapper = deckr.core.service_wrapper.ServiceWrapper(
+            tests.services.SERVICE_CONFIG, self.config_for_service)
 
     def test_create(self):
         """

@@ -47,7 +47,8 @@ class SimpleClient(object):
 
         if not sync:
             self._listen_thread = threading.Thread(
-                target=self.listen, args=(True,))
+                target=self.listen,
+                args=(True, ))
             self._listen_thread.start()
 
     def shutdown(self):

@@ -9,6 +9,4 @@ FOREST_CARD_DATA = {
     "subtypes": ["Forest"]
 }
 
-SIMPLE_CARD_LIBRARY = {
-    "Forest": FOREST_CARD_DATA
-}
+SIMPLE_CARD_LIBRARY = {"Forest": FOREST_CARD_DATA}
