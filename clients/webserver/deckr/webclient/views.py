@@ -1,4 +1,8 @@
+import os
 from django.shortcuts import render
+from django.templatetags.static import static
+from django.http import HttpResponse
+from django.conf import settings
 
 def index(request):
     """
@@ -13,3 +17,11 @@ def lobby(request):
     """
 
     return render(request, "webclient/lobby.html", {})
+
+def proto(request, base_file_name):
+    """
+    Returns appropriate .proto file.
+    """
+
+    proto_file = open(settings.PROTO_PATH + base_file_name + '.proto').read()
+    return HttpResponse(proto_file, content_type='application/x-protobuf')

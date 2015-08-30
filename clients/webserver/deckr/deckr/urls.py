@@ -24,8 +24,13 @@ LOBBY = url(r'^lobby/',
             'webclient.views.lobby',
             name='webclient.lobby')
 
+PROTO = url(r'^proto/(?P<base_file_name>.*)',
+            'webclient.views.proto',
+            name='webclient.proto')
+
 urlpatterns = [
     INDEX,
     LOBBY,
+    PROTO,
     url(r'^admin/', include(admin.site.urls)),
 ]
