@@ -61,6 +61,7 @@ def parse_game_state(game_state):
         }
     return game
 
+
 def get_game_object(game_state, game_id):
     """
     Get a game object by game_id.
@@ -171,7 +172,8 @@ class SinglePlayerTestCase(unittest.TestCase):
             response = self._check_response()
             if test(response.game_state_response.game_state):
                 return
-        raise ValueError("Should not have reached {} passes".format(max_passes))
+        raise ValueError("Should not have reached {} passes".format(
+            max_passes))
 
     def test_create(self):
         """
@@ -264,17 +266,18 @@ class SinglePlayerTestCase(unittest.TestCase):
         game_state = parse_game_state(response.game_state_response.game_state)
         self.assertEqual(len(game_state[player]['hand']), 8)
 
-
     def test_lost(self):
         """
         Make sure if we can't draw than we lose the game.
         """
 
         player_id, _ = self._create_join_start(7)
-        player = get_game_object(self.last_response.game_state_response.game_state, player_id)
+        player = get_game_object(
+            self.last_response.game_state_response.game_state, player_id)
         self.assertFalse(player.lost)
         self._pass_until(lambda game_state: game_state.current_step == 'draw')
         # Don't draw until the start of the second turn
         self._pass_until(lambda game_state: game_state.current_step == 'draw')
-        player = get_game_object(self.last_response.game_state_response.game_state, player_id)
+        player = get_game_object(
+            self.last_response.game_state_response.game_state, player_id)
         self.assertTrue(player.lost)
