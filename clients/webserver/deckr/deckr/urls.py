@@ -20,17 +20,39 @@ INDEX = url(r'^$',
             'webclient.views.index',
             name='webclient.index')
 
-LOBBY = url(r'^lobby/',
+LOBBY = url(r'^lobby/$',
             'webclient.views.lobby',
             name='webclient.lobby')
 
-PROTO = url(r'^proto/(?P<base_file_name>.*)',
+PROTO = url(r'^proto/(?P<base_file_name>.*)$',
             'webclient.views.proto',
             name='webclient.proto')
+
+LOGIN = url(r'^login/$',
+            'django.contrib.auth.views.login',
+            {'template_name': 'auth/login.html'},
+            name='login')
+
+LOGOUT = url(r'^logout/$',
+            'django.contrib.auth.views.logout',
+            {'next_page': '/'},
+            name='logout')
+
+CREATE_GAME = url(r'^game/create$',
+                 'webclient.views.create_game',
+                 name='create_game')
+
+GAME = url(r'^game/(?P<game_id>[0-9]+)$',
+           'webclient.views.game',
+           name='game')
 
 urlpatterns = [
     INDEX,
     LOBBY,
     PROTO,
+    LOGIN,
+    LOGOUT,
+    CREATE_GAME,
+    GAME,
     url(r'^admin/', include(admin.site.urls)),
 ]
