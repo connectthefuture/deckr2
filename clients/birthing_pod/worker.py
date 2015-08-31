@@ -23,11 +23,15 @@ class BirthingPodWorker(object):
         self.last_game_state = None
         self.player_id = None
 
-    def has_lost(self):
+    def is_over(self):
         """
         Check if we've lost in the last game_state.
         """
 
+        player_objs = [x for x in self.last_game_state.game_objects if x.game_object_type == 0]
+        return len([x for x in player_objs if not x.player.lost]) == 0 # The game if over if there's at most one player who hasn't lost.
+
+    def has_lost(self):
         player_obj = [x for x in self.last_game_state.game_objects if x.game_id == self.player_id][0].player
         return player_obj.lost
 
@@ -68,7 +72,7 @@ class BirthingPodWorker(object):
         Play a game.
         """
 
-        while not self.has_lost():
+        while not self.is_over():
             self.deckr_client.pass_priority()
             self.last_game_state = self.deckr_client.listen().game_state_response.game_state
 
@@ -79,7 +83,8 @@ class BirthingPodWorker(object):
 
         payload = {
             'worker_id': self.worker_id,
-            'playback_id': self.playback_id
+            'playback_id': self.playback_id,
+            'lost': self.has_lost()
         }
         response = requests.post(self.birthing_pod_base + '/stats', data=json.dumps(payload))
 

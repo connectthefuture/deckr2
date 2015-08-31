@@ -1,0 +1,24 @@
+<html>
+  <head>
+    <title>Birthing Pod</title>
+  </head>
+  <body>
+      <table>
+        <thead>
+          <tr>
+            <td>Deck</td>
+            <td>Win Count</td>
+            <td>Lose Count</td>
+          </tr>
+        </thead>
+        <tbody>
+          {% for deck in decks %}
+          <tr>
+            <td>{{ deck.deck }}</td>
+            <td>{{ deck.win_count}}</td>
+            <td>{{ deck.lose_count}}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+  </body>
+</html>
