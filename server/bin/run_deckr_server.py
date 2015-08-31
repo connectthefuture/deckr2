@@ -7,6 +7,15 @@ import yaml
 
 import deckr.core.service
 
+FOREST_CARD_DATA = {
+    "name": "Forest",
+    "types": ["Land"],
+    "supertypes": ["Basic"],
+    "subtypes": ["Forest"]
+}
+
+SIMPLE_CARD_LIBRARY = {"Forest": FOREST_CARD_DATA}
+
 
 def parse_arguments():
     """
@@ -32,7 +41,8 @@ def main():
         yaml.load(open('config/services/deckr_server_service.yml')),
         {'websockets': args.websockets})
     starter.add_service(
-        yaml.load(open('config/services/card_library_service.yml')), {})
+        yaml.load(open('config/services/card_library_service.yml')),
+        {'library': SIMPLE_CARD_LIBRARY})
     starter.add_service(
         yaml.load(open('config/services/action_validator_service.yml')), {})
     starter.add_service(
