@@ -8,22 +8,26 @@
 
 <div class="wrapper">
   <h1>Deckr Lobby</h1>
-  <a href="#">Start Game</a>
-  <a href="#">Join Game</a>
+  <a id="start" href="{% url 'create_game' %}">Create Game</a> | <a href="#">Join Game</a>
+  <!-- TODO: Load open games from db. -->
   <table class="games">
     <thead>
       <tr>
-        <th>Player</th>
+        <th>Created By</th>
+        <th>Name</th>
         <th>Format</th>
         <th>Play/Watch</th>
       </tr>
     </thead>
     <tbody>
+      {% for game in games %}
       <tr>
-        <td>...</td>
-        <td>...</td>
-        <td>...</td>
+        <td>{{ game.created_by }}</td>
+        <td>{{ game.name }}</td>
+        <td>{{ game.variant }}</td>
+        <td><a href="{% url 'game' game_id=game.game_id %}">Play</a></td>
       </tr>
+      {% endfor %}
     </tbody>
   </table>
 </div>

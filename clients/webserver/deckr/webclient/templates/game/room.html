@@ -1,0 +1,13 @@
+{% extends 'webclient/base.html' %}
+{% block morejs %}
+  {% load staticfiles %}
+  <script type="text/javascript" src="{% static 'js/sockets.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/game.js' %}"></script>
+{% endblock %}
+{% block body %}
+
+<div class="wrapper">
+  <h1>Game (id: {{ game.game_id }}, name: {{ game.name }})</h1>
+</div>
+
+{% endblock %}
