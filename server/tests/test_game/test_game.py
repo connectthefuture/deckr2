@@ -218,6 +218,8 @@ class MagicTheGatheringTestCase(unittest.TestCase):
         # Set up the game
         self.game.turn_manager.step = 'untap'
         self.game.turn_manager.phase = 'beginning'
+        self.game.turn_manager.priority_player = mock.MagicMock()
+        self.game.turn_manager.priority_player.game_id = 1
         self.game.registry.register(mock_game_object)
 
         self.game.update_proto(proto)

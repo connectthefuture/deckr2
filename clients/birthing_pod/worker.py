@@ -23,13 +23,26 @@ class BirthingPodWorker(object):
         self.last_game_state = None
         self.player_id = None
 
+    def wait_for_priority_or_over(self):
+        """
+        Wait until we have priority, or the game is over.
+        """
+
+        while True:
+            if self.last_game_state and (self.is_over() or self.last_game_state.priority_player == self.player_id):
+                print "I have priority or the game is over"
+                return
+            response = self.deckr_client.listen()
+            self.last_game_state = response.game_state_response.game_state
+
+
     def is_over(self):
         """
         Check if we've lost in the last game_state.
         """
 
         player_objs = [x for x in self.last_game_state.game_objects if x.game_object_type == 0]
-        return len([x for x in player_objs if not x.player.lost]) == 0 # The game if over if there's at most one player who hasn't lost.
+        return len([x for x in player_objs if not x.player.lost]) <= 1 # The game if over if there's at most one player who hasn't lost.
 
     def has_lost(self):
         player_obj = [x for x in self.last_game_state.game_objects if x.game_id == self.player_id][0].player
@@ -64,8 +77,9 @@ class BirthingPodWorker(object):
         self.playback_id = data['playback_id']
         self.deckr_client.join(data['game_id'], deck=data['deck'])
         self.player_id = self.deckr_client.listen().join_response.player_id
-        self.deckr_client.start()
-        self.last_game_state = self.deckr_client.listen().game_state_response.game_state
+        if data['start']:
+            self.deckr_client.start()
+        self.wait_for_priority_or_over()
 
     def play_game(self):
         """
@@ -73,8 +87,11 @@ class BirthingPodWorker(object):
         """
 
         while not self.is_over():
+            self.wait_for_priority_or_over()
             self.deckr_client.pass_priority()
-            self.last_game_state = self.deckr_client.listen().game_state_response.game_state
+            response = self.deckr_client.listen()
+            self.last_game_state = response.game_state_response.game_state
+            
 
     def report(self):
         """
@@ -96,4 +113,5 @@ if __name__ == "__main__":
     worker = BirthingPodWorker("http://127.0.0.1:5000", 1, deckr_client)
     worker.run()
     deckr_client.shutdown()
+    print worker.last_game_state
     LOGGER.info('Shut it down')

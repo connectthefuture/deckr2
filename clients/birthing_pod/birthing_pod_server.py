@@ -65,12 +65,12 @@ class BirthingPod(object):
         Get the data for the next worker.
         """
 
-        if self.pending_game is None or True:
+        if self.pending_game is None:
             self.client.create()
             response = self.client.listen()
             game_id = response.create_response.game_id
             self.pending_game = game_id
-            start = True
+            start = False
         else:
             game_id = self.pending_game
             self.pending_game = None

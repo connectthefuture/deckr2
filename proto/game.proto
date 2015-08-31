@@ -4,6 +4,8 @@ message GameState {
     required string current_phase = 1;
     required string current_step = 2;
     repeated GameObject game_objects = 3;
+    required int32 priority_player = 4;
+    required int32 turn_number = 5;
 }
 
 // Union to represent any type of game object

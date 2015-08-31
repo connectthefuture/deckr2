@@ -189,7 +189,9 @@ class TurnManager(object):
 
         next_player = self._game.player_manager.next_player(
             self.priority_player)
+        print (self.turn, self.step, self.phase)
         if next_player == self.active_player:
+            print "Next step"
             self._next_step()
         else:
             self.priority_player = next_player
@@ -280,6 +282,8 @@ class MagicTheGathering(object):  # pylint: disable=too-many-instance-attributes
         # Grab the simple global stuff
         game_state_proto.current_step = self.turn_manager.step
         game_state_proto.current_phase = self.turn_manager.phase
+        game_state_proto.priority_player = self.turn_manager.priority_player.game_id
+        game_state_proto.turn_number = self.turn_manager.turn
         for obj in self.registry:
             proto = game_state_proto.game_objects.add()
             obj.update_proto(proto)
