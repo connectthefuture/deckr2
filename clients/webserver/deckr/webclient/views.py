@@ -1,8 +1,12 @@
 import os
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
+from django.core.urlresolvers import reverse
 from django.templatetags.static import static
 from django.http import HttpResponse
 from django.conf import settings
+
+from .forms import CreateGameForm
+from .models import Game
 
 def index(request):
     """
@@ -15,8 +19,43 @@ def lobby(request):
     """
     Returns the lobby, where players can start, join, or watch games.
     """
+    games = get_list_or_404(Game)
+    return render(request, "webclient/lobby.html", {
+        'games': games,
+    })
 
-    return render(request, "webclient/lobby.html", {})
+def create_game(request):
+    """
+    Returns the create game page where players can create a new game.
+    """
+
+    if request.method == "POST":
+        form = CreateGameForm(request.POST)
+        if form.is_valid():
+            game = Game.objects.create(
+                game_id=form.cleaned_data['game_id'],
+                name=form.cleaned_data['name'],
+                variant=form.cleaned_data['variant'],
+                max_players=form.cleaned_data['max_players'],
+                created_by=request.user)
+            return redirect(reverse('game', args=(game.game_id,)))
+    else:
+        form = CreateGameForm()
+
+    return render(request, "game/create.html", {
+        'form': form,
+    })
+
+def game(request, game_id):
+    """
+    Returns the game room for the given game_id.
+    """
+
+    game = get_object_or_404(Game, pk=game_id)
+
+    return render(request, "game/room.html", {
+        'game': game,
+    })
 
 def proto(request, base_file_name):
     """
