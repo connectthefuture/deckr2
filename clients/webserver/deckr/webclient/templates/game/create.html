@@ -15,8 +15,8 @@
   <form id="create-game-room" method="post">
     {% csrf_token %}
     {{ form.as_p }}
+    <p><input type="submit" value="Create Game" class="btn create-game" /></p>
   </form>
-  <p><button class="btn create-game-button">Create Game</button></p>
 
 </div>
 

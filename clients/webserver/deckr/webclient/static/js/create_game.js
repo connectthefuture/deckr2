@@ -12,6 +12,15 @@ function sendCreateGameMessage () {
   sendMessage(create_msg);
 }
 
+function handleCreate (message) {
+  $("input[name='game_id']").val(message.game_id);
+  $('#create-game-room').submit();
+}
+
 $(document).ready(function () {
-  $('.create-game-button').on("click", sendCreateGameMessage);
+  $('.btn.create-game').on("click", sendCreateGameMessage);
+  $('#create-game-room input').on('keypress', function () {
+    var keycode = (event.keyCode ? event.keyCode : event.which);
+    if (keycode == '13') sendCreateGameMessage();
+  });
 });

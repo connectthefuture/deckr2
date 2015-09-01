@@ -6,8 +6,7 @@
   <script type="text/javascript" src="{% static 'js/game.js' %}"></script>
   <script type="text/javascript">
     var game_id = parseInt('{{ game.game_id }}');
-    var is_joining = Boolean('{{ is_joining }}');
-    var is_watching = Boolean('{{ is_watching }}');
+    var is_player = Boolean('{{ is_player }}');
   </script>
 {% endblock %}
 {% block body %}

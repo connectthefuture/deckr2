@@ -63,8 +63,7 @@ function handleServerResponse (message) {
 function _handleCreate (message) {
   console.log("Handling CREATE response");
   var message = message.create_response;
-  $("input[name='game_id']").val(message.game_id);
-  $('form').submit();
+  handleCreate(message); // Defined in create_game.js
 }
 
 function _handleJoin (message) {
@@ -87,6 +86,7 @@ function _handleError (message) {
 function _handleGameState (message) {
   console.log("Handling GAME STATE response");
   var message = message.game_state_response;
+  handleGameState(message); // Defined in game.js
   return;
 }
 

@@ -63,8 +63,7 @@ def game(request, game_id):
     """
 
     if request.method == "POST":
-        request.session['is_joining'] = request.POST.get('join', False)
-        request.session['is_watching'] = request.POST.get('watch', False)
+        request.session['is_player'] = request.POST.get('play', False)
         request.session['nick'] = request.POST.get("nick", "")
 
     game = get_object_or_404(Game, pk=game_id)
@@ -72,8 +71,7 @@ def game(request, game_id):
     return render(request, "game/room.html", {
         'game': game,
         'nick': request.session['nick'],
-        'is_joining': request.session['is_joining'],
-        'is_watching': request.session['is_watching'],
+        'is_player': request.session['is_player'],
     })
 
 def proto(request, base_file_name):
