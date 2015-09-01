@@ -8,12 +8,10 @@
 
 <div class="wrapper">
   <h1>Deckr Lobby</h1>
-  <a id="start" href="{% url 'create_game' %}">Create Game</a> | <a href="#">Join Game</a>
-  <!-- TODO: Load open games from db. -->
+  <a id="start" href="{% url 'create_game' %}">Create Game</a>
   <table class="games">
     <thead>
       <tr>
-        <th>Created By</th>
         <th>Name</th>
         <th>Format</th>
         <th>Play/Watch</th>
@@ -22,7 +20,6 @@
     <tbody>
       {% for game in games %}
       <tr>
-        <td>{{ game.created_by }}</td>
         <td>{{ game.name }}</td>
         <td>{{ game.variant }}</td>
         <td><a href="{% url 'game' game_id=game.game_id %}">Play</a></td>

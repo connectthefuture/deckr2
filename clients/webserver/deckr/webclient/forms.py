@@ -10,4 +10,4 @@ class CreateGameForm(forms.Form):
     name = forms.CharField(required=True)
     variant = forms.CharField(required=True)
     max_players = forms.IntegerField(required=True)
-    private = forms.BooleanField(required=False)
+    # private = forms.BooleanField(required=False)

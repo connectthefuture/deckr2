@@ -6,5 +6,5 @@ class Game(models.Model):
     name = models.CharField(max_length=100)
     variant = models.CharField(max_length=50)
     max_players = models.IntegerField()
-    created_by = models.ForeignKey(User)
+    # created_by = models.ForeignKey(User)
     is_game_over = models.BooleanField(default=False)

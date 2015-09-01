@@ -22,7 +22,7 @@ INDEX = url(r'^$',
 
 LOBBY = url(r'^lobby/$',
             'webclient.views.lobby',
-            name='webclient.lobby')
+            name='lobby')
 
 PROTO = url(r'^proto/(?P<base_file_name>.*)$',
             'webclient.views.proto',
@@ -50,8 +50,8 @@ urlpatterns = [
     INDEX,
     LOBBY,
     PROTO,
-    LOGIN,
-    LOGOUT,
+    # LOGIN,
+    # LOGOUT,
     CREATE_GAME,
     GAME,
     url(r'^admin/', include(admin.site.urls)),

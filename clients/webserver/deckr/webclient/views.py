@@ -19,7 +19,7 @@ def lobby(request):
     """
     Returns the lobby, where players can start, join, or watch games.
     """
-    games = get_list_or_404(Game)
+    games = list(Game.objects.filter())
     return render(request, "webclient/lobby.html", {
         'games': games,
     })
@@ -37,7 +37,7 @@ def create_game(request):
                 name=form.cleaned_data['name'],
                 variant=form.cleaned_data['variant'],
                 max_players=form.cleaned_data['max_players'],
-                created_by=request.user)
+            )
             return redirect(reverse('game', args=(game.game_id,)))
     else:
         form = CreateGameForm()

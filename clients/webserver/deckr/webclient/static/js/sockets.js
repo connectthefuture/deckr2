@@ -11,7 +11,7 @@ SOCKET_STATES = {
 
 function sendMessage (message) {
   console.log("Sending message.")
-  socket.send(message.encodeJSON() + "\r\n");
+  socket.send(message.toBase64() + "\r\n");
 }
 
 function getSocketState () {
@@ -24,7 +24,10 @@ function getSocketStateInEnglish () {
 }
 
 function handleServerResponse (response) {
-  message = ServerResponse.decodeJSON(response);
+  // Since we use sendLine, we recieve an additional two characters with our
+  // response, so we need remove them so we can properly decode the message.
+  response = response.substring(0, response.length - 2)
+  message = ServerResponse.decode64(response);
   if (message.response_type === 0) {
     _handleCreate(message.create_response);
   }
