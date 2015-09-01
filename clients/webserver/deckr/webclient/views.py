@@ -38,7 +38,7 @@ def create_game(request):
                 variant=form.cleaned_data['variant'],
                 max_players=form.cleaned_data['max_players'],
             )
-            return redirect(reverse('game', args=(game.game_id,)))
+            return redirect(reverse('staging', args=(game.game_id,)))
     else:
         form = CreateGameForm()
 
@@ -46,15 +46,34 @@ def create_game(request):
         'form': form,
     })
 
+def staging(request, game_id):
+    """
+    Returns the staging area for the given game_id.
+    """
+
+    game = get_object_or_404(Game, pk=game_id)
+
+    return render(request, "game/staging.html", {
+        'game': game,
+    })
+
 def game(request, game_id):
     """
     Returns the game room for the given game_id.
     """
 
+    if request.method == "POST":
+        request.session['is_joining'] = request.POST.get('join', False)
+        request.session['is_watching'] = request.POST.get('watch', False)
+        request.session['nick'] = request.POST.get("nick", "")
+
     game = get_object_or_404(Game, pk=game_id)
 
     return render(request, "game/room.html", {
         'game': game,
+        'nick': request.session['nick'],
+        'is_joining': request.session['is_joining'],
+        'is_watching': request.session['is_watching'],
     })
 
 def proto(request, base_file_name):

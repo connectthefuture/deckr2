@@ -22,7 +22,7 @@
       <tr>
         <td>{{ game.name }}</td>
         <td>{{ game.variant }}</td>
-        <td><a href="{% url 'game' game_id=game.game_id %}">Play</a></td>
+        <td><a href="{% url 'staging' game_id=game.game_id %}">Join Game</a></td>
       </tr>
       {% endfor %}
     </tbody>

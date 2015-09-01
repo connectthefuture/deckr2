@@ -1,4 +1,4 @@
-function sendCreateGameMessage() {
+function sendCreateGameMessage () {
   var variant = $('input[name="variant"]').val();
   var max_players = parseInt($('input[name="max_players"]').val());
   var create_msg = new ClientMessage({

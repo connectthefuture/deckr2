@@ -42,6 +42,10 @@ CREATE_GAME = url(r'^game/create$',
                  'webclient.views.create_game',
                  name='create_game')
 
+STAGING = url(r'^staging/(?P<game_id>[0-9]+)$',
+              'webclient.views.staging',
+              name='staging')
+
 GAME = url(r'^game/(?P<game_id>[0-9]+)$',
            'webclient.views.game',
            name='game')
@@ -53,6 +57,7 @@ urlpatterns = [
     # LOGIN,
     # LOGOUT,
     CREATE_GAME,
+    STAGING,
     GAME,
     url(r'^admin/', include(admin.site.urls)),
 ]
