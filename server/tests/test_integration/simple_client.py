@@ -65,11 +65,6 @@ class SimpleClient(object):
         """
 
         while True:
-            data = self._socket.recv(BUFFER_SIZE)
-            if not data:
-                print "Connection closed"
-                return
-            self._buffer += data
             if '\r\n' in self._buffer:
                 data, self._buffer = self._buffer.split('\r\n', 1)
                 response = proto.server_response_pb2.ServerResponse()
@@ -78,6 +73,12 @@ class SimpleClient(object):
                     print response
                 else:
                     return response
+            data = self._socket.recv(BUFFER_SIZE)
+            if not data:
+                print "Connection closed"
+                return
+            self._buffer += data
+
 
     def send_message(self, message):
         """

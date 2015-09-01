@@ -103,6 +103,7 @@ class PlayerManager(object):
         Returns the next player in turn order.
         """
 
+        print player, self.players
         assert player in self.players
         index = self.players.index(player)
         if index == len(self.players) - 1:

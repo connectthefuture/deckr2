@@ -22,6 +22,31 @@ class BirthingPodWorker(object):
         self.deckr_client = deckr_client
         self.last_game_state = None
         self.player_id = None
+        self.last_response = None
+
+    def reset(self):
+        self.player_id = None
+        self.last_game_state = None
+        self.deckr_client.leave()
+        self.wait_for_response(2)
+
+    def wait_for_response(self, response_type):
+        while True:
+            self.last_response = self.deckr_client.listen()
+            if self.last_response is not None and self.last_response.response_type == response_type:
+                return self.last_response
+            elif self.last_response is not None:
+                print "Unexpected response", self.last_response
+
+
+
+    def wait_for_game_state(self):
+        """
+        Wait unti we've updated the game state.
+        """
+
+        self.last_game_state = self.wait_for_response(4).game_state_response.game_state
+
 
     def wait_for_priority_or_over(self):
         """
@@ -30,10 +55,8 @@ class BirthingPodWorker(object):
 
         while True:
             if self.last_game_state and (self.is_over() or self.last_game_state.priority_player == self.player_id):
-                print "I have priority or the game is over"
                 return
-            response = self.deckr_client.listen()
-            self.last_game_state = response.game_state_response.game_state
+            self.wait_for_game_state()
 
 
     def is_over(self):
@@ -62,6 +85,7 @@ class BirthingPodWorker(object):
                 self.get_game()
                 self.play_game()
                 self.report()
+                self.reset()
         except KeyboardInterrupt:
             return
 
@@ -76,10 +100,12 @@ class BirthingPodWorker(object):
 
         self.playback_id = data['playback_id']
         self.deckr_client.join(data['game_id'], deck=data['deck'])
-        self.player_id = self.deckr_client.listen().join_response.player_id
+        self.player_id = self.wait_for_response(1).join_response.player_id
+        print self.player_id
         if data['start']:
+            time.sleep(0.2) # Make sure everyone has time to connect
             self.deckr_client.start()
-        self.wait_for_priority_or_over()
+        self.wait_for_game_state()
 
     def play_game(self):
         """
@@ -88,10 +114,9 @@ class BirthingPodWorker(object):
 
         while not self.is_over():
             self.wait_for_priority_or_over()
-            self.deckr_client.pass_priority()
-            response = self.deckr_client.listen()
-            self.last_game_state = response.game_state_response.game_state
-            
+            if not self.is_over():
+                self.deckr_client.pass_priority()
+                self.wait_for_game_state() # Make sure we don't spam, so wait until we have a new game state.
 
     def report(self):
         """
