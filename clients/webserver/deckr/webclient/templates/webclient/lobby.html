@@ -19,7 +19,7 @@
     </thead>
     <tbody>
       {% for game in games %}
-      <tr>
+      <tr data-game-id="{{ game.game_id }}">
         <td>{{ game.name }}</td>
         <td>{{ game.variant }}</td>
         <td><a href="{% url 'staging' game_id=game.game_id %}">Join Game</a></td>

@@ -34,7 +34,7 @@ function sendPassPriorityMessage () {
 }
 
 function handleGameState (message) {
-  $('.start-game').hide();
+  $('.start-game').hide(); // TODO: Broadcast this to all players
 }
 
 $(document).ready(function () {

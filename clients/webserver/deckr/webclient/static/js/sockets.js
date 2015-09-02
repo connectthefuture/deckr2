@@ -9,15 +9,26 @@ SOCKET_STATES = {
   CLOSED: 3
 };
 
-function sendMessageOnceSocketOpens (message) {
+function runOnceSocketOpens (callback) {
+  if (getSocketState() === SOCKET_STATES.OPEN) {
+    return callback();
+  }
+  var return_value;
   setTimeout(function () {
     if (getSocketState() === SOCKET_STATES.OPEN) {
-      sendMessage(message);
+      return_value = callback();
     } else {
       console.log("Wating for connection...");
-      sendMessageOnceSocketOpens(message);
+      return_value = runOnceSocketOpens(callback);
     }
   }, 5);
+  return return_value;
+}
+
+function sendMessageOnceSocketOpens (message) {
+  runOnceSocketOpens(function () {
+    sendMessage(message);
+  });
 }
 
 function sendMessage (message) {

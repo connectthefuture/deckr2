@@ -8,7 +8,7 @@
 {% block body %}
 
 <div class="wrapper">
-  <h1>Staging: Game (id: {{ game.game_id }}, name: {{ game.name }})</h1>
+  <h1>Staging: Game (id: <span class="game-id">{{ game.game_id }}</span>, name: <span class="game-name">{{ game.name }})<span></h1>
 
 <form class="join-game-form" method="post" action="{% url 'game' game_id=game.game_id %}">
   {% csrf_token %}
