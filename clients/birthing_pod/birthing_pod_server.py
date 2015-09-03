@@ -1,18 +1,19 @@
 #!/usr/bin/env python
 """
-Run the very simple birthing pod server.
+Run flask ontop of the birthing pod master.
 """
 
 import json
 import random
 
 import flask
-import simple_client
+
+import birthing_pod.master
 
 APP = flask.Flask(__name__)
 
 # Woo, global state....
-BIRTHING_POD = BirthingPod()
+BIRTHING_POD = birthing_pod.master.BirthingPodMaster()
 
 @APP.route('/')
 def index():
@@ -20,11 +21,7 @@ def index():
     Get the index page.
     """
 
-    user = {'nickname': 'Miguel'}  # fake user
-    return flask.render_template('index.html',
-                                 decks=BIRTHING_POD.decks)
-
-
+    return flask.render_template('index.html')
 
 @APP.route('/game')
 def game_view():
@@ -32,7 +29,7 @@ def game_view():
     Returns a game that should be joined, and a deck list to use.
     """
 
-    return json.dumps(BIRTHING_POD.get_game())
+    return json.dumps(BIRTHING_POD.get_job())
 
 @APP.route('/stats', methods=['GET', 'POST'])
 def stats_view():
