@@ -3,7 +3,27 @@ This module provides the BirthingPodMaster class and some of the associated
 functionality.
 """
 
+import random
+
 import birthing_pod.client
+
+class Match(object):
+    """
+    This represents a match between two decks.
+    """
+
+    def __init__(self, first_deck, second_deck):
+        self.first_deck = first_deck
+        self.second_deck = second_deck
+        self.game_id = None
+
+    def initialize(self, client):
+        """
+        Create an actual game for this match.
+        """
+
+        response = client.send_and_wait(birthing_pod.client.message_create())
+        self.game_id = response.create_response.game_id
 
 class DeckIndividual(object):
     """
@@ -15,13 +35,16 @@ class DeckIndividual(object):
     def __init__(self, deck):
         self.deck = deck # The actual cards in the deck.
 
-class GenectiController(object):
+class GeneticController(object):
     """
     This class runs the actual genetic algorithm.
     """
 
-     def __init__(self, population_size=10):
-         self.population_size = population_sized
+    def __init__(self, population_size=10):
+         self.population_size = population_size
+         self.population = [
+            DeckIndividual(["Forest"] * random.randint(7, 15)) for _ in range(self.population_size)
+         ]
 
     def initialize(self):
         """
@@ -35,7 +58,10 @@ class GenectiController(object):
         Get the matches that should be run for this generation.
         """
 
-        return []
+        return [
+            Match(random.choice(self.population), random.choice(self.population))
+            for _ in range(10)
+        ]
 
     def evolve(self):
         """
@@ -52,12 +78,16 @@ class BirthingPodMaster(object):
     """
 
     def __init__(self):
-        self._client = birthing_pod.client.Client
+        self._client = birthing_pod.client.Client()
         self._genetic_controller = GeneticController()
+        self._matches = []
+        self._playback_id = 0
+        self._next_match = None
 
     def initialize(self):
         self._client.initialize()
         self._genetic_controller.initialize()
+        self._matches = self._genetic_controller.get_matches()
 
     def get_job(self):
         """
@@ -65,7 +95,26 @@ class BirthingPodMaster(object):
         information for the next game to play.
         """
 
-        pass
+        if self._next_match is None:
+            self._next_match = self._matches.pop()
+            self._next_match.initialize(self._client)
+            deck = self._next_match.first_deck
+            game_id = self._next_match.game_id
+        else:
+            deck = self._next_match.second_deck
+            game_id = self._next_match.game_id
+            self._next_match = None
+
+        playback_id = self._playback_id
+        self._playback_id += 1
+        
+        return {
+            'deck': deck.deck,
+            'playback_id': playback_id,
+            'game_id': game_id
+        }
+
+
 
     def report(self, stats):
         """
