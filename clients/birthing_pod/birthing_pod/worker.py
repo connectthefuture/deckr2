@@ -12,30 +12,114 @@ import birthing_pod.client
 
 LOGGER = logging.getLogger(__name__)
 
+class GameState(object):
+    """
+    A very simple representation of the game state.
+    """
+
+    def __init__(self, game_state_proto):
+        self.players = {x.game_id: x.player for x in game_state_proto.game_objects
+                        if x.game_object_type == 0}
+        self.priority_player = game_state_proto.priority_player
+        self
+
 class BirthingPodJob(object):
     """
     A job is basically a deck that needs to be played.
     """
 
-    def __init__(self, deckr_client):
+    def __init__(self, deckr_client, job_id, game_id, deck, start):
         self._client = deckr_client
+        self._job_id = job_id
+        self._game_id = game_id
+        self._player_id = None
+        self._deck = deck
+        self._game_state = None
+        self._start = start
 
     def run(self):
         """
         Play the game.
         """
 
-        pass
+        # Start by joining the game
+        response = self._client.send_and_wait(
+            birthing_pod.client.message_join(self._game_id, self._deck))
+        self._player_id = response.join_response.player_id
+
+        # Start the game
+        if self._start:
+            time.sleep(0.1) # Sometimes people haven't all connected
+            self._client.send_message(birthing_pod.client.message_start())
+        self.wait_for_game_state()
+
+        while not self.is_over():
+            self.wait_for_priority()
+            # Right now the server doesn't do well with events after the game is over.
+            if self.is_over():
+                return
+            self._client.send_message(birthing_pod.client.message_pass_priority())
+            self.wait_for_game_state()
 
     def get_stats(self):
         """
         Get stats about this job upon completion.
         """
 
-        pass
+        return {
+            'job_id': self._job_id,
+            'won': not self.lost()
+        }
+
+    ##############################
+    # Simple actions for waiting #
+    ##############################
+
+    def lost(self):
+        """
+        Check if this player has lost in the last game state.
+        """
+
+        return self._game_state.players[self._player_id].lost
+
+    def is_over(self):
+        """
+        Check the current game state to see if the game is over (i.e. there's
+        only one player who hasn't lost).
+        """
+
+        return len([x for x in self._game_state.players.values() if not x.lost]) <= 1
+
+
+    def wait_for_game_state(self):
+        """
+        Wait until we update the game state.
+        """
+
+        while True:
+            response = self._client.get_response()
+            if response.response_type == 4:
+                self._game_state = GameState(response.game_state_response.game_state)
+                return
+            else:
+                print "Encounterd unexpected message", response
+
+    def wait_for_priority(self):
+        """
+        Wait until I have priority.
+        """
+
+        while (self._game_state is None or
+               self._game_state.priority_player != self._player_id):
+            self.wait_for_game_state()
+
 
 
 class BirthingPodWorker(object):
+    """
+    This class represents a simple birthing pod worker. It will get jobs,
+    and play games in an infinite loop.
+    """
 
     def __init__(self, birthing_pod_sever, deckr_server, worker_id):
         self.birthing_pod_server = birthing_pod_sever
@@ -43,6 +127,8 @@ class BirthingPodWorker(object):
         self.worker_id = worker_id
 
         self._client = None
+        self._current_job = None
+        self._won = False # Did I win my current job?
 
 
     def start(self):
@@ -53,7 +139,7 @@ class BirthingPodWorker(object):
 
         LOGGER.debug("Worker %d: Initializing deckr_client", self.worker_id)
         self._client = birthing_pod.client.Client()
-        self._client.initalize()
+        self._client.initialize()
         self.main_loop()
 
     def main_loop(self):
@@ -76,8 +162,12 @@ class BirthingPodWorker(object):
         Request a new job from the master.
         """
 
-        # Pull data from the server
-        self._current_job = BirthingPodJob(self._client)
+        job_data = requests.get(self.birthing_pod_server + '/game').json()
+        self._current_job = BirthingPodJob(self._client,
+                                           job_data['job_id'],
+                                           job_data['game_id'],
+                                           job_data['deck'],
+                                           job_data['start'])
 
     def run(self):
         """
@@ -92,7 +182,8 @@ class BirthingPodWorker(object):
         """
 
         stats = self._current_job.get_stats()
-        # Send up to the master
+        requests.post(self.birthing_pod_server + '/stats',
+                      data=json.dumps(stats))
 
     def reset(self):
         """
@@ -100,110 +191,5 @@ class BirthingPodWorker(object):
         """
 
         self._current_job = None
-    #
-    #
-    # def reset(self):
-    #     self.player_id = None
-    #     self.last_game_state = None
-    #     self.deckr_client.leave()
-    #     self.wait_for_response(2)
-    #
-    # def wait_for_response(self, response_type):
-    #     while True:
-    #         self.last_response = self.deckr_client.listen()
-    #         if self.last_response is not None and self.last_response.response_type == response_type:
-    #             return self.last_response
-    #         elif self.last_response is not None:
-    #             print "Unexpected response", self.last_response
-    #
-    #
-    #
-    # def wait_for_game_state(self):
-    #     """
-    #     Wait unti we've updated the game state.
-    #     """
-    #
-    #     self.last_game_state = self.wait_for_response(4).game_state_response.game_state
-    #
-    #
-    # def wait_for_priority_or_over(self):
-    #     """
-    #     Wait until we have priority, or the game is over.
-    #     """
-    #
-    #     while True:
-    #         if self.last_game_state and (self.is_over() or self.last_game_state.priority_player == self.player_id):
-    #             return
-    #         self.wait_for_game_state()
-    #
-    #
-    # def is_over(self):
-    #     """
-    #     Check if we've lost in the last game_state.
-    #     """
-    #
-    #     player_objs = [x for x in self.last_game_state.game_objects if x.game_object_type == 0]
-    #     return len([x for x in player_objs if not x.player.lost]) <= 1 # The game if over if there's at most one player who hasn't lost.
-    #
-    # def has_lost(self):
-    #     player_obj = [x for x in self.last_game_state.game_objects if x.game_id == self.player_id][0].player
-    #     return player_obj.lost
-    #
-    # def run(self):
-    #     """
-    #     The main run loop is as follows:
-    #
-    #     1) Get a game from birthing pod
-    #     2) Play game
-    #     3) Report to birthing pod
-    #     """
-    #
-    #     try:
-    #         while(True):
-    #             self.get_game()
-    #             self.play_game()
-    #             self.report()
-    #             self.reset()
-    #     except KeyboardInterrupt:
-    #         return
-    #
-    # def get_game(self):
-    #     """
-    #     Get the game from the birthing pod server.
-    #     """
-    #
-    #     response = requests.get(self.birthing_pod_base + '/game')
-    #     data = response.json()
-    #     LOGGER.debug("Got a new game %s", data)
-    #
-    #     self.playback_id = data['playback_id']
-    #     self.deckr_client.join(data['game_id'], deck=data['deck'])
-    #     self.player_id = self.wait_for_response(1).join_response.player_id
-    #     print self.player_id
-    #     if data['start']:
-    #         time.sleep(0.2) # Make sure everyone has time to connect
-    #         self.deckr_client.start()
-    #     self.wait_for_game_state()
-    #
-    # def play_game(self):
-    #     """
-    #     Play a game.
-    #     """
-    #
-    #     while not self.is_over():
-    #         self.wait_for_priority_or_over()
-    #         if not self.is_over():
-    #             self.deckr_client.pass_priority()
-    #             self.wait_for_game_state() # Make sure we don't spam, so wait until we have a new game state.
-    #
-    # def report(self):
-    #     """
-    #     Report my stats.
-    #     """
-    #
-    #     payload = {
-    #         'worker_id': self.worker_id,
-    #         'playback_id': self.playback_id,
-    #         'lost': self.has_lost()
-    #     }
-    #     response = requests.post(self.birthing_pod_base + '/stats', data=json.dumps(payload))
+        self._client.send_and_wait(birthing_pod.client.message_leave())
+        self._client.clear_buffer()

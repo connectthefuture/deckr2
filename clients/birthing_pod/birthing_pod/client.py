@@ -102,6 +102,11 @@ class Client(object):
         self.send_message(message)
         return self.get_response()
 
+    def clear_buffer(self):
+        """
+        Clear out the buffer.
+        """
+        self.buffer = ''
 
 ###########################################
 # Utility functions for cretaing messages #
@@ -125,18 +130,18 @@ def message_join(game_id, deck):
         message.join_message.player_config.deck.append(card)
     return message
 
-def message_leave(self):
+def message_leave():
     message = proto.client_message_pb2.ClientMessage()
     message.message_type = proto.client_message_pb2.ClientMessage.LEAVE
     return message
 
-def message_start(self):
+def message_start():
     message = proto.client_message_pb2.ClientMessage()
     message.message_type = proto.client_message_pb2.ClientMessage.ACTION
     message.action_message.action_type = proto.client_message_pb2.ActionMessage.START
     return message
 
-def message_pass_priority(self):
+def message_pass_priority():
     message = proto.client_message_pb2.ClientMessage()
     message.message_type = proto.client_message_pb2.ClientMessage.ACTION
     message.action_message.action_type = proto.client_message_pb2.ActionMessage.PASS_PRIORITY

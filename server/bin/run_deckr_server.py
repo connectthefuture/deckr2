@@ -34,7 +34,7 @@ def main():
 
     args = parse_arguments()
     # Any basic config for logging goes here
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
 
     starter = deckr.core.service.ServiceStarter(False)
     starter.add_service(

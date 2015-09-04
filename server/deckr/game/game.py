@@ -103,7 +103,6 @@ class PlayerManager(object):
         Returns the next player in turn order.
         """
 
-        print player, self.players
         assert player in self.players
         index = self.players.index(player)
         if index == len(self.players) - 1:
@@ -190,9 +189,7 @@ class TurnManager(object):
 
         next_player = self._game.player_manager.next_player(
             self.priority_player)
-        print (self.turn, self.step, self.phase)
         if next_player == self.active_player:
-            print "Next step"
             self._next_step()
         else:
             self.priority_player = next_player

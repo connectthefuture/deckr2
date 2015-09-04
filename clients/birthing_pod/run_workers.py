@@ -3,11 +3,12 @@
 This a very lightweight script for spinning up multiple birthing pod workers.
 """
 
-import logging
 import argparse
+import logging
 import multiprocessing
 
 import birthing_pod.worker
+
 
 def start_worker(birthing_pod_server, deckr_server, worker_id):
     """
@@ -15,10 +16,10 @@ def start_worker(birthing_pod_server, deckr_server, worker_id):
     """
 
     logging.debug("Starting worker %d", worker_id)
-    # worker = birthing_pdod.worker.BirthingPodWorker(birthing_pod_server,
-    #                                                 deckr_server,
-    #                                                 worker_id)
-    # worker.start()
+    worker = birthing_pod.worker.BirthingPodWorker(birthing_pod_server,
+                                                   deckr_server,
+                                                   worker_id)
+    worker.start()
     logging.debug("Worker %d has shutdown", worker_id)
 
 
@@ -38,8 +39,7 @@ def main():
     workers = [multiprocessing.Process(target=start_worker,
                                        args=(args.birthing_pod_server,
                                              args.deckr_server,
-                                             worker_id))
-              for worker_id in range(args.count)]
+                                             worker_id)) for worker_id in range(args.count)]
     [worker.start() for worker in workers]
     [worker.join() for worker in workers]
 

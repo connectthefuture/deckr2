@@ -6,9 +6,8 @@ Run flask ontop of the birthing pod master.
 import json
 import random
 
-import flask
-
 import birthing_pod.master
+import flask
 
 APP = flask.Flask(__name__)
 
@@ -21,7 +20,8 @@ def index():
     Get the index page.
     """
 
-    return flask.render_template('index.html')
+    decks = BIRTHING_POD.genetic_controller.population
+    return flask.render_template('index.html', decks=decks)
 
 @APP.route('/game')
 def game_view():
@@ -38,7 +38,7 @@ def stats_view():
     """
 
     if flask.request.method == 'POST':
-        BIRTHING_POD.update_stats(json.loads(flask.request.data))
+        BIRTHING_POD.report(json.loads(flask.request.data))
         return ''
     else:
         return "/stats only supports POST requests"
