@@ -1,11 +1,11 @@
 """
-This module provides code that will enable a server to properly start services.
+This module provides code for services.
 """
 
 import logging
 
-from deckr.services.reloader import ReloadingServiceWrapper
-from deckr.services.service_wrapper import ServiceWrapper
+import deckr.core.service_wrapper
+import deckr.debug.reloader
 
 LOGGER = logging.getLogger(__name__)
 
@@ -38,9 +38,11 @@ class ServiceStarter(object):
         """
 
         if self._reload_all:
-            wrapper = ReloadingServiceWrapper(service_config, config_for_service)
+            wrapper = deckr.debug.reloader.ReloadingServiceWrapper(
+                service_config, config_for_service)
         else:
-            wrapper = ServiceWrapper(service_config, config_for_service)
+            wrapper = deckr.core.service_wrapper.ServiceWrapper(
+                service_config, config_for_service)
         self.services[service_config["name"]] = wrapper
 
     def start(self):
@@ -91,3 +93,24 @@ class ServiceStarter(object):
         for dependancy in service.dependancies:
             service_dep = self.services[dependancy[1]].get_instance()
             getattr(service_instance, 'set_' + dependancy[0])(service_dep)
+
+
+class Service(object):
+    """
+    A service is pretty simple. It just has a start and a stop method. Additionally, it takes an
+    optional init argument called 'config'.
+    """
+
+    def start(self):
+        """
+        Start the service.
+        """
+
+        pass
+
+    def stop(self):
+        """
+        Stop the service gracefully.
+        """
+
+        pass

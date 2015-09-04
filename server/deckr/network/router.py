@@ -4,8 +4,8 @@ This module provides code for the Router.
 
 import logging
 
-from proto.client_message_pb2 import ClientMessage
-from proto.server_response_pb2 import ServerResponse
+import proto.client_message_pb2
+import proto.server_response_pb2
 
 LOGGER = logging.getLogger(__name__)
 
@@ -36,17 +36,19 @@ class Router(object):
         any responses that are generated.
 
         Args:
-            message (ClientMessage): The protobuf object (already parsed)
+            message (proto.client_message_pb2.ClientMessage): The protobuf object (already parsed)
             connection (Connection): The connection that sent this message.
         """
 
         message_type = message.message_type
-        if message_type == ClientMessage.CREATE:
+        if message_type == proto.client_message_pb2.ClientMessage.CREATE:
             self._handle_create(message, connection)
-        elif message_type == ClientMessage.JOIN:
+        elif message_type == proto.client_message_pb2.ClientMessage.JOIN:
             self._handle_join(message, connection)
-        elif message_type == ClientMessage.LEAVE:
-            self._handle_leave(message, connection)
+        elif message_type == proto.client_message_pb2.ClientMessage.LEAVE:
+            self._handle_leave(connection)
+        elif message_type == proto.client_message_pb2.ClientMessage.ACTION:
+            self._handle_action(message.action_message, connection)
         else:
             connection.send_error("Not implemented yet")
 
@@ -72,7 +74,7 @@ class Router(object):
 
         return self._game_rooms[room_id][1]
 
-    def _handle_create(self, message, connection):
+    def _handle_create(self, message, connection):  # pylint: disable=unused-argument
         """
         Handle a create message. This will create a game through the game master and then return
         a create response.
@@ -82,8 +84,8 @@ class Router(object):
         game = self._game_master.get_game(game_id)
         self.create_room(game_id, game)
 
-        response = ServerResponse()
-        response.response_type = ServerResponse.CREATE
+        response = proto.server_response_pb2.ServerResponse()
+        response.response_type = proto.server_response_pb2.ServerResponse.CREATE
         response.create_response.game_id = game_id
         connection.send_response(response)
 
@@ -94,18 +96,45 @@ class Router(object):
 
         game_id = message.join_message.game_id
         game = self._game_master.get_game(game_id)
-        player = game.create_player()
+
+        player_config = message.join_message.player_config
+        connection.player = game.player_manager.create_player(
+            player_config.deck)
         self.add_to_room(connection, game_id)
 
-        response = ServerResponse()
-        response.response_type = ServerResponse.JOIN
+        response = proto.server_response_pb2.ServerResponse()
+        response.response_type = proto.server_response_pb2.ServerResponse.JOIN
+        response.join_response.player_id = connection.player.game_id
         connection.send_response(response)
 
-    def _handle_leave(self, message, connection):
+    def _handle_leave(self, connection):  # pylint: disable=no-self-use
         """
         Handle a message that the user wants to leave the current game.
         """
 
-        response = ServerResponse()
-        response.response_type = ServerResponse.LEAVE
+        response = proto.server_response_pb2.ServerResponse()
+        response.response_type = proto.server_response_pb2.ServerResponse.LEAVE
         connection.send_response(response)
+
+    def _handle_action(self, message, connection):
+        """
+        Handle an action message. Mainly this just figures out where to dispatch the call.
+        """
+
+        game = self._game_rooms[connection.room_id][0]
+        player = connection.player
+
+        assert game is not None and player is not None
+
+        if message.action_type == proto.client_message_pb2.ActionMessage.START:
+            game.start()
+        elif message.action_type == proto.client_message_pb2.ActionMessage.PASS_PRIORITY:
+            player.pass_priority()
+
+        # Assuming the action was completed, we broadcast the current state
+        # to all clients.
+        response = proto.server_response_pb2.ServerResponse()
+        response.response_type = proto.server_response_pb2.ServerResponse.GAME_STATE
+        game.update_proto(response.game_state_response.game_state)
+        for conn in self.get_room_connections(connection.room_id):
+            conn.send_response(response)

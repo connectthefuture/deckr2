@@ -1,0 +1,283 @@
+"""
+This module provides simple integration tests. It will spin up a lightweight server and client,
+and send messages from the client to the server with expected responses.
+"""
+
+import multiprocessing
+import unittest
+
+import nose.plugins.attrib
+import yaml
+
+import deckr.core.service
+import proto.game_pb2
+import proto.server_response_pb2
+import tests.test_integration.simple_client
+import tests.utils
+
+
+def start_server():
+    """
+    Start a lightweight server.
+    """
+
+    starter = deckr.core.service.ServiceStarter()
+    starter.add_service(
+        yaml.load(open('config/services/deckr_server_service.yml')), {})
+    starter.add_service(
+        yaml.load(open('config/services/card_library_service.yml')),
+        {'library': tests.utils.SIMPLE_CARD_LIBRARY})
+    starter.add_service(
+        yaml.load(open('config/services/action_validator_service.yml')), {})
+    starter.add_service(
+        yaml.load(open('config/services/game_master_service.yml')), {})
+    starter.start()
+
+
+def parse_game_state(game_state):
+    """
+    Parse the game state into something with a little more structure.
+    """
+
+    players = {
+        x.game_id: x.player
+        for x in game_state.game_objects
+        if x.game_object_type == proto.game_pb2.GameObject.PLAYER
+    }
+    zones = {
+        x.game_id: x.zone
+        for x in game_state.game_objects
+        if x.game_object_type == proto.game_pb2.GameObject.ZONE
+    }
+    # cards = {x.game_id: x.card for x in game_state.game_objects
+    #         if x.game_object_type == proto.game_pb2.GameObject.CARD}
+    game = {}
+
+    for game_id, player in players.items():
+        game[game_id] = {
+            'library': zones[player.library].objs,
+            'graveyard': zones[player.graveyard].objs,
+            'hand': zones[player.hand].objs
+        }
+    return game
+
+
+def get_game_object(game_state, game_id):
+    """
+    Get a game object by game_id.
+    """
+
+    for obj in game_state.game_objects:
+        if obj.game_id == game_id:
+            if obj.game_object_type == proto.game_pb2.GameObject.PLAYER:
+                return obj.player
+            elif obj.game_object_type == proto.game_pb2.GameObject.CARD:
+                return obj.card
+            elif obj.game_object_type == proto.game_pb2.GameObject.ZONE:
+                return obj.zone
+    raise ValueError("{} not in game state response".format(game_id))
+
+
+class SimpleServer(object):
+    """
+    A very simple instance of a deckr server.
+    """
+
+    def __init__(self):
+        self._server_process = None
+
+    def start(self):
+        """
+        Start the server in a subprocess and return.
+        """
+
+        self._server_process = multiprocessing.Process(target=start_server)
+        self._server_process.start()
+
+    def stop(self):
+        """
+        Terminate the server.
+        """
+
+        self._server_process.terminate()
+
+
+@nose.plugins.attrib.attr('integration')
+class SinglePlayerTestCase(unittest.TestCase):
+    """
+    Integration tests for a single player. Generally, this is more related
+    to the network stack than the gaming stack.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.server = SimpleServer()
+        cls.server.start()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.server.stop()
+
+    def setUp(self):
+        self.client = tests.test_integration.simple_client.SimpleClient()
+        self.client.initalize()
+        self.last_response = None
+
+    def tearDown(self):
+        self.client.shutdown()
+
+    def _check_response(self):
+        """
+        Get a response and make sure the response does not contain errors.
+        """
+
+        response = self.client.listen()
+        self.assertIsNotNone(response)
+        if response.response_type == proto.server_response_pb2.ServerResponse.ERROR:
+            raise AssertionError("Unexpected error response: " + str(response))
+        self.last_response = response
+        return response
+
+    def _create_join_start(self, card_count=10):
+        """
+        Create, join, and start a game. Returns the player that we joined as.
+        """
+
+        self.client.create()
+        response = self._check_response()
+        self.client.join(response.create_response.game_id,
+                         deck=["Forest"] * card_count)
+        response = self._check_response()
+        player = response.join_response.player_id
+        self.client.start()
+        response = self._check_response()
+        return player, response
+
+    def _assert_phase_step(self, phase, step, game_state):
+        """
+        Takes in a game state response and makes sure that the phase and step
+        are correct.
+        """
+
+        self.assertEqual(game_state.current_step, step)
+        self.assertEqual(game_state.current_phase, phase)
+
+    def _pass_until(self, test, max_passes=100):
+        """
+        Pass priority until a test or until we've passed too many times.
+        """
+
+        for _ in range(max_passes):
+            self.client.pass_priority()
+            response = self._check_response()
+            if test(response.game_state_response.game_state):
+                return
+        raise ValueError("Should not have reached {} passes".format(
+            max_passes))
+
+    def test_create(self):
+        """
+        Make sure that create gets a create response back.
+        """
+
+        expected_response = proto.server_response_pb2.ServerResponse()
+        expected_response.response_type = proto.server_response_pb2.ServerResponse.CREATE
+        expected_response.create_response.game_id = 0
+
+        self.client.create()
+        response = self.client.listen()
+        self.assertEqual(response, expected_response)
+
+    def test_create_join_start(self):
+        """
+        Create a game, join it, and then start it. There should be no
+        errors.
+        """
+
+        player, response = self._create_join_start()
+        # Check the starting hand
+        game_state = parse_game_state(response.game_state_response.game_state)
+        self.assertEqual(len(game_state[player]['hand']), 7)
+
+    def test_pass_turn_draw(self):
+        """
+        Create/join/start a game. Then pass through the turn and make sure you
+        draw again when the next turn starts.
+        """
+
+        player, response = self._create_join_start()
+        self._assert_phase_step('beginning', 'upkeep',
+                                response.game_state_response.game_state)
+        self.client.pass_priority()
+        response = self._check_response()
+        self._assert_phase_step('beginning', 'draw',
+                                response.game_state_response.game_state)
+        self.client.pass_priority()
+        response = self._check_response()
+        self._assert_phase_step('precombat main', 'precombat main',
+                                response.game_state_response.game_state)
+        self.client.pass_priority()
+        response = self._check_response()
+        self._assert_phase_step('combat', 'beginning of combat',
+                                response.game_state_response.game_state)
+        self.client.pass_priority()
+        response = self._check_response()
+        self._assert_phase_step('combat', 'declare attackers',
+                                response.game_state_response.game_state)
+        self.client.pass_priority()
+        response = self._check_response()
+        self._assert_phase_step('combat', 'declare blockers',
+                                response.game_state_response.game_state)
+        self.client.pass_priority()
+        response = self._check_response()
+        self._assert_phase_step('combat', 'combat damage',
+                                response.game_state_response.game_state)
+        self.client.pass_priority()
+        response = self._check_response()
+        self._assert_phase_step('combat', 'end of combat',
+                                response.game_state_response.game_state)
+        self.client.pass_priority()
+        response = self._check_response()
+        self._assert_phase_step('postcombat main', 'postcombat main',
+                                response.game_state_response.game_state)
+        self.client.pass_priority()
+        response = self._check_response()
+        self._assert_phase_step('end', 'end',
+                                response.game_state_response.game_state)
+        self.client.pass_priority()
+        response = self._check_response()
+        # Remove this eventually.
+        self._assert_phase_step('end', 'cleanup',
+                                response.game_state_response.game_state)
+        self.client.pass_priority()
+        response = self._check_response()
+        # Now we should be bakc to the untap
+        self._assert_phase_step('beginning', 'untap',
+                                response.game_state_response.game_state)
+        self.client.pass_priority()
+        response = self._check_response()
+        self._assert_phase_step('beginning', 'upkeep',
+                                response.game_state_response.game_state)
+        self.client.pass_priority()
+        response = self._check_response()
+        self._assert_phase_step('beginning', 'draw',
+                                response.game_state_response.game_state)
+        # Make sure we actually drew a card
+        game_state = parse_game_state(response.game_state_response.game_state)
+        self.assertEqual(len(game_state[player]['hand']), 8)
+
+    def test_lost(self):
+        """
+        Make sure if we can't draw than we lose the game.
+        """
+
+        player_id, _ = self._create_join_start(7)
+        player = get_game_object(
+            self.last_response.game_state_response.game_state, player_id)
+        self.assertFalse(player.lost)
+        self._pass_until(lambda game_state: game_state.current_step == 'draw')
+        # Don't draw until the start of the second turn
+        self._pass_until(lambda game_state: game_state.current_step == 'draw')
+        player = get_game_object(
+            self.last_response.game_state_response.game_state, player_id)
+        self.assertTrue(player.lost)

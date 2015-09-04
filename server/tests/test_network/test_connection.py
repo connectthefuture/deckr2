@@ -2,26 +2,25 @@
 This module provides code around testing connections.
 """
 
-from unittest import TestCase
+import unittest
 
-from mock import MagicMock
+import deckr.network.connection
+import mock
+import proto.client_message_pb2
+import proto.server_response_pb2
 
-from deckr.network.connection import Connection
-from proto.client_message_pb2 import ClientMessage
-from proto.server_response_pb2 import ServerResponse
 
-
-class ConnectionTestCase(TestCase):
+class ConnectionTestCase(unittest.TestCase):
     """
     A simple unittest case around the connection.
     """
 
     def setUp(self):
-        self.router = MagicMock()
-        self.connection = Connection(self.router)
+        self.router = mock.MagicMock()
+        self.connection = deckr.network.connection.Connection(self.router)
         # Create a message
-        self.message = ClientMessage()
-        self.message.message_type = ClientMessage.CREATE
+        self.message = proto.client_message_pb2.ClientMessage()
+        self.message.message_type = proto.client_message_pb2.ClientMessage.CREATE
         self.message.create_message.variant = 'standard'
 
     def test_recieve_message(self):
@@ -38,11 +37,11 @@ class ConnectionTestCase(TestCase):
         Make sure that if we can't decode a message we send an error instead of dying.
         """
 
-        expected_response = ServerResponse()
-        expected_response.response_type = ServerResponse.ERROR
+        expected_response = proto.server_response_pb2.ServerResponse()
+        expected_response.response_type = proto.server_response_pb2.ServerResponse.ERROR
         expected_response.error_response.message = "Could not parse message"
 
-        self.connection.send_response = MagicMock()
+        self.connection.send_response = mock.MagicMock()
         self.connection.recieve_message("foobar")
         self.connection.send_response.assert_called_with(expected_response)
 
@@ -51,19 +50,19 @@ class ConnectionTestCase(TestCase):
         If we get a quit message we should lose connection.
         """
 
-        self.message.message_type = ClientMessage.QUIT
-        self.connection.transport = MagicMock()
+        self.message.message_type = proto.client_message_pb2.ClientMessage.QUIT
+        self.connection.transport = mock.MagicMock()
         self.connection.recieve_message(self.message.SerializeToString())
         self.connection.transport.loseConnection.assert_called_with()
 
     def test_survives_exception(self):
         """
-        If we encounter an exception processing a message, we should catch it and let the 
+        If we encounter an exception processing a message, we should catch it and let the
         end user know.
         """
 
         self.router.handle_message.side_effect = Exception(
             "Never should happen")
-        self.connection.send_error = MagicMock()
+        self.connection.send_error = mock.MagicMock()
         self.connection.recieve_message(self.message.SerializeToString())
         self.connection.send_error.called_once()

@@ -2,11 +2,12 @@
 This module provides the code for Players.
 """
 
-from deckr.game.game_object import GameObject
-from deckr.game.zone import Zone
+import deckr.game.game_object
+import deckr.game.zone
+import proto.game_pb2 as proto_lib
 
 
-class Player(GameObject):
+class Player(deckr.game.game_object.GameObject):
     """
     A player has a number of attributes associated with them (life, etc.) and also is able to
     perform actions.
@@ -18,11 +19,31 @@ class Player(GameObject):
         self.life = 20
         self.poison_counters = 0
 
-        self.hand = Zone('hand', self)
-        self.graveyard = Zone('graveyard', self)
-        self.library = Zone('library', self)
+        self.hand = deckr.game.zone.Zone('hand', self)
+        self.graveyard = deckr.game.zone.Zone('graveyard', self)
+        self.library = deckr.game.zone.Zone('library', self)
+
+        self.lost = False
 
         self._game = game
+
+    def draw(self):
+        """
+        Draw a card.
+        """
+
+        if len(self.library) == 0:
+            self.lost = True
+        else:
+            self.hand.append(self.library.pop())
+
+    def start(self):
+        """
+        Start the game. Draw the initial hand of 7 cards.
+        """
+
+        for _ in range(7):
+            self.draw()
 
     def play_card(self, card):
         """
@@ -66,4 +87,17 @@ class Player(GameObject):
         Pass priority to the next player.
         """
 
-        pass
+        self._game.turn_manager.advance()
+
+    def update_proto(self, proto):
+        """
+        Update a player proto.
+        """
+
+        super(Player, self).update_proto(proto)
+        proto.game_object_type = proto_lib.GameObject.PLAYER
+        proto.player.graveyard = self.graveyard.game_id
+        proto.player.library = self.library.game_id
+        proto.player.hand = self.hand.game_id
+        proto.player.life = self.life
+        proto.player.lost = self.lost

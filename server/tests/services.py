@@ -1,4 +1,4 @@
-from deckr.services.service import Service
+import deckr.core.service
 
 # pylint: skip-file
 # Incemented whenever a service starts
@@ -7,32 +7,32 @@ LAST_STARTED = None
 
 SERVICE_CONFIG = {
     'name': 'TestService',
-    'module': 'tests.test_services.services',
+    'module': 'tests.services',
     'class': 'TestService',
 }
 
 DEPENDENT_CONFIG = {
     'name': 'DependentService',
-    'module': 'tests.test_services.services',
+    'module': 'tests.services',
     'class': 'DependentService',
     'dependancies': [['test_service', 'TestService']]
 }
 
 EVENT_LOOP_CONFIG = {
     'name': 'EventLoopService',
-    'module': 'tests.test_services.services',
+    'module': 'tests.services',
     'class': 'EventLoopService',
     'requires_event_loop': True,
 }
 
 ECHO_SERVICE = {
     'name': 'EchoService',
-    'module': 'tests.test_services.services',
+    'module': 'tests.services',
     'class': 'EchoService',
 }
 
 
-class TestService(Service):
+class TestService(deckr.core.service.Service):
     """
     A very simple test service.
     """
@@ -46,7 +46,7 @@ class TestService(Service):
         LAST_STARTED = self
 
 
-class DependentService(Service):
+class DependentService(deckr.core.service.Service):
     """
     A service that depends on a test service.
     """
@@ -62,7 +62,7 @@ class DependentService(Service):
         assert isinstance(self._test_service, TestService)
 
 
-class EventLoopService(Service):
+class EventLoopService(deckr.core.service.Service):
     """
     A service that is marked as requiring the event loop.
     """
@@ -75,7 +75,7 @@ class EventLoopService(Service):
         LAST_STARTED = self
 
 
-class EchoService(Service):
+class EchoService(deckr.core.service.Service):
     """
     A simple service that exports a single method.
     """

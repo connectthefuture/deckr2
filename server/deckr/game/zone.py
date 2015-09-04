@@ -1,11 +1,12 @@
 """
-This module provides the code for zones.
+This module provides code to interact with zones.
 """
 
-from deckr.game.game_object import GameObject
+import deckr.game.game_object
+import proto.game_pb2 as proto_lib
 
 
-class Zone(GameObject):
+class Zone(deckr.game.game_object.GameObject):
     """
     A zone is really just a collection of game objects. For the most part it looks like a list, but
     it has some extra logic to call triggers.
@@ -26,9 +27,9 @@ class Zone(GameObject):
             obj (object): Object to append to the zone
         """
 
-        pass
+        self._objs.append(obj)
 
-    def pop(self, index=0):
+    def pop(self, index=None):
         """
         Pop an object by index.
 
@@ -38,7 +39,10 @@ class Zone(GameObject):
         Returns:
             object The popped object.
         """
-        pass
+
+        if index is not None:
+            return self._objs.pop(index)
+        return self._objs.pop()
 
     def insert(self, index, obj):
         """
@@ -49,7 +53,7 @@ class Zone(GameObject):
             obj (object): Object to insert
         """
 
-        pass
+        self._objs.insert(index, obj)
 
     def remove(self, obj):
         """
@@ -58,4 +62,26 @@ class Zone(GameObject):
         Args:
             obj (object): Object to remove.
         """
-        pass
+
+        self._objs.remove(obj)
+
+    def update_proto(self, proto):
+        """
+        Update a protobuff.
+        """
+
+        super(Zone, self).update_proto(proto)
+        proto.game_object_type = proto_lib.GameObject.ZONE
+
+        for obj in self._objs:
+            assert obj.game_id is not None
+            proto.zone.objs.append(obj.game_id)
+
+    def __contains__(self, obj):
+        return obj in self._objs
+
+    def __len__(self):
+        return len(self._objs)
+
+    def __getitem__(self, key):
+        return self._objs[key]

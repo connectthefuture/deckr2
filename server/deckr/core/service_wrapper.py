@@ -1,5 +1,5 @@
 """
-This module provides the code for a simple service wrapper.
+This module provides the base service wrapper class.
 """
 
 import importlib

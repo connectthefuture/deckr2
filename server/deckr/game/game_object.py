@@ -1,5 +1,5 @@
 """
-This module provides the base GameObject class.
+This module provides the base GameObject and the Zone and Ability game objects
 """
 
 
@@ -10,3 +10,10 @@ class GameObject(object):
 
     def __init__(self):
         self.game_id = None
+
+    def update_proto(self, proto):
+        """
+        Get a protobuf representation of this game object.
+        """
+
+        proto.game_id = self.game_id

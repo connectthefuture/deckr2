@@ -5,16 +5,15 @@ This module provides code for deckr connections.
 import logging
 import traceback
 
-from twisted.protocols.basic import LineReceiver
-
-from google.protobuf.message import DecodeError
-from proto.client_message_pb2 import ClientMessage
-from proto.server_response_pb2 import ServerResponse
+import google.protobuf.message
+import proto.client_message_pb2
+import proto.server_response_pb2
+import twisted.protocols.basic
 
 LOGGER = logging.getLogger(__name__)
 
 
-class Connection(LineReceiver):
+class Connection(twisted.protocols.basic.LineReceiver):
     """
     This represents a single client connection. Each connection can be associated with at most
     1 game.
@@ -23,6 +22,8 @@ class Connection(LineReceiver):
     def __init__(self, router):
         # What room this connection is part of
         self.room_id = None
+        # The player assocaited with this connection, if any
+        self.player = None
         #: Router The central router for deckr messages.
         self._router = router
 
@@ -46,15 +47,15 @@ class Connection(LineReceiver):
                 and then pass off to the router.
         """
 
-        decoded_message = ClientMessage()
+        decoded_message = proto.client_message_pb2.ClientMessage()
         try:
             decoded_message.ParseFromString(message)
-        except DecodeError:
+        except google.protobuf.message.DecodeError:
             self.send_error("Could not parse message")
             return
 
         LOGGER.debug("Got a message %s from %s", decoded_message, self)
-        if decoded_message.message_type == ClientMessage.QUIT:
+        if decoded_message.message_type == proto.client_message_pb2.ClientMessage.QUIT:
             self.transport.loseConnection()  # twisted specific
             return
 
@@ -62,7 +63,7 @@ class Connection(LineReceiver):
         # to kill the connection. Hopefully we don't hit this very often.
         try:
             self._router.handle_message(decoded_message, self)
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             LOGGER.exception("Encountered unexpected exception")
             # Potentially hide this behind a debug flag.
             self.send_error(traceback.format_exc())
@@ -73,8 +74,8 @@ class Connection(LineReceiver):
         """
 
         LOGGER.warn("Sending error message %s", message)
-        response = ServerResponse()
-        response.response_type = ServerResponse.ERROR
+        response = proto.server_response_pb2.ServerResponse()
+        response.response_type = proto.server_response_pb2.ServerResponse.ERROR
         response.error_response.message = message
         self.send_response(response)
 

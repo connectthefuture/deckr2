@@ -2,31 +2,31 @@
 """
 This module provides code for reloading services for quicker development. Essentially it spnis off each service
 into a seperate process and then communicates between them using xmlrpc. If there are any file changes detected
-it will restart the process which forces a reload of all modules. 
+it will restart the process which forces a reload of all modules.
 
 Note:
-    This is not foolproof and can get kind of messy. With the reloader you'll have processes, threads, and 
+    This is not foolproof and can get kind of messy. With the reloader you'll have processes, threads, and
     probably the twisted event loop. Shutting down doesn't currently work properly so you just need to kill it
     if you want a full shutdown.
 """
 
-
 import logging
+import multiprocessing
 import os.path
+import SimpleXMLRPCServer
 import sys
-import threading  
+import threading
 import time
 import xmlrpclib
-from multiprocessing import Process
-from SimpleXMLRPCServer import SimpleXMLRPCServer
 
-from deckr.services.service_wrapper import ServiceWrapper
+import deckr.core.service_wrapper
 
 LOGGER = logging.getLogger(__name__)
 
-NEXT_PORT = 10000 # Port to start the next service XMLRPC server on
+NEXT_PORT = 10000  # Port to start the next service XMLRPC server on
 
-class ReloadingServiceWrapper(ServiceWrapper):
+
+class ReloadingServiceWrapper(deckr.core.service_wrapper.ServiceWrapper):
     """
     This handles all of the reloading logic. It handles file watching, process reloading, and
     transparent proxying. This implements the same interface as a ServiceWrapper.
@@ -53,12 +53,15 @@ class ReloadingServiceWrapper(ServiceWrapper):
             ReloaderProxy: A proxy that can be called as if it were the original class.
         """
 
-        self._process = Process(target=self._child_create)
+        self._process = multiprocessing.Process(target=self._child_create)
         self._process.start()
-        time.sleep(0.1) # Make sure we give the proxy time to start up.
+        time.sleep(0.1)  # Make sure we give the proxy time to start up.
 
-        self._instance = xmlrpclib.ServerProxy("http://localhost:%d/" % self._port, allow_none=True)
-        self._watcher_thread = threading.Thread(target=self._file_watcher.watch)
+        self._instance = xmlrpclib.ServerProxy(
+            "http://localhost:%d/" % self._port,
+            allow_none=True)
+        self._watcher_thread = threading.Thread(
+            target=self._file_watcher.watch)
         self._watcher_thread.start()
         self._stopped = False
 
@@ -82,10 +85,12 @@ class ReloadingServiceWrapper(ServiceWrapper):
 
         instance = super(ReloadingServiceWrapper, self).create()
         LOGGER.info("Starting XMLRPCServer on localhost:%s", self._port)
-        server = SimpleXMLRPCServer(("localhost", self._port), allow_none=True, logRequests=False)
+        server = SimpleXMLRPCServer.SimpleXMLRPCServer(
+            ("localhost", self._port),
+            allow_none=True,
+            logRequests=False)
         server.register_instance(instance)
         server.serve_forever()
-
 
     def reload(self):
         """
@@ -94,15 +99,16 @@ class ReloadingServiceWrapper(ServiceWrapper):
 
         LOGGER.info("Reloading service: %s", self.name)
         self._process.terminate()
-        self._process = Process(target=self._child_create)
+        self._process = multiprocessing.Process(target=self._child_create)
         self._process.start()
-        time.sleep(0.1) # Give the server time to start up
+        time.sleep(0.1)  # Give the server time to start up
 
-        self._instance.start() # Restart our instance
+        self._instance.start()  # Restart our instance
 
     def __del__(self):
         if not self._stopped:
             self.stop()
+
 
 class FileWatcher(object):
     """
@@ -138,4 +144,3 @@ class FileWatcher(object):
         Get the current modification times.
         """
         return [(x, os.path.getmtime(x)) for x in self._files]
-

@@ -4,23 +4,23 @@ This module provides code for various deckr server implementations.
 
 import logging
 
-from twisted.internet import endpoints, protocol, reactor
-
-from deckr.network.connection import Connection
-from deckr.network.router import Router
-from deckr.services.service import Service
-from txsockjs.factory import SockJSFactory
+import deckr.core.service
+import deckr.network.connection
+import deckr.network.router
+import twisted.internet.endpoints
+import twisted.internet.reactor
+import txsockjs.factory
 
 LOGGER = logging.getLogger(__name__)
 
 
-class DeckrServer(Service):
+class DeckrServer(deckr.core.service.Service):
     """
     An interface for the deckr server.
     """
 
     def __init__(self, config):
-        self._router = Router()
+        self._router = deckr.network.router.Router()
         self._game_master = None
         self._factory = None
         # Load values from config
@@ -46,23 +46,25 @@ class DeckrServer(Service):
         self._factory = DeckrFactory(self._router)
         if self._websockets:
             LOGGER.info("Starting with websocket support")
-            self._factory = SockJSFactory(self._factory)
+            self._factory = txsockjs.factory.SockJSFactory(self._factory)
 
-        endpoints.serverFromString(reactor, "tcp:%d" %
-                                   self._port).listen(self._factory)
-        LOGGER.info('Starting the DeckrServer listening on port %d', self._port)
-        reactor.run()
+        twisted.internet.endpoints.serverFromString(
+            twisted.internet.reactor,
+            "tcp:%d" % self._port).listen(self._factory)
+        LOGGER.info('Starting the DeckrServer listening on port %d',
+                    self._port)
+        twisted.internet.reactor.run()
 
     def stop(self):
         """
         Stop the server and relinquish the control loop.
         """
 
-        if reactor.running:
-            reactor.stop()
+        if twisted.internet.reactor.running:
+            twisted.internet.reactor.stop()
 
 
-class DeckrFactory(protocol.Factory):
+class DeckrFactory(twisted.internet.protocol.Factory):
     """
     A very simple factory for building deckr connetions.
     """
@@ -75,4 +77,4 @@ class DeckrFactory(protocol.Factory):
         Build the protocol and pass along the router.
         """
 
-        return Connection(self._router)
+        return deckr.network.connection.Connection(self._router)
