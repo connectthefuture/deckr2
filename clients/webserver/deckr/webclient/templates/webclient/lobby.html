@@ -1,0 +1,32 @@
+{% extends 'webclient/base.html' %}
+{% block morejs %}
+  {% load staticfiles %}
+  <script type="text/javascript" src="{% static 'js/sockets.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/lobby.js' %}"></script>
+{% endblock %}
+{% block body %}
+
+<div class="wrapper">
+  <h1>Deckr Lobby</h1>
+  <a id="start" href="{% url 'create_game' %}">Create Game</a>
+  <table class="games">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Format</th>
+        <th>Play/Watch</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for game in games %}
+      <tr data-game-id="{{ game.game_id }}">
+        <td>{{ game.name }}</td>
+        <td>{{ game.variant }}</td>
+        <td><a href="{% url 'staging' game_id=game.game_id %}">Join Game</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

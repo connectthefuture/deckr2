@@ -1,0 +1,43 @@
+{% extends 'webclient/base.html' %}
+{% block morejs %}
+  {% load staticfiles %}
+  <script type="text/javascript" src="{% static 'js/sockets.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/proto.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/staging.js' %}"></script>
+{% endblock %}
+{% block body %}
+
+<div class="wrapper">
+  <h1>Staging: Game (id: <span class="game-id">{{ game.game_id }}</span>, name: <span class="game-name">{{ game.name }})<span></h1>
+
+<form class="join-game-form" method="post" action="{% url 'game' game_id=game.game_id %}">
+  {% csrf_token %}
+
+  <div class="player-info">
+    <h2>Enter your nickname:</h2>
+    <input type="text" name="nick" />
+  </div>
+<!--
+  <div class="decks">
+    <h2>Choose or create a deck</h2>
+    <p>(User decks go here...)</p>
+    <textarea name="custom-deck">
+Example:
+4 Black Lotus
+4 Dark Ritual
+4 Ancestral Recal
+20 Islands
+...
+    </textarea>
+-->
+  </div>
+  <input type="hidden" name="game_id" value="{{ game.game_id }}" />
+  <input name="play" type="submit" value="Play" />
+  <input name="watch" type="submit" value="Watch" />
+
+</form>
+
+  </div>
+</div>
+
+{% endblock %}
