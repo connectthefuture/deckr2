@@ -20,7 +20,7 @@ class Connection(twisted.protocols.basic.LineReceiver):
     1 game.
     """
 
-    def __init__(self, router, config):
+    def __init__(self, router, use_base64=False):
         # What room this connection is part of
         self.room_id = None
         # The player assocaited with this connection, if any
@@ -28,7 +28,7 @@ class Connection(twisted.protocols.basic.LineReceiver):
         #: Router The central router for deckr messages.
         self._router = router
         # Load values from config
-        self._base64 = config.get('base64', False)
+        self._base64 = use_base64
 
     def send_response(self, response):
         """
@@ -42,7 +42,7 @@ class Connection(twisted.protocols.basic.LineReceiver):
         if self._base64:
             self.sendLine(base64.b64encode(serialized_response))
         else:
-            self.sendLine(response.SerializeToString())
+            self.sendLine(serialized_response)
 
     def recieve_message(self, message):
         """
@@ -54,10 +54,10 @@ class Connection(twisted.protocols.basic.LineReceiver):
                 and then pass off to the router.
         """
 
+        if self._base64:
+            message = base64.b64decode(message)
         decoded_message = proto.client_message_pb2.ClientMessage()
         try:
-            if self._base64:
-                message = base64.b64decode(message)
             decoded_message.ParseFromString(message)
         except google.protobuf.message.DecodeError:
             self.send_error("Could not parse message")
