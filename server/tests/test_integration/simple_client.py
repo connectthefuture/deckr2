@@ -148,3 +148,14 @@ class SimpleClient(object):
         message.message_type = proto.client_message_pb2.ClientMessage.ACTION
         message.action_message.action_type = proto.client_message_pb2.ActionMessage.PASS_PRIORITY
         self.send_message(message)
+
+    def play(self, card):
+        """
+        Play a card (specified by card id).
+        """
+
+        message = proto.client_message_pb2.ClientMessage()
+        message.message_type = proto.client_message_pb2.ClientMessage.ACTION
+        message.action_message.action_type = proto.client_message_pb2.ActionMessage.PLAY
+        message.action_message.play.card = card
+        self.send_message(message)

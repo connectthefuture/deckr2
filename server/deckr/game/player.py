@@ -51,7 +51,11 @@ class Player(deckr.game.game_object.GameObject):
         if it's a land, or put it onto the stack.
         """
 
-        pass
+        assert card in self.hand
+        # Lands don't use the stack
+        if card.is_land():
+            self.hand.remove(card)
+            self._game.battlefield.append(card)
 
     def activate_ability(self, card, ability_index):
         """

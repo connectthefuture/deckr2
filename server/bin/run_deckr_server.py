@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+"""
+A very simple script to run the deckr server.
+"""
 
 import argparse
 import logging
@@ -14,7 +17,9 @@ def parse_arguments():
     """
 
     parser = argparse.ArgumentParser(description='Run the deckr server.')
-    parser.add_argument('--websockets', action='store_true', help='Run with websocket support')
+    parser.add_argument('--websockets',
+                        action='store_true',
+                        help='Run with websocket support')
     return parser.parse_args()
 
 

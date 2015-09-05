@@ -119,6 +119,7 @@ class Router(object):
     def _handle_action(self, message, connection):
         """
         Handle an action message. Mainly this just figures out where to dispatch the call.
+        It will also swap out game ids for the actual game objects.
         """
 
         game = self._game_rooms[connection.room_id][0]
@@ -126,10 +127,18 @@ class Router(object):
 
         assert game is not None and player is not None
 
+        print message.action_type
         if message.action_type == proto.client_message_pb2.ActionMessage.START:
             game.start()
         elif message.action_type == proto.client_message_pb2.ActionMessage.PASS_PRIORITY:
             player.pass_priority()
+        elif message.action_type == proto.client_message_pb2.ActionMessage.PLAY:
+            card = game.registry.lookup(message.play.card)
+            player.play_card(card)
+        else:  # Catch all bail out case.
+            connection.send_error("Invalid action type {}".format(
+                message.action_type))
+            return
 
         # Assuming the action was completed, we broadcast the current state
         # to all clients.
