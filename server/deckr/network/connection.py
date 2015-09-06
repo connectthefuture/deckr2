@@ -2,6 +2,7 @@
 This module provides code for deckr connections.
 """
 
+import base64
 import logging
 import traceback
 
@@ -19,13 +20,15 @@ class Connection(twisted.protocols.basic.LineReceiver):
     1 game.
     """
 
-    def __init__(self, router):
+    def __init__(self, router, use_base64=False):
         # What room this connection is part of
         self.room_id = None
         # The player assocaited with this connection, if any
         self.player = None
         #: Router The central router for deckr messages.
         self._router = router
+        # Load values from config
+        self._base64 = use_base64
 
     def send_response(self, response):
         """
@@ -35,7 +38,11 @@ class Connection(twisted.protocols.basic.LineReceiver):
             response (ServerResponse): A server response that should be sent over the wire.
         """
 
-        self.sendLine(response.SerializeToString())
+        serialized_response = response.SerializeToString()
+        if self._base64:
+            self.sendLine(base64.b64encode(serialized_response))
+        else:
+            self.sendLine(serialized_response)
 
     def recieve_message(self, message):
         """
@@ -47,6 +54,8 @@ class Connection(twisted.protocols.basic.LineReceiver):
                 and then pass off to the router.
         """
 
+        if self._base64:
+            message = base64.b64decode(message)
         decoded_message = proto.client_message_pb2.ClientMessage()
         try:
             decoded_message.ParseFromString(message)
