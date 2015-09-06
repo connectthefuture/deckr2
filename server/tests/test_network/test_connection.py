@@ -4,6 +4,7 @@ This module provides code around testing connections.
 
 import unittest
 
+import base64
 import deckr.network.connection
 import mock
 import proto.client_message_pb2
@@ -31,6 +32,21 @@ class ConnectionTestCase(unittest.TestCase):
         self.connection.recieve_message(self.message.SerializeToString())
         self.router.handle_message.assert_called_with(
             self.message, self.connection)
+
+    def test_base64_support(self):
+        """
+        Make sure that when the base64 flag is set to true, we can encode and decode messages.
+        """
+
+        self.connection._base64 = True
+
+        encoded_message = base64.b64encode(self.message.SerializeToString())
+        self.connection.recieve_message(encoded_message)
+        self.router.handle_message.assert_called_with(
+            self.message, self.connection)
+
+        self.connection._base64 = False
+
 
     def test_survives_malformed_input(self):
         """
@@ -66,3 +82,6 @@ class ConnectionTestCase(unittest.TestCase):
         self.connection.send_error = mock.MagicMock()
         self.connection.recieve_message(self.message.SerializeToString())
         self.connection.send_error.called_once()
+
+if __name__ == "__main__":
+    unittest.main()
