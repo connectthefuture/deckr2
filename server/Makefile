@@ -1,6 +1,6 @@
-all: lint test
+all: lint test integration
 lint: format
-	pylint --rcfile=config/pylintrc deckr tests
+	pylint --rcfile=config/pylintrc deckr tests || true
 format:
 	autopep8 -r --in-place deckr tests --max-line-length 100
 test:

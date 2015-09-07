@@ -41,6 +41,7 @@ class PlayerManagerTestCase(unittest.TestCase):
         self.assert_registered(player.hand)
         self.assert_registered(player.library)
         self.assert_registered(player.graveyard)
+        self.assert_registered(player.mana_pool)
 
     def test_create_player_deck(self):
         """

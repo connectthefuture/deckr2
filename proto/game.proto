@@ -13,6 +13,7 @@ message GameObject {
         ZONE = 1;
         CARD = 2;
         COUNTER = 3;
+        MANA_POOL = 4;
     }
 
     required GameObjectType game_object_type = 1;
@@ -22,6 +23,7 @@ message GameObject {
     optional Zone zone = 4;
     optional Card card = 5;
     optional Counter counter = 6;
+    optional ManaPool mana_pool = 7;
 }
 
 message Player {
@@ -30,6 +32,7 @@ message Player {
     required int32 library = 3;
     required int32 life = 4;
     required bool lost = 5;
+    required int32 mana_pool = 6;
 }
 
 message Zone {
@@ -62,4 +65,12 @@ message Counter {
 message Ability {
     required int32 ability_on = 1;
     required int32 ability_index = 2;
+}
+
+message ManaPool {
+    required int32 white = 1;
+    required int32 blue = 2;
+    required int32 black = 3;
+    required int32 red = 4;
+    required int32 green = 5;
 }

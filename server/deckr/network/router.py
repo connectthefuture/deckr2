@@ -135,6 +135,9 @@ class Router(object):
         elif message.action_type == proto.client_message_pb2.ActionMessage.PLAY:
             card = game.registry.lookup(message.play.card)
             player.play_card(card)
+        elif message.action_type == proto.client_message_pb2.ActionMessage.ACTIVATE:
+            card = game.registry.lookup(message.activate_ability.card)
+            player.activate_ability(card, message.activate_ability.index)
         else:  # Catch all bail out case.
             connection.send_error("Invalid action type {}".format(
                 message.action_type))

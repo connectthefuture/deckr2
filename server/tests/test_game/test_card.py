@@ -50,6 +50,16 @@ class CardUtilityFunctionsTestCase(unittest.TestCase):
         self.assertIn("Basic", card.supertypes)
         self.assertIn("Forest", card.subtypes)
 
+    def test_forest_abilities(self):
+        """
+        Make sure when we create a forest it gets a single ability.
+        """
+
+        card = deckr.game.card.Card()
+        card.name = "Forest"
+        deckr.game.card.populate_abilities(card)
+        self.assertEqual(len(card.abilities), 1)
+
 
 class CardLibraryTestCase(unittest.TestCase):
     """
