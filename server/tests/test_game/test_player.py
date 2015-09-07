@@ -110,6 +110,18 @@ class PlayerTestCase(unittest.TestCase):
         self.game.battlefield.append.assert_called_with(forest)
         self.assertEqual(forest.controller, self.player)
 
+    def test_play_creature(self):
+        """
+        Make sure we can play a creature (it should go onto the stack).
+        """
+
+        grizzly_bears = deckr.game.card.create_card_from_dict(
+            tests.utils.GRIZZLY_BEARS)
+        self.player.hand.append(grizzly_bears)
+        self.player.mana_pool.add(green=2)
+        self.player.play_card(grizzly_bears)
+        self.game.stack.append.assert_called_with(grizzly_bears)
+
     def test_activate_ability(self):
         """
         Make sure we can active a card ability.

@@ -6,7 +6,32 @@ import unittest
 
 import deckr.game.game_object
 import deckr.game.zone
+import mock
 import proto.game_pb2 as proto_lib
+
+
+class StackTestCase(unittest.TestCase):
+    """
+    Test the functionality of the stack.
+    """
+
+    def setUp(self):
+        self.game = mock.MagicMock()
+        self.card = mock.MagicMock()
+        self.stack = deckr.game.zone.Stack(name="stack",
+                                           owner=None,
+                                           game=self.game)
+
+    def test_resolve_permanent(self):
+        """
+        Make sure that when we resolve a permanent it goes onto the battlefield.
+        """
+
+        self.card.is_permanent.return_value = True
+        self.stack.append(self.card)
+        self.stack.resolve()
+        self.game.battlefield.append.assert_called_with(self.card)
+        self.assertNotIn(self.card, self.stack)
 
 
 class ZoneAsContainerTestCase(unittest.TestCase):
@@ -65,6 +90,15 @@ class ZoneAsContainerTestCase(unittest.TestCase):
 
         self.zone.remove(self.object1)
         self.assertNotIn(self.object1, self.zone)
+
+    def test_is_empty(self):
+        """
+        Make sure we can tell if a zone is empty.
+        """
+
+        self.assertTrue(self.zone.is_empty())
+        self.zone.append(self.object1)
+        self.assertFalse(self.zone.is_empty())
 
     def test_update_proto(self):
         """
