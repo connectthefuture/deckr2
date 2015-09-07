@@ -57,12 +57,14 @@ class Player(deckr.game.game_object.GameObject):
             self.hand.remove(card)
             self._game.battlefield.append(card)
 
+        card.controller = self
+
     def activate_ability(self, card, ability_index):
         """
         Activate an ability. Resolve it if it's a mana ability, otherwise, put it on the stack.
         """
 
-        pass
+        card.activate_ability(ability_index)
 
     def declare_attackers(self, attackers):
         """

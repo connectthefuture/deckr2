@@ -5,7 +5,31 @@ This module provides unittests for the card and card library logic.
 import unittest
 
 import deckr.game.card
+import mock
 import tests.utils
+
+
+class CardTestCase(unittest.TestCase):
+    """
+    Test the functionality associated with a generic card.
+    """
+
+    def setUp(self):
+        self.card = deckr.game.card.Card()
+
+    def test_activate_ability(self):
+        """
+        Make sure we can activate a card's ability.
+        """
+
+        ability1 = mock.MagicMock()
+        ability2 = mock.MagicMock()
+        self.card.abilities = [ability1, ability2]
+        self.card.activate_ability(0)
+        ability1.assert_called_with(self.card)
+        self.card.activate_ability(1)
+        ability2.assert_called_with(self.card)
+        self.assertRaises(IndexError, self.card.activate_ability, 2)
 
 
 class CardUtilityFunctionsTestCase(unittest.TestCase):

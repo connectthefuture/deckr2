@@ -69,3 +69,13 @@ class PlayerTestCase(unittest.TestCase):
         self.player.hand.append(forest)
         self.player.play_card(forest)
         self.game.battlefield.append.assert_called_with(forest)
+        self.assertEqual(forest.controller, self.player)
+
+    def test_activate_ability(self):
+        """
+        Make sure we can active a card ability.
+        """
+
+        card = mock.MagicMock()
+        self.player.activate_ability(card, 0)
+        card.activate_ability.assert_called_with(0)
