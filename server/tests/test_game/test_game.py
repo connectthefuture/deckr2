@@ -5,6 +5,7 @@ classes.
 
 import unittest
 
+import deckr.game.card
 import deckr.game.game
 import deckr.game.game_object
 import deckr.game.player
@@ -19,6 +20,15 @@ class CombatDamageManagerTestCase(unittest.TestCase):
 
     def setUp(self):
         self.game = mock.MagicMock()
+        self.player = mock.MagicMock()
+        self.attacker = deckr.game.card.Card()
+        self.blocker = deckr.game.card.Card()
+        self.attacker.power = 2
+        self.blocker.power = 2
+        self.attacker.deal_combat_damage = mock.MagicMock()
+        self.blocker.deal_combat_damage = mock.MagicMock()
+        self.game.battlefield = [self.attacker, self.blocker]
+        self.attacker.attacking = self.player
         self.combat_damage_manager = deckr.game.game.CombatDamageManager(
             self.game)
 
@@ -27,13 +37,20 @@ class CombatDamageManagerTestCase(unittest.TestCase):
         Make sure that we can have a single attacker deal combat damage to a player.
         """
 
-        player = mock.MagicMock()
-        attacker = mock.MagicMock()
-        attacker.power = 2
-        attacker.attacking = player
-        self.game.battlefield = [attacker]  # Fake a zone
+
         self.combat_damage_manager.deal_combat_damage()
-        player.deal_combat_damage.assert_called_with(2)
+        self.player.deal_combat_damage.assert_called_with(2)
+
+    def test_blocker(self):
+        """
+        Make sure we can have an attacker and a single blocker.
+        """
+
+        self.blocker.blocking = self.attacker
+        self.combat_damage_manager.deal_combat_damage()
+        self.player.deal_combat_damage.assert_not_called()
+        self.blocker.deal_combat_damage.assert_called_with(2)
+        self.attacker.deal_combat_damage.assert_called_with(2)
 
 
 class PlayerManagerTestCase(unittest.TestCase):

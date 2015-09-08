@@ -26,9 +26,17 @@ class CombatDamageManager(object):
         """
 
         attackers = [x for x in self._game.battlefield if x.attacking]
-        for attacker in attackers:
+        blockers = [x for x in self._game.battlefield if x.blocking]
+
+        blocked = [x.blocking for x in blockers]
+        unblocked = [x for x in attackers if x not in blocked]
+
+        for attacker in unblocked:
             attacker.attacking.deal_combat_damage(attacker.power)
 
+        for blocker in blockers:
+            blocker.deal_combat_damage(blocker.blocking.power)
+            blocker.blocking.deal_combat_damage(blocker.power)
 
 class GameRegistry(object):
     """
