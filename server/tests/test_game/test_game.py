@@ -12,6 +12,30 @@ import mock
 import proto.game_pb2 as game_proto
 
 
+class CombatDamageManagerTestCase(unittest.TestCase):
+    """
+    Test the combat damage manager.
+    """
+
+    def setUp(self):
+        self.game = mock.MagicMock()
+        self.combat_damage_manager = deckr.game.game.CombatDamageManager(
+            self.game)
+
+    def test_single_attacker(self):
+        """
+        Make sure that we can have a single attacker deal combat damage to a player.
+        """
+
+        player = mock.MagicMock()
+        attacker = mock.MagicMock()
+        attacker.power = 2
+        attacker.attacking = player
+        self.game.battlefield = [attacker]  # Fake a zone
+        self.combat_damage_manager.deal_combat_damage()
+        player.deal_combat_damage.assert_called_with(2)
+
+
 class PlayerManagerTestCase(unittest.TestCase):
     """
     Test the player manager.
@@ -194,6 +218,16 @@ class TurnManagerTestCase(unittest.TestCase):
         self.turn_manager.turn = 2
         self.turn_manager.turn_based_actions()
         self.player1.draw.assert_called_with()
+
+    def test_deal_combat_damage(self):
+        """
+        Make sure that we deal combat damage during the combat damage phase.
+        """
+
+        self.turn_manager.step = self.turn_manager.COMBAT_DAMAGE_STEP
+        self.turn_manager.phase = self.turn_manager.COMBAT_PHASE
+        self.turn_manager.turn_based_actions()
+        self.game.combat_damage_manager.deal_combat_damage.assert_called_with()
 
     def test_resolve_stack(self):
         """
