@@ -19,7 +19,7 @@ import util_pb2
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='game.proto',
   package='',
-  serialized_pb=_b('\n\ngame.proto\x1a\nutil.proto\"\xca\x01\n\tGameState\x12\x15\n\rcurrent_phase\x18\x01 \x02(\t\x12\x14\n\x0c\x63urrent_step\x18\x02 \x02(\t\x12\x15\n\ractive_player\x18\x03 \x02(\x05\x12\x17\n\x0fpriority_player\x18\x04 \x02(\x05\x12\x14\n\x05stack\x18\x05 \x02(\x0b\x32\x05.Zone\x12\x1a\n\x0b\x62\x61ttlefield\x18\x06 \x02(\x0b\x32\x05.Zone\x12\x14\n\x05\x65xile\x18\x07 \x02(\x0b\x32\x05.Zone\x12\x18\n\x07players\x18\x08 \x03(\x0b\x32\x07.Player\"|\n\x06Player\x12\x0f\n\x07game_id\x18\x01 \x02(\x05\x12\x13\n\x04hand\x18\x02 \x02(\x0b\x32\x05.Zone\x12\x18\n\tgraveyard\x18\x03 \x02(\x0b\x32\x05.Zone\x12\x16\n\x07library\x18\x04 \x02(\x0b\x32\x05.Zone\x12\x0c\n\x04life\x18\x05 \x02(\x05\x12\x0c\n\x04lost\x18\x06 \x02(\x08\"-\n\x04Zone\x12\x0f\n\x07game_id\x18\x01 \x02(\x05\x12\x14\n\x05\x63\x61rds\x18\x02 \x03(\x0b\x32\x05.Card\"\xe4\x01\n\x04\x43\x61rd\x12\x0f\n\x07game_id\x18\x01 \x02(\x05\x12\x0c\n\x04name\x18\x02 \x02(\t\x12\x11\n\tmana_cost\x18\x03 \x01(\t\x12\r\n\x05\x63olor\x18\x04 \x01(\t\x12\x13\n\x0bsuper_types\x18\x05 \x03(\t\x12\r\n\x05types\x18\x06 \x03(\t\x12\x10\n\x08subtypes\x18\x07 \x03(\t\x12\x11\n\tabilities\x18\x08 \x03(\t\x12\x13\n\x0b\x66lavor_text\x18\t \x01(\t\x12\r\n\x05power\x18\n \x01(\x05\x12\x11\n\ttoughness\x18\x0b \x01(\x05\x12\x1b\n\x04meta\x18\x0c \x03(\x0b\x32\r.KeyValuePair')
+  serialized_pb=_b('\n\ngame.proto\x1a\nutil.proto\"\xca\x01\n\tGameState\x12\x15\n\rcurrent_phase\x18\x01 \x02(\t\x12\x14\n\x0c\x63urrent_step\x18\x02 \x02(\t\x12\x15\n\ractive_player\x18\x03 \x02(\x05\x12\x17\n\x0fpriority_player\x18\x04 \x02(\x05\x12\x14\n\x05stack\x18\x05 \x02(\x0b\x32\x05.Zone\x12\x1a\n\x0b\x62\x61ttlefield\x18\x06 \x02(\x0b\x32\x05.Zone\x12\x14\n\x05\x65xile\x18\x07 \x02(\x0b\x32\x05.Zone\x12\x18\n\x07players\x18\x08 \x03(\x0b\x32\x07.Player\"|\n\x06Player\x12\x0f\n\x07game_id\x18\x01 \x02(\x05\x12\x13\n\x04hand\x18\x02 \x02(\x0b\x32\x05.Zone\x12\x18\n\tgraveyard\x18\x03 \x02(\x0b\x32\x05.Zone\x12\x16\n\x07library\x18\x04 \x02(\x0b\x32\x05.Zone\x12\x0c\n\x04life\x18\x05 \x02(\x05\x12\x0c\n\x04lost\x18\x06 \x02(\x08\"-\n\x04Zone\x12\x0f\n\x07game_id\x18\x01 \x02(\x05\x12\x14\n\x05\x63\x61rds\x18\x02 \x03(\x0b\x32\x05.Card\"\xe4\x01\n\x04\x43\x61rd\x12\x0f\n\x07game_id\x18\x01 \x02(\x05\x12\x0c\n\x04name\x18\x02 \x02(\t\x12\x11\n\tmana_cost\x18\x03 \x01(\t\x12\r\n\x05\x63olor\x18\x04 \x01(\t\x12\x13\n\x0bsuper_types\x18\x05 \x03(\t\x12\r\n\x05types\x18\x06 \x03(\t\x12\x10\n\x08subtypes\x18\x07 \x03(\t\x12\x11\n\tabilities\x18\x08 \x03(\t\x12\x13\n\x0b\x66lavor_text\x18\t \x01(\t\x12\r\n\x05power\x18\n \x01(\x05\x12\x11\n\ttoughness\x18\x0b \x01(\x05\x12\x1b\n\x04meta\x18\x0c \x03(\x0b\x32\r.KeyValuePair\"R\n\x08ManaPool\x12\r\n\x05white\x18\x01 \x02(\x05\x12\x0c\n\x04\x62lue\x18\x02 \x02(\x05\x12\r\n\x05\x62lack\x18\x03 \x02(\x05\x12\x0b\n\x03red\x18\x04 \x02(\x05\x12\r\n\x05green\x18\x05 \x02(\x05')
   ,
   dependencies=[util_pb2.DESCRIPTOR,])
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
@@ -314,6 +314,64 @@ _CARD = _descriptor.Descriptor(
   serialized_end=633,
 )
 
+
+_MANAPOOL = _descriptor.Descriptor(
+  name='ManaPool',
+  full_name='ManaPool',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='white', full_name='ManaPool.white', index=0,
+      number=1, type=5, cpp_type=1, label=2,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='blue', full_name='ManaPool.blue', index=1,
+      number=2, type=5, cpp_type=1, label=2,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='black', full_name='ManaPool.black', index=2,
+      number=3, type=5, cpp_type=1, label=2,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='red', full_name='ManaPool.red', index=3,
+      number=4, type=5, cpp_type=1, label=2,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='green', full_name='ManaPool.green', index=4,
+      number=5, type=5, cpp_type=1, label=2,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=635,
+  serialized_end=717,
+)
+
 _GAMESTATE.fields_by_name['stack'].message_type = _ZONE
 _GAMESTATE.fields_by_name['battlefield'].message_type = _ZONE
 _GAMESTATE.fields_by_name['exile'].message_type = _ZONE
@@ -327,6 +385,7 @@ DESCRIPTOR.message_types_by_name['GameState'] = _GAMESTATE
 DESCRIPTOR.message_types_by_name['Player'] = _PLAYER
 DESCRIPTOR.message_types_by_name['Zone'] = _ZONE
 DESCRIPTOR.message_types_by_name['Card'] = _CARD
+DESCRIPTOR.message_types_by_name['ManaPool'] = _MANAPOOL
 
 GameState = _reflection.GeneratedProtocolMessageType('GameState', (_message.Message,), dict(
   DESCRIPTOR = _GAMESTATE,
@@ -355,6 +414,13 @@ Card = _reflection.GeneratedProtocolMessageType('Card', (_message.Message,), dic
   # @@protoc_insertion_point(class_scope:Card)
   ))
 _sym_db.RegisterMessage(Card)
+
+ManaPool = _reflection.GeneratedProtocolMessageType('ManaPool', (_message.Message,), dict(
+  DESCRIPTOR = _MANAPOOL,
+  __module__ = 'game_pb2'
+  # @@protoc_insertion_point(class_scope:ManaPool)
+  ))
+_sym_db.RegisterMessage(ManaPool)
 
 
 # @@protoc_insertion_point(module_scope)

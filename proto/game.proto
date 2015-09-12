@@ -43,3 +43,11 @@ message Card {
     // Anything not conveyed above can be stuffed in meta (like artwork)
     repeated KeyValuePair meta = 12;
 }
+
+message ManaPool {
+    required int32 white = 1;
+    required int32 blue = 2;
+    required int32 black = 3;
+    required int32 red = 4;
+    required int32 green = 5;
+}

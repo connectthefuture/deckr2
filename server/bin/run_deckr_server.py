@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+"""
+A very simple script to run the deckr server.
+"""
 
 import argparse
 import logging

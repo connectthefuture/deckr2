@@ -75,6 +75,8 @@ def get_game_object(game_state, game_id):
                 return obj.card
             elif obj.game_object_type == proto.game_pb2.GameObject.ZONE:
                 return obj.zone
+            elif obj.game_object_type == proto.game_pb2.GameObject.MANA_POOL:
+                return obj.mana_pool
     raise ValueError("{} not in game state response".format(game_id))
 
 
@@ -180,13 +182,11 @@ class SinglePlayerTestCase(unittest.TestCase):
         Make sure that create gets a create response back.
         """
 
-        expected_response = proto.server_response_pb2.ServerResponse()
-        expected_response.response_type = proto.server_response_pb2.ServerResponse.CREATE
-        expected_response.create_response.game_id = 0
-
         self.client.create()
         response = self.client.listen()
-        self.assertEqual(response, expected_response)
+        self.assertEqual(response.response_type,
+                         proto.server_response_pb2.ServerResponse.CREATE)
+        self.assertIsNotNone(response.create_response.game_id)
 
     def test_create_join_start(self):
         """
@@ -281,3 +281,86 @@ class SinglePlayerTestCase(unittest.TestCase):
         player = get_game_object(
             self.last_response.game_state_response.game_state, player_id)
         self.assertTrue(player.lost)
+
+    def test_play_land(self):
+        """
+        Make sure we can play a simple land.
+        """
+
+        player_id, _ = self._create_join_start(7)
+        player = get_game_object(
+            self.last_response.game_state_response.game_state, player_id)
+        # Can only play lands at sorcercy speed
+        self._pass_until(
+            lambda game_state: game_state.current_step == 'precombat main')
+        hand = get_game_object(
+            self.last_response.game_state_response.game_state, player.hand)
+        card = hand.objs[0]
+        # Play the forest
+        self.client.play(card)
+        response = self.client.listen()
+        game_state = response.game_state_response.game_state
+        hand = get_game_object(game_state, player.hand)
+        self.assertEqual(len(hand.objs), 6)
+        self.assertNotIn(card, hand.objs)
+
+    def test_activate_land(self):
+        """
+        Make sure we can play a land and then activate it.
+        """
+
+        # TODO: Refactor this so we don't duplicate code from above
+        player_id, _ = self._create_join_start(7)
+        player = get_game_object(
+            self.last_response.game_state_response.game_state, player_id)
+        # Can only play lands at sorcercy speed
+        self._pass_until(
+            lambda game_state: game_state.current_step == 'precombat main')
+        hand = get_game_object(
+            self.last_response.game_state_response.game_state, player.hand)
+        card = hand.objs[0]
+        # Play the forest
+        self.client.play(card)
+        response = self.client.listen()
+        game_state = response.game_state_response.game_state
+        hand = get_game_object(game_state, player.hand)
+        self.assertEqual(len(hand.objs), 6)
+        self.assertNotIn(card, hand.objs)
+        self.client.activate_ability(card, 0)
+
+        response = self.client.listen()
+        game_state = response.game_state_response.game_state
+        mana_pool = get_game_object(game_state, player.mana_pool)
+        self.assertEqual(mana_pool.green, 1)
+
+    def test_play_creature(self):
+        """
+        Make sure we can play a creature.
+        """
+
+        self.client.create()
+        response = self._check_response()
+        self.client.join(response.create_response.game_id,
+                         deck=["Grizzly Bears"] * 7)
+        response = self._check_response()
+        player_id = response.join_response.player_id
+        self.client.start()
+        self._check_response()
+        player = get_game_object(
+            self.last_response.game_state_response.game_state, player_id)
+        # Can only play lands at sorcercy speed
+        self._pass_until(
+            lambda game_state: game_state.current_step == 'precombat main')
+        hand = get_game_object(
+            self.last_response.game_state_response.game_state, player.hand)
+        card = hand.objs[0]
+        # Play the forest
+        self.client.play(card)
+        response = self.client.listen()
+        game_state = response.game_state_response.game_state
+        hand = get_game_object(game_state, player.hand)
+        self.assertEqual(len(hand.objs), 6)
+        self.assertNotIn(card, hand.objs)
+        # It should not be on the battlefield
+        # TODO: I need to update the protos to identify the stack/battlefield.
+        # It should be on the stack

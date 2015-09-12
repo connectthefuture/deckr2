@@ -9,4 +9,15 @@ FOREST_CARD_DATA = {
     "subtypes": ["Forest"]
 }
 
-SIMPLE_CARD_LIBRARY = {"Forest": FOREST_CARD_DATA}
+GRIZZLY_BEARS = {
+    "name": "Grizzly Bears",
+    "types": ["Creature"],
+    "subtypes": ["Bear"],
+    "power": 2,
+    "toughness": 2
+}
+
+SIMPLE_CARD_LIBRARY = {
+    "Forest": FOREST_CARD_DATA,
+    "Grizzly Bears": GRIZZLY_BEARS
+}
