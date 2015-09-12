@@ -195,6 +195,21 @@ class TurnManagerTestCase(unittest.TestCase):
         self.turn_manager.turn_based_actions()
         self.player1.draw.assert_called_with()
 
+    def test_resolve_stack(self):
+        """
+        Make sure we don't continue if the stack isn't empty.
+        """
+
+        self.game.stack.is_empty.return_value = False
+        self.turn_manager.turn_based_actions = lambda: None
+        self.turn_manager.advance()
+        self.turn_manager.advance()
+        # We should still be in the default step/phase
+        self.assert_turn_state(deckr.game.game.TurnManager.UPKEEP_STEP,
+                               deckr.game.game.TurnManager.BEGINNING_PHASE,
+                               self.player1, self.player1)
+        self.game.stack.resolve.assert_called_with()
+
 
 class MagicTheGatheringTestCase(unittest.TestCase):
     """

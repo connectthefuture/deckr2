@@ -98,6 +98,9 @@ class Player(deckr.game.game_object.GameObject):  # pylint: disable=too-many-ins
         if card.is_land():
             self.hand.remove(card)
             self._game.battlefield.append(card)
+        else:  # Otherwise we put it on the stack
+            self.hand.remove(card)
+            self._game.stack.append(card)
 
         card.controller = self
 

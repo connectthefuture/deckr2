@@ -191,7 +191,12 @@ class TurnManager(object):
         next_player = self._game.player_manager.next_player(
             self.priority_player)
         if next_player == self.active_player:
-            self._next_step()
+            # Check the stack
+            if self._game.stack.is_empty():
+                self._next_step()
+            else:
+                self._game.stack.resolve()
+                self.priority_player = next_player
         else:
             self.priority_player = next_player
 
@@ -228,8 +233,8 @@ class TurnManager(object):
 
         if self.step == self.DRAW_STEP:
             # Suppress the draw on the very first turn
-            if self.turn != 1 or self.active_player != self._game.player_manager.first_player(
-            ):
+            if (self.turn != 1 or self.active_player !=
+                    self._game.player_manager.first_player()):
                 self.active_player.draw()
 
 
@@ -252,7 +257,7 @@ class MagicTheGathering(object):  # pylint: disable=too-many-instance-attributes
         # Each game has a set of shared zones
         self.battlefield = deckr.game.zone.Zone('battlefield', None)
         self.exile = deckr.game.zone.Zone('exile', None)
-        self.stack = deckr.game.zone.Zone('stack', None)
+        self.stack = deckr.game.zone.Stack(name='stack', owner=None, game=self)
 
         # Register all game objects
         self.registry.register(self.battlefield)
