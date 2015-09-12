@@ -29,6 +29,8 @@ class RouterTestCase(unittest.TestCase):
 
         self.router.create_room(0, self.game)
         self.router.add_to_room(self.connection, 0)
+        # Mock out the player
+        self.connection.player = mock.MagicMock()
 
     def test_create(self):
         """
@@ -136,3 +138,22 @@ class RouterTestCase(unittest.TestCase):
         self._create_and_join_game()
         self.router.handle_message(message, self.connection)
         self.connection.player.pass_priority.assert_called_with()
+
+    def test_play_card(self):
+        """
+        Make sure that we can play a card, and that it will properly parse the
+        card to play.
+        """
+
+        test_object = object()
+        message = proto.client_message_pb2.ClientMessage()
+        message.message_type = proto.client_message_pb2.ClientMessage.ACTION
+        message.action_message.action_type = proto.client_message_pb2.ActionMessage.PLAY
+        message.action_message.play.card = 1
+        self.game.registry.lookup.return_value = test_object
+        self._create_and_join_game()
+        self.router.handle_message(message, self.connection)
+        # Make sure we look it up in the registry
+        self.game.registry.lookup.assert_called_with(1)
+        # Make sure we properly sub in the object
+        self.connection.player.play_card.assert_called_with(test_object)

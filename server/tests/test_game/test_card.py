@@ -56,3 +56,11 @@ class CardLibraryTestCase(unittest.TestCase):
         self.assertEqual(len(cards), 3)
         for card in cards:
             self.assertEqual(card.name, "Forest")
+
+    def test_is_land(self):
+        """
+        Make sure we can identify a card as a land.
+        """
+
+        forest = self.card_library.create("Forest")
+        self.assertTrue(forest.is_land())

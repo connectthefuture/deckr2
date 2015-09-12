@@ -281,3 +281,25 @@ class SinglePlayerTestCase(unittest.TestCase):
         player = get_game_object(
             self.last_response.game_state_response.game_state, player_id)
         self.assertTrue(player.lost)
+
+    def test_play_land(self):
+        """
+        Make sure we can play a simple land.
+        """
+
+        player_id, _ = self._create_join_start(7)
+        player = get_game_object(
+            self.last_response.game_state_response.game_state, player_id)
+        # Can only play lands at sorcercy speed
+        self._pass_until(
+            lambda game_state: game_state.current_step == 'precombat main')
+        hand = get_game_object(
+            self.last_response.game_state_response.game_state, player.hand)
+        card = hand.objs[0]
+        # Play the forest
+        self.client.play(card)
+        response = self.client.listen()
+        game_state = response.game_state_response.game_state
+        hand = get_game_object(game_state, player.hand)
+        self.assertEqual(len(hand.objs), 6)
+        self.assertNotIn(card, hand.objs)

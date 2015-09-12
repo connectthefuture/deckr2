@@ -4,9 +4,11 @@ This module contains player tests.
 
 import unittest
 
+import deckr.game.card
 import deckr.game.player
 import mock
 import proto.game_pb2 as proto_lib
+import tests.utils
 
 
 class PlayerTestCase(unittest.TestCase):
@@ -56,3 +58,14 @@ class PlayerTestCase(unittest.TestCase):
         self.assertEqual(proto.player.library, self.player.library.game_id)
         self.assertEqual(proto.player.hand, self.player.hand.game_id)
         self.assertEqual(proto.player.lost, self.player.lost)
+
+    def test_play_land(self):
+        """
+        Make sure we can properly play a land.
+        """
+
+        forest = deckr.game.card.create_card_from_dict(
+            tests.utils.FOREST_CARD_DATA)
+        self.player.hand.append(forest)
+        self.player.play_card(forest)
+        self.game.battlefield.append.assert_called_with(forest)

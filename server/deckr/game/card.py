@@ -55,6 +55,13 @@ class Card(deckr.game.game_object.GameObject):  # pylint: disable=too-many-insta
 
         pass
 
+    def is_land(self):
+        """
+        Check if the card is a land of any type.
+        """
+
+        return 'Land' in self.types
+
     def update_proto(self, proto):
         """
         Update a protobuf.
