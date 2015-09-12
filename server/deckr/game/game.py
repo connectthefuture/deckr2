@@ -86,11 +86,12 @@ class PlayerManager(object):
         player = deckr.game.player.Player(self._game)
 
         self.players.append(player)
-        # Register the player zones and cards
+        # Register the player zones, mana pool, and cards
         self._game.registry.register(player)
         self._game.registry.register(player.hand)
         self._game.registry.register(player.library)
         self._game.registry.register(player.graveyard)
+        self._game.registry.register(player.mana_pool)
         # Create the deck
         cards = self._game.card_library.create_from_list(deck_list)
         for card in cards:

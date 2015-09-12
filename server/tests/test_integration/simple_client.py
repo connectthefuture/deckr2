@@ -159,3 +159,15 @@ class SimpleClient(object):
         message.action_message.action_type = proto.client_message_pb2.ActionMessage.PLAY
         message.action_message.play.card = card
         self.send_message(message)
+
+    def activate_ability(self, card, index):
+        """
+        Activate a card's ability
+        """
+
+        message = proto.client_message_pb2.ClientMessage()
+        message.message_type = proto.client_message_pb2.ClientMessage.ACTION
+        message.action_message.action_type = proto.client_message_pb2.ActionMessage.ACTIVATE
+        message.action_message.activate_ability.card = card
+        message.action_message.activate_ability.index = index
+        self.send_message(message)

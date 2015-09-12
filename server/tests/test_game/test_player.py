@@ -11,6 +11,44 @@ import proto.game_pb2 as proto_lib
 import tests.utils
 
 
+class ManaPoolTestCase(unittest.TestCase):
+    """
+    Tests around the mana pool.
+    """
+
+    def setUp(self):
+        self.mana_pool = deckr.game.player.ManaPool()
+
+    def test_add(self):
+        """
+        Make sure we can add mana to a mana pool.
+        """
+
+        self.mana_pool.add(white=1, blue=2, black=3, red=4, green=5)
+        self.assertEqual(self.mana_pool.white, 1)
+        self.assertEqual(self.mana_pool.blue, 2)
+        self.assertEqual(self.mana_pool.black, 3)
+        self.assertEqual(self.mana_pool.red, 4)
+        self.assertEqual(self.mana_pool.green, 5)
+
+    def test_update_proto(self):
+        """
+        Make sure we can properly update a proto.
+        """
+
+        proto = proto_lib.GameObject()
+        self.mana_pool.game_id = 0
+        self.mana_pool.add(white=1, blue=2, black=3, red=4, green=5)
+        self.mana_pool.update_proto(proto)
+        self.assertEqual(proto.game_object_type,
+                         proto_lib.GameObject.MANA_POOL)
+        self.assertEqual(proto.mana_pool.white, 1)
+        self.assertEqual(proto.mana_pool.blue, 2)
+        self.assertEqual(proto.mana_pool.black, 3)
+        self.assertEqual(proto.mana_pool.red, 4)
+        self.assertEqual(proto.mana_pool.green, 5)
+
+
 class PlayerTestCase(unittest.TestCase):
     """
     Simple tests around the player.
@@ -25,6 +63,7 @@ class PlayerTestCase(unittest.TestCase):
         self.player.library.game_id = 1
         self.player.graveyard.game_id = 2
         self.player.hand.game_id = 3
+        self.player.mana_pool.game_id = 4
 
     def test_pass_priority(self):
         """
@@ -69,3 +108,13 @@ class PlayerTestCase(unittest.TestCase):
         self.player.hand.append(forest)
         self.player.play_card(forest)
         self.game.battlefield.append.assert_called_with(forest)
+        self.assertEqual(forest.controller, self.player)
+
+    def test_activate_ability(self):
+        """
+        Make sure we can active a card ability.
+        """
+
+        card = mock.MagicMock()
+        self.player.activate_ability(card, 0)
+        card.activate_ability.assert_called_with(0)

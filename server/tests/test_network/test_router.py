@@ -157,3 +157,23 @@ class RouterTestCase(unittest.TestCase):
         self.game.registry.lookup.assert_called_with(1)
         # Make sure we properly sub in the object
         self.connection.player.play_card.assert_called_with(test_object)
+
+    def test_activate_ability(self):
+        """
+        Make sure we can activate the ability of a card.
+        """
+
+        test_object = object()
+        message = proto.client_message_pb2.ClientMessage()
+        message.message_type = proto.client_message_pb2.ClientMessage.ACTION
+        message.action_message.action_type = proto.client_message_pb2.ActionMessage.ACTIVATE
+        message.action_message.activate_ability.card = 1
+        message.action_message.activate_ability.index = 0
+        self.game.registry.lookup.return_value = test_object
+        self._create_and_join_game()
+        self.router.handle_message(message, self.connection)
+        # Make sure we look it up in the registry
+        self.game.registry.lookup.assert_called_with(1)
+        # Make sure we properly sub in the object
+        self.connection.player.activate_ability.assert_called_with(test_object,
+                                                                   0)

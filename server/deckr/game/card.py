@@ -9,6 +9,24 @@ import deckr.game.game_object
 import proto.game_pb2 as proto_lib
 
 
+def populate_abilities(card):
+    """
+    At some point this will be greatly expanded to do rules parsing, etc.
+    Right now this is in place to allow for quick development. It will take in
+    a card and then generate some abilities for it.
+    """
+
+    ### Default ability functions. ###
+    def forest_ability(card):
+        """Add {G} to the controller's mana pool."""
+
+        card.controller.mana_pool.add(green=1)
+
+    ### Ability population ###
+    if card.name == "Forest":
+        card.abilities.append(forest_ability)
+
+
 def create_card_from_dict(card_data):
     """
     Create a new card from a dictionary.
@@ -25,6 +43,7 @@ def create_card_from_dict(card_data):
     card.types = card_data['types']
     card.subtypes = card_data.get('subtypes', [])
     card.supertypes = card_data.get('supertypes', [])
+    populate_abilities(card)
     return card
 
 
@@ -43,6 +62,8 @@ class Card(deckr.game.game_object.GameObject):  # pylint: disable=too-many-insta
         self.name = ''
         self.owner = None
         self.controller = None
+        # Store function pointers for abilities
+        self.abilities = []
         # These will generally be hidden based on the types of the card.
         self.power = 0
         self.toughness = 0
@@ -69,6 +90,13 @@ class Card(deckr.game.game_object.GameObject):  # pylint: disable=too-many-insta
 
         super(Card, self).update_proto(proto)
         proto.game_object_type = proto_lib.GameObject.CARD
+
+    def activate_ability(self, index):
+        """
+        Activate an ability for this card.
+        """
+
+        self.abilities[index](self)
 
 
 class CardLibrary(deckr.core.service.Service):
