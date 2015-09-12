@@ -1,11 +1,11 @@
 import 'util.proto';
 
-# NOTE: Most int32 fields should be populated with game ids. THese will be noted.
+// NOTE: Some int32 fields should be populated with game ids. These will be noted.
 message GameState {
     required string current_phase = 1;
     required string current_step = 2;
-    required int32 active_player =  3; # Game id
-    required int32 priority_player = 4; # Game id
+    required int32 active_player =  3; // Game id
+    required int32 priority_player = 4; // Game id
     required Zone stack = 5;
     required Zone battlefield = 6;
     required Zone exile = 7;
@@ -17,18 +17,18 @@ message Player {
     required Zone hand = 2;
     required Zone graveyard = 3;
     required Zone library = 4;
-    required int32 life = 4;
-    required bool lost = 5;
+    required int32 life = 5;
+    required bool lost = 6;
 }
 
 message Zone {
     required int32 game_id = 1;
-    repeated Card cards = 2
+    repeated Card cards = 2;
 }
 
 message Card {
     required int32 game_id = 1;
-    required string name = 2
+    required string name = 2;
 
     optional string mana_cost = 3;
     optional string color = 4; // In case mana cost is 0
