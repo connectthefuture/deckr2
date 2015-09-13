@@ -34,51 +34,51 @@ def start_server():
         yaml.load(open('config/services/game_master_service.yml')), {})
     starter.start()
 
-
-def parse_game_state(game_state):
-    """
-    Parse the game state into something with a little more structure.
-    """
-
-    players = {
-        x.game_id: x.player
-        for x in game_state.game_objects
-        if x.game_object_type == proto.game_pb2.GameObject.PLAYER
-    }
-    zones = {
-        x.game_id: x.zone
-        for x in game_state.game_objects
-        if x.game_object_type == proto.game_pb2.GameObject.ZONE
-    }
-    # cards = {x.game_id: x.card for x in game_state.game_objects
-    #         if x.game_object_type == proto.game_pb2.GameObject.CARD}
-    game = {}
-
-    for game_id, player in players.items():
-        game[game_id] = {
-            'library': zones[player.library].objs,
-            'graveyard': zones[player.graveyard].objs,
-            'hand': zones[player.hand].objs
-        }
-    return game
-
-
-def get_game_object(game_state, game_id):
-    """
-    Get a game object by game_id.
-    """
-
-    for obj in game_state.game_objects:
-        if obj.game_id == game_id:
-            if obj.game_object_type == proto.game_pb2.GameObject.PLAYER:
-                return obj.player
-            elif obj.game_object_type == proto.game_pb2.GameObject.CARD:
-                return obj.card
-            elif obj.game_object_type == proto.game_pb2.GameObject.ZONE:
-                return obj.zone
-            elif obj.game_object_type == proto.game_pb2.GameObject.MANA_POOL:
-                return obj.mana_pool
-    raise ValueError("{} not in game state response".format(game_id))
+#
+# def parse_game_state(game_state):
+#     """
+#     Parse the game state into something with a little more structure.
+#     """
+#
+#     players = {
+#         x.game_id: x.player
+#         for x in game_state.game_objects
+#         if x.game_object_type == proto.game_pb2.GameObject.PLAYER
+#     }
+#     zones = {
+#         x.game_id: x.zone
+#         for x in game_state.game_objects
+#         if x.game_object_type == proto.game_pb2.GameObject.ZONE
+#     }
+#     # cards = {x.game_id: x.card for x in game_state.game_objects
+#     #         if x.game_object_type == proto.game_pb2.GameObject.CARD}
+#     game = {}
+#
+#     for game_id, player in players.items():
+#         game[game_id] = {
+#             'library': zones[player.library].objs,
+#             'graveyard': zones[player.graveyard].objs,
+#             'hand': zones[player.hand].objs
+#         }
+#     return game
+#
+#
+# def get_game_object(game_state, game_id):
+#     """
+#     Get a game object by game_id.
+#     """
+#
+#     for obj in game_state.game_objects:
+#         if obj.game_id == game_id:
+#             if obj.game_object_type == proto.game_pb2.GameObject.PLAYER:
+#                 return obj.player
+#             elif obj.game_object_type == proto.game_pb2.GameObject.CARD:
+#                 return obj.card
+#             elif obj.game_object_type == proto.game_pb2.GameObject.ZONE:
+#                 return obj.zone
+#             elif obj.game_object_type == proto.game_pb2.GameObject.MANA_POOL:
+#                 return obj.mana_pool
+#     raise ValueError("{} not in game state response".format(game_id))
 
 
 class SimpleServer(object):
@@ -123,22 +123,43 @@ class SinglePlayerTestCase(unittest.TestCase):
 
     def setUp(self):
         self.client = deckrclient.client.DeckrClient(ip='127.0.0.1',
-                                                     port=8080)
+                                                     port=8080, raise_errors=True)
         self.client.initialize()
 
     def tearDown(self):
         self.client.shutdown()
+
+    def _create_join_start(self, deck):
+        """
+        Create, join, and start a game. Returns the player that we joined as.
+        """
+
+        self.client.create()
+        response = self.client.listen()
+        self.client.join(response.create_response.game_id,
+                         deck=deck)
+        response = self.client.listen()
+        self.client.start()
 
     def test_create(self):
         """
         Make sure that create gets a create response back.
         """
 
-        # self.client.create()
-        # response = self.client.listen()
-        # self.assertEqual(response.response_type,
-        #                  proto.server_response_pb2.ServerResponse.CREATE)
-        # self.assertIsNotNone(response.create_response.game_id)
+        self.client.create()
+        response = self.client.listen()
+        self.assertEqual(response.response_type,
+                         proto.server_response_pb2.ServerResponse.CREATE)
+        self.assertIsNotNone(response.create_response.game_id)
+
+    def test_create_join_start(self):
+        """
+        Create a game, join it, and then start it. There should be no
+        errors.
+        """
+
+        deck = ["Forest"] * 7
+        self._create_join_start(deck)
 
     # def _check_response(self):
     #     """
@@ -191,16 +212,7 @@ class SinglePlayerTestCase(unittest.TestCase):
     #
 
     #
-    # def test_create_join_start(self):
-    #     """
-    #     Create a game, join it, and then start it. There should be no
-    #     errors.
-    #     """
     #
-    #     player, response = self._create_join_start()
-    #     # Check the starting hand
-    #     game_state = parse_game_state(response.game_state_response.game_state)
-    #     self.assertEqual(len(game_state[player]['hand']), 7)
     #
     # def test_pass_turn_draw(self):
     #     """

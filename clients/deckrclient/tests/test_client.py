@@ -160,3 +160,41 @@ class DeckrClientTestCase(unittest.TestCase):
 
         self.client._listener_thread_worker()
         callback.assert_called_with("foobar")
+
+    def test_raise_errors(self):
+        """
+        Make sure if the raise_errors flag is set, then we raise any error response
+        as an exception.
+        """
+
+        error_response = proto.server_response_pb2.ServerResponse()
+        error_response.response_type = proto.server_response_pb2.ServerResponse.ERROR
+        self.client._raise_errors = True
+        self.client._listen = mock.MagicMock()
+        self.client._listen.return_value = error_response
+        self.assertRaises(ValueError, self.client.listen)
+
+    def test_join(self):
+        """
+        Make sure we can send a join message.
+        """
+
+        expected_message = proto.client_message_pb2.ClientMessage()
+        expected_message.message_type = proto.client_message_pb2.ClientMessage.JOIN
+        expected_message.join_message.game_id = 0
+        expected_message.join_message.client_type = proto.client_message_pb2.JoinMessage.PLAYER
+        self.client._send_message = mock.MagicMock()
+        self.client.join(game_id=0)
+        self.client._send_message.assert_called_with(expected_message)
+
+    def test_start(self):
+        """
+        Make sure we can start a game.
+        """
+
+        expected_message = proto.client_message_pb2.ClientMessage()
+        expected_message.message_type = proto.client_message_pb2.ClientMessage.ACTION
+        expected_message.action_message.action_type = proto.client_message_pb2.ActionMessage.START
+        self.client._send_message = mock.MagicMock()
+        self.client.start()
+        self.client._send_message.assert_called_with(expected_message)

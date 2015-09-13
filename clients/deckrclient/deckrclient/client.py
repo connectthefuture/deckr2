@@ -22,7 +22,8 @@ class DeckrClient(object):  # pylint: disable=too-many-instance-attributes
     then call a callback whenever a message comes in.
     """
 
-    def __init__(self, ip, port, sync=True, backoff=0.1, callback=None): # pylint: disable=too-many-arguments
+    def __init__(self, ip, port, sync=True,
+                 backoff=0.1, callback=None, raise_errors=False): # pylint: disable=too-many-arguments
         self._ip = ip
         self._port = port
         self._socket = None
@@ -31,6 +32,7 @@ class DeckrClient(object):  # pylint: disable=too-many-instance-attributes
         self._buffer = ''
         self._listener_thread = None
         self._callback = callback
+        self._raise_errors = raise_errors # Should any error message be treated as an exception?
 
     def initialize(self, max_retries=3):
         """
@@ -113,7 +115,11 @@ class DeckrClient(object):  # pylint: disable=too-many-instance-attributes
         internal handling, and then return the message.
         """
 
-        return self._listen()
+        response = self._listen()
+        # Check for errors
+        if self._raise_errors and response.response_type == proto.server_response_pb2.ServerResponse.ERROR:
+            raise ValueError(response)
+        return response
 
     ###################
     # Client Messages #
@@ -126,4 +132,28 @@ class DeckrClient(object):  # pylint: disable=too-many-instance-attributes
 
         message = proto.client_message_pb2.ClientMessage()
         message.message_type = proto.client_message_pb2.ClientMessage.CREATE
+        self._send_message(message)
+
+    def join(self, game_id, deck=None):
+        """
+        Send a join message.
+        """
+
+        message = proto.client_message_pb2.ClientMessage()
+        message.message_type = proto.client_message_pb2.ClientMessage.JOIN
+        message.join_message.game_id = game_id
+        message.join_message.client_type = proto.client_message_pb2.JoinMessage.PLAYER
+        # if deck is not None:
+        #     for card in deck:
+        #         message.join_message.player_config.deck.append(card)
+        self._send_message(message)
+
+    def start(self):
+        """
+        Send a start message.
+        """
+
+        message = proto.client_message_pb2.ClientMessage()
+        message.message_type = proto.client_message_pb2.ClientMessage.ACTION
+        message.action_message.action_type = proto.client_message_pb2.ActionMessage.START
         self._send_message(message)
