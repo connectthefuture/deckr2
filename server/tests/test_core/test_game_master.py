@@ -10,7 +10,6 @@ import mock
 
 
 class GameMasterTestCase(unittest.TestCase):
-
     def setUp(self):
         self.game_master = deckr.core.game_master.GameMaster()
 

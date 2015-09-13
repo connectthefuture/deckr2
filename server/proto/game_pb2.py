@@ -19,7 +19,7 @@ import util_pb2
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='game.proto',
   package='',
-  serialized_pb=_b('\n\ngame.proto\x1a\nutil.proto\"\xca\x01\n\tGameState\x12\x15\n\rcurrent_phase\x18\x01 \x02(\t\x12\x14\n\x0c\x63urrent_step\x18\x02 \x02(\t\x12\x15\n\ractive_player\x18\x03 \x02(\x05\x12\x17\n\x0fpriority_player\x18\x04 \x02(\x05\x12\x14\n\x05stack\x18\x05 \x02(\x0b\x32\x05.Zone\x12\x1a\n\x0b\x62\x61ttlefield\x18\x06 \x02(\x0b\x32\x05.Zone\x12\x14\n\x05\x65xile\x18\x07 \x02(\x0b\x32\x05.Zone\x12\x18\n\x07players\x18\x08 \x03(\x0b\x32\x07.Player\"|\n\x06Player\x12\x0f\n\x07game_id\x18\x01 \x02(\x05\x12\x13\n\x04hand\x18\x02 \x02(\x0b\x32\x05.Zone\x12\x18\n\tgraveyard\x18\x03 \x02(\x0b\x32\x05.Zone\x12\x16\n\x07library\x18\x04 \x02(\x0b\x32\x05.Zone\x12\x0c\n\x04life\x18\x05 \x02(\x05\x12\x0c\n\x04lost\x18\x06 \x02(\x08\"-\n\x04Zone\x12\x0f\n\x07game_id\x18\x01 \x02(\x05\x12\x14\n\x05\x63\x61rds\x18\x02 \x03(\x0b\x32\x05.Card\"\xe4\x01\n\x04\x43\x61rd\x12\x0f\n\x07game_id\x18\x01 \x02(\x05\x12\x0c\n\x04name\x18\x02 \x02(\t\x12\x11\n\tmana_cost\x18\x03 \x01(\t\x12\r\n\x05\x63olor\x18\x04 \x01(\t\x12\x13\n\x0bsuper_types\x18\x05 \x03(\t\x12\r\n\x05types\x18\x06 \x03(\t\x12\x10\n\x08subtypes\x18\x07 \x03(\t\x12\x11\n\tabilities\x18\x08 \x03(\t\x12\x13\n\x0b\x66lavor_text\x18\t \x01(\t\x12\r\n\x05power\x18\n \x01(\x05\x12\x11\n\ttoughness\x18\x0b \x01(\x05\x12\x1b\n\x04meta\x18\x0c \x03(\x0b\x32\r.KeyValuePair\"R\n\x08ManaPool\x12\r\n\x05white\x18\x01 \x02(\x05\x12\x0c\n\x04\x62lue\x18\x02 \x02(\x05\x12\r\n\x05\x62lack\x18\x03 \x02(\x05\x12\x0b\n\x03red\x18\x04 \x02(\x05\x12\r\n\x05green\x18\x05 \x02(\x05')
+  serialized_pb=_b('\n\ngame.proto\x1a\nutil.proto\"\xca\x01\n\tGameState\x12\x15\n\rcurrent_phase\x18\x01 \x02(\t\x12\x14\n\x0c\x63urrent_step\x18\x02 \x02(\t\x12\x15\n\ractive_player\x18\x03 \x02(\x05\x12\x17\n\x0fpriority_player\x18\x04 \x02(\x05\x12\x14\n\x05stack\x18\x05 \x02(\x0b\x32\x05.Zone\x12\x1a\n\x0b\x62\x61ttlefield\x18\x06 \x02(\x0b\x32\x05.Zone\x12\x14\n\x05\x65xile\x18\x07 \x02(\x0b\x32\x05.Zone\x12\x18\n\x07players\x18\x08 \x03(\x0b\x32\x07.Player\"\x9a\x01\n\x06Player\x12\x0f\n\x07game_id\x18\x01 \x02(\x05\x12\x13\n\x04hand\x18\x02 \x02(\x0b\x32\x05.Zone\x12\x18\n\tgraveyard\x18\x03 \x02(\x0b\x32\x05.Zone\x12\x16\n\x07library\x18\x04 \x02(\x0b\x32\x05.Zone\x12\x1c\n\tmana_pool\x18\x05 \x02(\x0b\x32\t.ManaPool\x12\x0c\n\x04life\x18\x06 \x02(\x05\x12\x0c\n\x04lost\x18\x07 \x02(\x08\"-\n\x04Zone\x12\x0f\n\x07game_id\x18\x01 \x02(\x05\x12\x14\n\x05\x63\x61rds\x18\x02 \x03(\x0b\x32\x05.Card\"\xe4\x01\n\x04\x43\x61rd\x12\x0f\n\x07game_id\x18\x01 \x02(\x05\x12\x0c\n\x04name\x18\x02 \x02(\t\x12\x11\n\tmana_cost\x18\x03 \x01(\t\x12\r\n\x05\x63olor\x18\x04 \x01(\t\x12\x13\n\x0bsuper_types\x18\x05 \x03(\t\x12\r\n\x05types\x18\x06 \x03(\t\x12\x10\n\x08subtypes\x18\x07 \x03(\t\x12\x11\n\tabilities\x18\x08 \x03(\t\x12\x13\n\x0b\x66lavor_text\x18\t \x01(\t\x12\r\n\x05power\x18\n \x01(\x05\x12\x11\n\ttoughness\x18\x0b \x01(\x05\x12\x1b\n\x04meta\x18\x0c \x03(\x0b\x32\r.KeyValuePair\"c\n\x08ManaPool\x12\x0f\n\x07game_id\x18\x01 \x02(\x05\x12\r\n\x05white\x18\x02 \x02(\x05\x12\x0c\n\x04\x62lue\x18\x03 \x02(\x05\x12\r\n\x05\x62lack\x18\x04 \x02(\x05\x12\x0b\n\x03red\x18\x05 \x02(\x05\x12\r\n\x05green\x18\x06 \x02(\x05')
   ,
   dependencies=[util_pb2.DESCRIPTOR,])
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
@@ -142,15 +142,22 @@ _PLAYER = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='life', full_name='Player.life', index=4,
-      number=5, type=5, cpp_type=1, label=2,
+      name='mana_pool', full_name='Player.mana_pool', index=4,
+      number=5, type=11, cpp_type=10, label=2,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='life', full_name='Player.life', index=5,
+      number=6, type=5, cpp_type=1, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='lost', full_name='Player.lost', index=5,
-      number=6, type=8, cpp_type=7, label=2,
+      name='lost', full_name='Player.lost', index=6,
+      number=7, type=8, cpp_type=7, label=2,
       has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -166,8 +173,8 @@ _PLAYER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=231,
-  serialized_end=355,
+  serialized_start=232,
+  serialized_end=386,
 )
 
 
@@ -203,8 +210,8 @@ _ZONE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=357,
-  serialized_end=402,
+  serialized_start=388,
+  serialized_end=433,
 )
 
 
@@ -310,8 +317,8 @@ _CARD = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=405,
-  serialized_end=633,
+  serialized_start=436,
+  serialized_end=664,
 )
 
 
@@ -323,36 +330,43 @@ _MANAPOOL = _descriptor.Descriptor(
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='white', full_name='ManaPool.white', index=0,
+      name='game_id', full_name='ManaPool.game_id', index=0,
       number=1, type=5, cpp_type=1, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='blue', full_name='ManaPool.blue', index=1,
+      name='white', full_name='ManaPool.white', index=1,
       number=2, type=5, cpp_type=1, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='black', full_name='ManaPool.black', index=2,
+      name='blue', full_name='ManaPool.blue', index=2,
       number=3, type=5, cpp_type=1, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='red', full_name='ManaPool.red', index=3,
+      name='black', full_name='ManaPool.black', index=3,
       number=4, type=5, cpp_type=1, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='green', full_name='ManaPool.green', index=4,
+      name='red', full_name='ManaPool.red', index=4,
       number=5, type=5, cpp_type=1, label=2,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='green', full_name='ManaPool.green', index=5,
+      number=6, type=5, cpp_type=1, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -368,8 +382,8 @@ _MANAPOOL = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=635,
-  serialized_end=717,
+  serialized_start=666,
+  serialized_end=765,
 )
 
 _GAMESTATE.fields_by_name['stack'].message_type = _ZONE
@@ -379,6 +393,7 @@ _GAMESTATE.fields_by_name['players'].message_type = _PLAYER
 _PLAYER.fields_by_name['hand'].message_type = _ZONE
 _PLAYER.fields_by_name['graveyard'].message_type = _ZONE
 _PLAYER.fields_by_name['library'].message_type = _ZONE
+_PLAYER.fields_by_name['mana_pool'].message_type = _MANAPOOL
 _ZONE.fields_by_name['cards'].message_type = _CARD
 _CARD.fields_by_name['meta'].message_type = util_pb2._KEYVALUEPAIR
 DESCRIPTOR.message_types_by_name['GameState'] = _GAMESTATE

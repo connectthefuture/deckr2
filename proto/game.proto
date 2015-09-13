@@ -17,8 +17,9 @@ message Player {
     required Zone hand = 2;
     required Zone graveyard = 3;
     required Zone library = 4;
-    required int32 life = 5;
-    required bool lost = 6;
+    required ManaPool mana_pool = 5;
+    required int32 life = 6;
+    required bool lost = 7;
 }
 
 message Zone {
@@ -45,9 +46,10 @@ message Card {
 }
 
 message ManaPool {
-    required int32 white = 1;
-    required int32 blue = 2;
-    required int32 black = 3;
-    required int32 red = 4;
-    required int32 green = 5;
+    required int32 game_id = 1;
+    required int32 white = 2;
+    required int32 blue = 3;
+    required int32 black = 4;
+    required int32 red = 5;
+    required int32 green = 6;
 }

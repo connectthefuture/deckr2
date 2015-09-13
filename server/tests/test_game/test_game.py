@@ -227,6 +227,8 @@ class MagicTheGatheringTestCase(unittest.TestCase):
         Make sure that we properly update the game state proto.
         """
 
+        player1 = mock.MagicMock()
+        player1.game_id = 1
         proto = game_proto.GameState()
         mock_game_object = deckr.game.game_object.GameObject()
         mock_game_object.update_proto = mock.MagicMock()
@@ -234,13 +236,16 @@ class MagicTheGatheringTestCase(unittest.TestCase):
         # Set up the game
         self.game.turn_manager.step = 'untap'
         self.game.turn_manager.phase = 'beginning'
-        self.game.registry.register(mock_game_object)
+        self.game.turn_manager.active_player = player1
+        self.game.turn_manager.priority_player = player1
+        self.game.player_manager.players = [player1]
 
         self.game.update_proto(proto)
         self.assertEqual(proto.current_step, 'untap')
         self.assertEqual(proto.current_phase, 'beginning')
-        self.assertTrue(mock_game_object.update_proto.called)
-        self.assertEqual(len(proto.game_objects), 4)
+        self.assertEqual(len(proto.players), 1)
+
+        self.assertEqual(player1.update_proto.call_count, 1)
 
 
 class GameRegistryTestCase(unittest.TestCase):
