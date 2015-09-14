@@ -243,7 +243,7 @@ class TurnManager(object):
         if self.step == self.DRAW_STEP:
             # Suppress the draw on the very first turn
             if (self.turn != 1 or self.active_player !=
-                self._game.player_manager.first_player()):
+                    self._game.player_manager.first_player()):
                 self.active_player.draw()
 
     def update_proto(self, proto):

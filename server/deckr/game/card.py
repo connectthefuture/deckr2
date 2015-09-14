@@ -6,7 +6,6 @@ import json
 
 import deckr.core.service
 import deckr.game.game_object
-import proto.game_pb2 as proto_lib
 
 
 def populate_abilities(card):

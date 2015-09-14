@@ -3,7 +3,6 @@ This module provides code to interact with zones.
 """
 
 import deckr.game.game_object
-import proto.game_pb2 as proto_lib
 
 
 class Zone(deckr.game.game_object.GameObject):

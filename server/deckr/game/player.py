@@ -4,7 +4,6 @@ This module provides the code for Players.
 
 import deckr.game.game_object
 import deckr.game.zone
-import proto.game_pb2 as proto_lib
 
 
 class ManaPool(deckr.game.game_object.GameObject):

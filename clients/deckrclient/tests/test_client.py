@@ -203,7 +203,7 @@ class DeckrClientTestCase(unittest.TestCase):
         """
         Make sure we can pass priority.
         """
-        
+
         expected_message = proto.client_message_pb2.ClientMessage()
         expected_message.message_type = proto.client_message_pb2.ClientMessage.ACTION
         expected_message.action_message.action_type = proto.client_message_pb2.ActionMessage.PASS_PRIORITY
@@ -225,6 +225,26 @@ class DeckrClientTestCase(unittest.TestCase):
         self.client.listen()
 
         self.assertEqual(self.client.player_id, 1)
+
+    def test_play(self):
+        """
+        Make sure we can play a card.
+        """
+
+        card_proto = proto.game_pb2.Card()
+        card_proto.game_id = 1
+        card_proto.name = "Grizzly Bears"
+        mock_card = deckrclient.client.Card(card_proto)
+        expected_message = proto.client_message_pb2.ClientMessage()
+        expected_message.message_type = proto.client_message_pb2.ClientMessage.ACTION
+        expected_message.action_message.action_type = proto.client_message_pb2.ActionMessage.PLAY
+        expected_message.action_message.play.card = 1
+
+        self.client._send_message = mock.MagicMock()
+        self.client.play(1)
+        self.client._send_message.assert_called_with(expected_message)
+        self.client.play(mock_card)
+        self.client._send_message.assert_called_with(expected_message)
 
     def test_game_state_response(self):
         """

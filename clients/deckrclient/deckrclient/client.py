@@ -11,6 +11,18 @@ import proto.server_response_pb2
 
 BUFFER_SIZE = 2048
 
+class ManaPool(object):
+    """
+    Represent a mana pool.
+    """
+    
+    def __init__(self, proto):
+        self.white = proto.white
+        self.blue = proto.blue
+        self.black = proto.black
+        self.green = proto.green
+        self.red = proto.red
+
 class Card(object):
     """
     A simple repesentation of a card.
@@ -33,6 +45,7 @@ class Player(object):
         self.graveyard = [Card(x) for x in proto.graveyard.cards]
         self.hand = [Card(x) for x in proto.hand.cards]
         self.library = [Card(x) for x in proto.library.cards]
+        self.mana_pool = ManaPool(proto.mana_pool)
 
 class GameState(object):
     """
@@ -226,4 +239,36 @@ class DeckrClient(object):  # pylint: disable=too-many-instance-attributes
         message = proto.client_message_pb2.ClientMessage()
         message.message_type = proto.client_message_pb2.ClientMessage.ACTION
         message.action_message.action_type = proto.client_message_pb2.ActionMessage.PASS_PRIORITY
+        self._send_message(message)
+
+    def play(self, card):
+        """
+        Play a card. Either takes in an int (for a game_id) or a Card object.
+        """
+
+
+        if isinstance(card, int):
+            card_id = card
+        else:
+            card_id = card.game_id
+        message = proto.client_message_pb2.ClientMessage()
+        message.message_type = proto.client_message_pb2.ClientMessage.ACTION
+        message.action_message.action_type = proto.client_message_pb2.ActionMessage.PLAY
+        message.action_message.play.card = card_id
+        self._send_message(message)
+
+    def activate_ability(self, card, index):
+        """
+        Activate a card's ability
+        """
+
+        if isinstance(card, int):
+            card_id = card
+        else:
+            card_id = card.game_id
+        message = proto.client_message_pb2.ClientMessage()
+        message.message_type = proto.client_message_pb2.ClientMessage.ACTION
+        message.action_message.action_type = proto.client_message_pb2.ActionMessage.ACTIVATE
+        message.action_message.activate_ability.card = card_id
+        message.action_message.activate_ability.index = index
         self._send_message(message)
