@@ -11,17 +11,19 @@ import proto.server_response_pb2
 
 BUFFER_SIZE = 2048
 
+
 class ManaPool(object):
     """
     Represent a mana pool.
     """
-    
+
     def __init__(self, proto):
         self.white = proto.white
         self.blue = proto.blue
         self.black = proto.black
         self.green = proto.green
         self.red = proto.red
+
 
 class Card(object):
     """
@@ -46,6 +48,7 @@ class Player(object):
         self.hand = [Card(x) for x in proto.hand.cards]
         self.library = [Card(x) for x in proto.library.cards]
         self.mana_pool = ManaPool(proto.mana_pool)
+
 
 class GameState(object):
     """
@@ -73,6 +76,7 @@ class GameState(object):
 
         return [x for x in self.players if x.game_id == player_id][0]
 
+
 class DeckrClient(object):  # pylint: disable=too-many-instance-attributes
     """
     A client for interacting with a deckr server.
@@ -85,16 +89,16 @@ class DeckrClient(object):  # pylint: disable=too-many-instance-attributes
     """
 
     def __init__(self, ip, port, sync=True,
-                 backoff=0.1, callback=None, raise_errors=False): # pylint: disable=too-many-arguments
+                 backoff=0.1, callback=None, raise_errors=False):  # pylint: disable=too-many-arguments
         self._ip = ip
         self._port = port
         self._socket = None
-        self._backoff = backoff # How long to wait between retries
-        self._sync = sync # Should this client run in sync mode.
+        self._backoff = backoff  # How long to wait between retries
+        self._sync = sync  # Should this client run in sync mode.
         self._buffer = ''
         self._listener_thread = None
         self._callback = callback
-        self._raise_errors = raise_errors # Should any error message be treated as an exception?
+        self._raise_errors = raise_errors  # Should any error message be treated as an exception?
 
         # Game state
         self.player_id = None
@@ -117,7 +121,7 @@ class DeckrClient(object):  # pylint: disable=too-many-instance-attributes
                     raise ex
                 time.sleep(self._backoff)
 
-        if not self._sync: # Create the listener thread
+        if not self._sync:  # Create the listener thread
             self._listener_thread = threading.Thread(target=self._listener_thread_worker)
             self._listener_thread.daemon = True
             self._listener_thread.start()
@@ -129,7 +133,7 @@ class DeckrClient(object):  # pylint: disable=too-many-instance-attributes
 
         while True:
             result = self.listen()
-            if not result: # Bail if the socket has closed
+            if not result:  # Bail if the socket has closed
                 return
             self._callback(result)
 
@@ -161,7 +165,7 @@ class DeckrClient(object):  # pylint: disable=too-many-instance-attributes
                 data, self._buffer = self._buffer.split('\r\n', 1)
                 return data
             data = self._socket.recv(BUFFER_SIZE)
-            if not data: # No data means the connection has closed.
+            if not data:  # No data means the connection has closed.
                 self.shutdown()
                 return
             self._buffer += data
@@ -245,7 +249,6 @@ class DeckrClient(object):  # pylint: disable=too-many-instance-attributes
         """
         Play a card. Either takes in an int (for a game_id) or a Card object.
         """
-
 
         if isinstance(card, int):
             card_id = card

@@ -16,6 +16,7 @@ CALL_COUNT = 0
 
 # pylint: disable=protected-access
 
+
 class DeckrClientTestCase(unittest.TestCase):
     """
     Unittests for the actual client.
@@ -53,7 +54,6 @@ class DeckrClientTestCase(unittest.TestCase):
         mock_connection.connect.assert_called_with((SERVER_IP, SERVER_PORT))
         # Make sure we spin up a listener thread
         self.assertEqual(thread_mock.call_count, 1)
-
 
     @mock.patch('socket.socket')
     def test_retry(self, socket_mock):
@@ -114,7 +114,7 @@ class DeckrClientTestCase(unittest.TestCase):
         Make sure we parse a message into a protobuf.
         """
 
-        self.client._listen_raw = mock.MagicMock() # Don't actually need a message.
+        self.client._listen_raw = mock.MagicMock()  # Don't actually need a message.
         self.assertIsInstance(self.client._listen(),
                               proto.server_response_pb2.ServerResponse)
         self.client._listen_raw.assert_called_with()
@@ -211,7 +211,6 @@ class DeckrClientTestCase(unittest.TestCase):
         self.client.pass_priority()
         self.client._send_message.assert_called_with(expected_message)
 
-
     def test_join_response(self):
         """
         Make sure that we properly parse a join response.
@@ -264,6 +263,7 @@ class DeckrClientTestCase(unittest.TestCase):
 
         self.assertIsNotNone(self.client.game_state)
         self.assertIsInstance(self.client.game_state.priority_player, deckrclient.client.Player)
+
 
 class GameStateTestCase(unittest.TestCase):
     """
