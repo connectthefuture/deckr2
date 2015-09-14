@@ -3,6 +3,11 @@
 This is a very simple CLI for deckr. It uses deckrclient as the primary backend.
 """
 
+# pylint: skip-file
+
+import readline
+import traceback
+
 import deckrclient.client
 
 
@@ -31,6 +36,8 @@ def main():
             continue
         except KeyboardInterrupt:
             break
+        except: # Keep going with other errors.
+            traceback.print_exc()
     client.shutdown()
 
 if __name__ == "__main__":

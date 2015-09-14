@@ -146,7 +146,7 @@ class DeckrClientTestCase(unittest.TestCase):
         Make sure we can listen and then call a callback.
         """
 
-        def mock_listen(): # TODO: Can I do this better?
+        def mock_listen():
             """Mock listener."""
             global CALL_COUNT
             if CALL_COUNT == 0:
@@ -198,3 +198,107 @@ class DeckrClientTestCase(unittest.TestCase):
         self.client._send_message = mock.MagicMock()
         self.client.start()
         self.client._send_message.assert_called_with(expected_message)
+
+    def test_pass_priority(self):
+        """
+        Make sure we can pass priority.
+        """
+        
+        expected_message = proto.client_message_pb2.ClientMessage()
+        expected_message.message_type = proto.client_message_pb2.ClientMessage.ACTION
+        expected_message.action_message.action_type = proto.client_message_pb2.ActionMessage.PASS_PRIORITY
+        self.client._send_message = mock.MagicMock()
+        self.client.pass_priority()
+        self.client._send_message.assert_called_with(expected_message)
+
+
+    def test_join_response(self):
+        """
+        Make sure that we properly parse a join response.
+        """
+
+        response = proto.server_response_pb2.ServerResponse()
+        response.response_type = proto.server_response_pb2.ServerResponse.JOIN
+        response.join_response.player_id = 1
+        self.client._listen = mock.MagicMock()
+        self.client._listen.return_value = response
+        self.client.listen()
+
+        self.assertEqual(self.client.player_id, 1)
+
+    def test_game_state_response(self):
+        """
+        Make sure we update the game state when we get a gamestate response.
+        """
+
+        response = proto.server_response_pb2.ServerResponse()
+        response.response_type = proto.server_response_pb2.ServerResponse.GAME_STATE
+        game_state = response.game_state_response.game_state
+        player = game_state.players.add()
+        player.game_id = 1
+        game_state.active_player = 1
+        game_state.priority_player = 1
+        self.client._listen = mock.MagicMock()
+        self.client._listen.return_value = response
+        self.client.listen()
+
+        self.assertIsNotNone(self.client.game_state)
+        self.assertIsInstance(self.client.game_state.priority_player, deckrclient.client.Player)
+
+class GameStateTestCase(unittest.TestCase):
+    """
+    Test the client game state.
+    """
+
+    def test_card(self):
+        """
+        Make sure we can load a card from a card protobuf.
+        """
+
+        card_proto = proto.game_pb2.Card()
+        card_proto.game_id = 0
+        card_proto.name = "Grizzly Bears"
+        card = deckrclient.client.Card(card_proto)
+        self.assertEqual(card.game_id, 0)
+        self.assertEqual(card.name, "Grizzly Bears")
+
+    def test_player(self):
+        """
+        Make sure we can load a player from a protobuf.
+        """
+
+        player_proto = proto.game_pb2.Player()
+        player_proto.game_id = 0
+        player_proto.lost = False
+        player_proto.life = 20
+        player_proto.hand.cards.add()
+        player_proto.library.cards.add()
+        player_proto.graveyard.cards.add()
+        player = deckrclient.client.Player(player_proto)
+        self.assertEqual(player.game_id, 0)
+        self.assertEqual(player.life, 20)
+        self.assertEqual(player.lost, False)
+        self.assertEqual(len(player.library), 1)
+        self.assertEqual(len(player.graveyard), 1)
+        self.assertEqual(len(player.hand), 1)
+
+    def test_game_state(self):
+        """
+        Make sure we can properly parse the entire game state.
+        """
+
+        game_state_proto = proto.game_pb2.GameState()
+        game_state_proto.current_step = 'upkeep'
+        game_state_proto.current_phase = 'beginning'
+        game_state_proto.priority_player = 1
+        game_state_proto.active_player = 1
+        player = game_state_proto.players.add()
+        player.game_id = 1
+
+        game_state = deckrclient.client.GameState(game_state_proto)
+        self.assertEqual(game_state.step, 'upkeep')
+        self.assertEqual(game_state.phase, 'beginning')
+        self.assertEqual(len(game_state.players), 1)
+        player1 = game_state.players[0]
+        self.assertEqual(game_state.active_player, player1)
+        self.assertEqual(game_state.priority_player, player1)

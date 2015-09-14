@@ -11,6 +11,55 @@ import proto.server_response_pb2
 
 BUFFER_SIZE = 2048
 
+class Card(object):
+    """
+    A simple repesentation of a card.
+    """
+
+    def __init__(self, proto):
+        self.game_id = proto.game_id
+        self.name = proto.name
+
+
+class Player(object):
+    """
+    A simple representation of a player loaded from a proto.
+    """
+
+    def __init__(self, proto):
+        self.game_id = proto.game_id
+        self.life = proto.life
+        self.lost = proto.lost
+        self.graveyard = [Card(x) for x in proto.graveyard.cards]
+        self.hand = [Card(x) for x in proto.hand.cards]
+        self.library = [Card(x) for x in proto.library.cards]
+
+class GameState(object):
+    """
+    A simple representation of the game state.
+    """
+
+    def __init__(self, proto, player_id=None):
+        self.step = proto.current_step
+        self.phase = proto.current_phase
+        self.players = [Player(x) for x in proto.players]
+        self.active_player = self.get_player_by_id(proto.active_player)
+        self.priority_player = self.get_player_by_id(proto.priority_player)
+        self.exile = [Card(x) for x in proto.exile.cards]
+        self.battlefield = [Card(x) for x in proto.battlefield.cards]
+        self.stack = [Card(x) for x in proto.stack.cards]
+        if player_id is not None:
+            self.player = self.get_player_by_id(player_id)
+        else:
+            self.player = None
+
+    def get_player_by_id(self, player_id):
+        """
+        Get a player by their game id.
+        """
+
+        return [x for x in self.players if x.game_id == player_id][0]
+
 class DeckrClient(object):  # pylint: disable=too-many-instance-attributes
     """
     A client for interacting with a deckr server.
@@ -33,6 +82,10 @@ class DeckrClient(object):  # pylint: disable=too-many-instance-attributes
         self._listener_thread = None
         self._callback = callback
         self._raise_errors = raise_errors # Should any error message be treated as an exception?
+
+        # Game state
+        self.player_id = None
+        self.game_state = None
 
     def initialize(self, max_retries=3):
         """
@@ -70,10 +123,13 @@ class DeckrClient(object):  # pylint: disable=too-many-instance-attributes
     def shutdown(self):
         """
         Cleanly shutdown a client.
+
+        Note that an async thread is dameonized so we don't have to clean it
+        up.
         """
 
         self._socket.close()
-        # Note the thread sholud be cleaned up when the program exits.
+
     def _send_message(self, message):
         """
         Takes in a ClientMessage protobuf, serialize it to a string, and append
@@ -116,9 +172,13 @@ class DeckrClient(object):  # pylint: disable=too-many-instance-attributes
         """
 
         response = self._listen()
-        # Check for errors
+        # Run internal handlers
         if self._raise_errors and response.response_type == proto.server_response_pb2.ServerResponse.ERROR:
             raise ValueError(response)
+        if response.response_type == proto.server_response_pb2.ServerResponse.JOIN:
+            self.player_id = response.join_response.player_id
+        elif response.response_type == proto.server_response_pb2.ServerResponse.GAME_STATE:
+            self.game_state = GameState(response.game_state_response.game_state, self.player_id)
         return response
 
     ###################
@@ -143,9 +203,9 @@ class DeckrClient(object):  # pylint: disable=too-many-instance-attributes
         message.message_type = proto.client_message_pb2.ClientMessage.JOIN
         message.join_message.game_id = game_id
         message.join_message.client_type = proto.client_message_pb2.JoinMessage.PLAYER
-        # if deck is not None:
-        #     for card in deck:
-        #         message.join_message.player_config.deck.append(card)
+        if deck is not None:
+            for card in deck:
+                message.join_message.player_config.deck.append(card)
         self._send_message(message)
 
     def start(self):
@@ -156,4 +216,14 @@ class DeckrClient(object):  # pylint: disable=too-many-instance-attributes
         message = proto.client_message_pb2.ClientMessage()
         message.message_type = proto.client_message_pb2.ClientMessage.ACTION
         message.action_message.action_type = proto.client_message_pb2.ActionMessage.START
+        self._send_message(message)
+
+    def pass_priority(self):
+        """
+        Pass prioirty.
+        """
+
+        message = proto.client_message_pb2.ClientMessage()
+        message.message_type = proto.client_message_pb2.ClientMessage.ACTION
+        message.action_message.action_type = proto.client_message_pb2.ActionMessage.PASS_PRIORITY
         self._send_message(message)

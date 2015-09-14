@@ -138,8 +138,18 @@ class SinglePlayerTestCase(unittest.TestCase):
         response = self.client.listen()
         self.client.join(response.create_response.game_id,
                          deck=deck)
-        response = self.client.listen()
+        self.client.listen()
         self.client.start()
+        self.client.listen()
+
+    def _assert_phase_step(self, phase, step):
+        """
+        Takes in a game state response and makes sure that the phase and step
+        are correct.
+        """
+
+        self.assertEqual(self.client.game_state.step, step)
+        self.assertEqual(self.client.game_state.phase, phase)
 
     def test_create(self):
         """
@@ -160,7 +170,64 @@ class SinglePlayerTestCase(unittest.TestCase):
 
         deck = ["Forest"] * 7
         self._create_join_start(deck)
+        self.assertEqual(len(self.client.game_state.player.hand), 7)
+        for card in self.client.game_state.player.hand:
+            self.assertEqual(card.name, "Forest")
 
+    def test_pass_turn_draw(self):
+        """
+        Create/join/start a game. Then pass through the turn and make sure you
+        draw again when the next turn starts.
+        """
+
+        deck = ["Forest"] * 8
+        self._create_join_start(deck)
+        self._assert_phase_step('beginning', 'upkeep')
+        self.client.pass_priority()
+        self.client.listen()
+        self._assert_phase_step('beginning', 'draw')
+        self.client.pass_priority()
+        self.client.listen()
+        self._assert_phase_step('precombat main', 'precombat main')
+        self.client.pass_priority()
+        self.client.listen()
+        self._assert_phase_step('combat', 'beginning of combat')
+        self.client.pass_priority()
+        self.client.listen()
+        self._assert_phase_step('combat', 'declare attackers')
+        self.client.pass_priority()
+        self.client.listen()
+        self._assert_phase_step('combat', 'declare blockers')
+        self.client.pass_priority()
+        self.client.listen()
+        self._assert_phase_step('combat', 'combat damage')
+        self.client.pass_priority()
+        self.client.listen()
+        self._assert_phase_step('combat', 'end of combat')
+        self.client.pass_priority()
+        self.client.listen()
+        self._assert_phase_step('postcombat main', 'postcombat main')
+        self.client.pass_priority()
+        self.client.listen()
+        self._assert_phase_step('end', 'end')
+        self.client.pass_priority()
+        self.client.listen()
+        self._assert_phase_step('end', 'cleanup')
+        self.client.pass_priority()
+        self.client.listen()
+        self._assert_phase_step('beginning', 'untap')
+        self.client.pass_priority()
+        self.client.listen()
+        self._assert_phase_step('beginning', 'upkeep')
+        self.client.pass_priority()
+        self.client.listen()
+        self._assert_phase_step('beginning', 'draw')
+        self.client.pass_priority()
+        self.client.listen()
+        self.assertEqual(len(self.client.game_state.player.hand), 8)
+
+
+        
     # def _check_response(self):
     #     """
     #     Get a response and make sure the response does not contain errors.
