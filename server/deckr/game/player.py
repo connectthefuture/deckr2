@@ -133,11 +133,13 @@ class Player(deckr.game.game_object.GameObject):  # pylint: disable=too-many-ins
 
         pass
 
+
     def pass_priority(self):
         """
         Pass priority to the next player.
         """
 
+        self._game.action_validator.validate(self._game, self, 'pass_priority')
         self._game.turn_manager.advance()
 
     def update_proto(self, proto):

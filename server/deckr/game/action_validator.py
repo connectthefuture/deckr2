@@ -5,7 +5,6 @@ Note that the action validator is implemented as a service to allow for easier r
 
 import deckr.core.service
 
-
 class InvalidActionException(Exception):
     """
     This should be raised whenever a player tries to make an invalid action. It should include a
@@ -38,14 +37,47 @@ class ActionValidator(deckr.core.service.Service):
 
         pass
 
-    def validate(self, game, action):
+    def validate(self, game, player, action, *args):
         """
         Validate a specific action. Returns if the action is valid, and raises an exception
         otherwise.
 
         Args:
             game MagicTheGathering: The game that the action is being applied to.
-            action (???): An action that is being performed.
+            action: String of the action being performed
         """
 
-        pass
+        if action == 'pass_priority':
+            self._validate_pass_priority(game, player)
+        else:
+            raise ValueError("Invalid Action")
+
+    def _validate_pass_priority(self, game, player):
+        """
+        Check if we can pass priority. The only real restriction is that we
+        have priority.
+        """
+
+        has_priority(game, player)
+
+
+#################################
+# Various rules checks go  here #
+#################################
+
+def check(error_string):
+    def wrapper(func):
+        def inner(*args, **kwargs):
+            result = func(*args, **kwargs)
+            if not result:
+                raise InvalidActionException(error_string)
+        return inner
+    return wrapper
+
+@check("You need priority.")
+def has_priority(game, player):
+    """
+    Does the player have priority?
+    """
+
+    return game.turn_manager.priority_player == player

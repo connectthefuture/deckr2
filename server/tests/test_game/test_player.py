@@ -64,6 +64,8 @@ class PlayerTestCase(unittest.TestCase):
         self.player.graveyard.game_id = 2
         self.player.hand.game_id = 3
         self.player.mana_pool.game_id = 4
+        # Most of these assume we have priority
+        self.game.turn_manager.priority_player = self.player
 
     def test_pass_priority(self):
         """
@@ -130,3 +132,13 @@ class PlayerTestCase(unittest.TestCase):
         card = mock.MagicMock()
         self.player.activate_ability(card, 0)
         card.activate_ability.assert_called_with(0)
+
+    def test_validate_actions(self):
+        """
+        Make sure all of our actions are validated.
+        """
+
+        self.player.pass_priority()
+        self.game.action_validator.validate.assert_called_with(self.game,
+                                                               self.player,
+                                                               'pass_priority')
