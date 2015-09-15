@@ -47,7 +47,6 @@ class ConnectionTestCase(unittest.TestCase):
 
         self.connection._base64 = False
 
-
     def test_survives_malformed_input(self):
         """
         Make sure that if we can't decode a message we send an error instead of dying.

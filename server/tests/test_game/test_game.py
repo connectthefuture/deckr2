@@ -82,6 +82,7 @@ class TurnManagerTestCase(unittest.TestCase):
             return self.player2 if player == self.player1 else self.player1
 
         self.game.player_manager.next_player.side_effect = fake_next_player
+        self.game.player_manager.players = [self.player1, self.player2]
 
         self.turn_manager.phase = 'beginning'
         self.turn_manager.step = 'upkeep'
@@ -98,6 +99,18 @@ class TurnManagerTestCase(unittest.TestCase):
         self.assertEqual(self.turn_manager.phase, phase)
         self.assertEqual(self.turn_manager.active_player, active)
         self.assertEqual(self.turn_manager.priority_player, priority)
+
+    def test_new_turn(self):
+        """
+        Make sure that when we start a new turn we call all the proper cleanup.
+        """
+
+        self.turn_manager.phase = 'end'
+        self.turn_manager.step = 'cleanup'
+        self.turn_manager.advance()
+        self.turn_manager.advance()
+        self.player1.start_new_turn.assert_called_with()
+        self.player2.start_new_turn.assert_called_with()
 
     def test_full_turn(self):
         """

@@ -111,6 +111,7 @@ class PlayerTestCase(unittest.TestCase):
         self.player.play_card(forest)
         self.game.battlefield.append.assert_called_with(forest)
         self.assertEqual(forest.controller, self.player)
+        self.assertEqual(self.player.lands_played, 1)
 
     def test_play_creature(self):
         """
@@ -142,3 +143,18 @@ class PlayerTestCase(unittest.TestCase):
         self.game.action_validator.validate.assert_called_with(self.game,
                                                                self.player,
                                                                'pass_priority')
+        card = mock.MagicMock()
+        self.player.hand.append(card)
+        self.player.play_card(card)
+        self.game.action_validator.validate.assert_called_with(self.game,
+                                                               self.player,
+                                                               'play', card)
+
+    def test_start_new_turn(self):
+        """
+        Make sure that we can clear internal state when we start a new turn.
+        """
+
+        self.player.lands_played = 10
+        self.player.start_new_turn()
+        self.assertEqual(self.player.lands_played, 0)

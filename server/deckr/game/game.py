@@ -225,6 +225,8 @@ class TurnManager(object):
             self.active_player)
         self.step, self.phase = self.TURN_ORDER[0]
         self.turn += 1
+        for player in self._game.player_manager.players:
+            player.start_new_turn()
 
     def turn_based_actions(self):
         """

@@ -66,6 +66,8 @@ class Player(deckr.game.game_object.GameObject):  # pylint: disable=too-many-ins
         self.library = deckr.game.zone.Zone('library', self)
 
         self.lost = False
+        self.lands_played = 0
+        self.land_limit = 1  # Some effects might change this.
 
         self._game = game
 
@@ -78,6 +80,13 @@ class Player(deckr.game.game_object.GameObject):  # pylint: disable=too-many-ins
             self.lost = True
         else:
             self.hand.append(self.library.pop())
+
+    def start_new_turn(self):
+        """
+        Clear all internal state for a new turn.
+        """
+
+        self.lands_played = 0
 
     def start(self):
         """
@@ -93,11 +102,13 @@ class Player(deckr.game.game_object.GameObject):  # pylint: disable=too-many-ins
         if it's a land, or put it onto the stack.
         """
 
-        assert card in self.hand
+        self._game.action_validator.validate(self._game, self, 'play', card)
+
         # Lands don't use the stack
         if card.is_land():
             self.hand.remove(card)
             self._game.battlefield.append(card)
+            self.lands_played += 1
         else:  # Otherwise we put it on the stack
             self.hand.remove(card)
             self._game.stack.append(card)
@@ -132,7 +143,6 @@ class Player(deckr.game.game_object.GameObject):  # pylint: disable=too-many-ins
         """
 
         pass
-
 
     def pass_priority(self):
         """

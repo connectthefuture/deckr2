@@ -5,6 +5,7 @@ Note that the action validator is implemented as a service to allow for easier r
 
 import deckr.core.service
 
+
 class InvalidActionException(Exception):
     """
     This should be raised whenever a player tries to make an invalid action. It should include a
@@ -49,6 +50,8 @@ class ActionValidator(deckr.core.service.Service):
 
         if action == 'pass_priority':
             self._validate_pass_priority(game, player)
+        elif action == 'play':
+            self._validate_play(game, player, *args)
         else:
             raise ValueError("Invalid Action")
 
@@ -60,10 +63,28 @@ class ActionValidator(deckr.core.service.Service):
 
         has_priority(game, player)
 
+    def _validate_play(self, game, player, card):
+        """
+        To play a card the following conditions need to be met:
+
+        1) Has priority
+        2) If it's a land
+            a) Sorcery Speed
+            b) Hsan't exceeded the land limit for the turn.
+        """
+
+        has_priority(game, player)
+
+        if card.is_land():
+            sorcery_speed(game)
+            land_limit(player)
+        else:
+            pass
 
 #################################
 # Various rules checks go  here #
 #################################
+
 
 def check(error_string):
     def wrapper(func):
@@ -74,6 +95,7 @@ def check(error_string):
         return inner
     return wrapper
 
+
 @check("You need priority.")
 def has_priority(game, player):
     """
@@ -81,3 +103,23 @@ def has_priority(game, player):
     """
 
     return game.turn_manager.priority_player == player
+
+
+@check("That can only be done at Sorcery speed")
+def sorcery_speed(game):
+    """
+    Check that it is one of the main phases and that the stack is empty.
+    """
+
+    return ("main" in game.turn_manager.step and
+            "main" in game.turn_manager.phase and
+            game.stack.is_empty())
+
+
+@check("You have played to many lands this turn")
+def land_limit(player):
+    """
+    Check that a player hasn't played too many lands already.
+    """
+
+    return player.lands_played < player.land_limit
