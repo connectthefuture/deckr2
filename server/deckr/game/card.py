@@ -16,14 +16,15 @@ def populate_abilities(card):
     """
 
     ### Default ability functions. ###
-    def forest_ability(card):
-        """Add {G} to the controller's mana pool."""
+    def forest_ability(ability):
+        """{T}: Add {G} to the controller's mana pool."""
 
-        card.controller.mana_pool.add(green=1)
+        ability.controller.mana_pool.add(green=1)
 
     ### Ability population ###
     if card.name == "Forest":
-        card.abilities.append(forest_ability)
+        ability_factory = AbilityFactory(card, forest_ability)
+        card.abilities.append(ability_factory)
 
 
 def create_card_from_dict(card_data):
@@ -45,6 +46,45 @@ def create_card_from_dict(card_data):
     card.mana_cost = card_data.get('mana_cost', None)
     populate_abilities(card)
     return card
+
+class Ability(object):
+    """
+    Represents an ability on the stack.
+    """
+
+    def __init__(self, resolve, controller, *args, **kwargs):
+        super(Ability, self).__init__(*args, **kwargs)
+        self.resolve = lambda: resolve(self) # This is a function that takes in this ability as an argument.
+        self.controller = controller
+
+
+
+class AbilityFactory(object):
+    """
+    Creates abilities, generally registered to a card.
+    """
+
+    def __init__(self, card, resolution, mana_ability=False, cost=None):
+        self.card = card
+        self.mana_ability = mana_ability
+        self.cost = cost
+        self.resolution = resolution
+
+    def can_pay_cost(self):
+        """
+        Can we pay the cost (for activated abilities only).
+        """
+
+        return True
+
+
+    def create_instance(self):
+        """
+        Create a new instance of this ability.
+        """
+
+        return Ability(self.resolution, self.card.controller)
+
 
 
 class Card(deckr.game.game_object.GameObject):  # pylint: disable=too-many-instance-attributes
@@ -111,7 +151,7 @@ class Card(deckr.game.game_object.GameObject):  # pylint: disable=too-many-insta
         Activate an ability for this card.
         """
 
-        self.abilities[index](self)
+        return self.abilities[index].create_instance()
 
 
 class CardLibrary(deckr.core.service.Service):

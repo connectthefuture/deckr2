@@ -59,7 +59,18 @@ class GameIntegrationTestCase(unittest.TestCase):
         self.player.play_card(card)
         self.assertNotIn(card, self.player.hand)
         self.assertIn(card, self.game.stack)
-        # TODO: Restore this when colorless mana is working
-        # self.assertEqual(self.player.mana_pool.green, 0)
+        self.assertEqual(self.player.mana_pool.green, 0)
         self.player.pass_priority()  # This should allow the spell to resolve
         self.assertIn(card, self.game.battlefield)
+
+    def test_activate_land(self):
+        """
+        Make sure we can activate a mana ability and it doesn't go on the stack.
+        """
+
+        forest = self.card_library.create("Forest")
+        forest.controller = self.player
+        self.game.battlefield.append(forest)
+
+        self.player.activate_ability(forest, 0)
+        self.assertEqual(self.player.mana_pool.green, 1)

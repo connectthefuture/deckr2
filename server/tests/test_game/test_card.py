@@ -8,7 +8,16 @@ import deckr.game.card
 import mock
 import tests.utils
 
+class AbilityTestCase(unittest.TestCase):
+    """
+    Test abilities and the ability factory.
+    """
 
+    def setUp(self):
+        pass
+
+    # TODO: Write some unittests here.
+    
 class CardTestCase(unittest.TestCase):
     """
     Test the functionality associated with a generic card.
@@ -26,9 +35,9 @@ class CardTestCase(unittest.TestCase):
         ability2 = mock.MagicMock()
         self.card.abilities = [ability1, ability2]
         self.card.activate_ability(0)
-        ability1.assert_called_with(self.card)
+        ability1.create_instance.assert_called_with()
         self.card.activate_ability(1)
-        ability2.assert_called_with(self.card)
+        ability2.create_instance.assert_called_with()
         self.assertRaises(IndexError, self.card.activate_ability, 2)
 
 

@@ -80,16 +80,25 @@ class ManaPool(deckr.game.game_object.GameObject):
         Remove the amount specified from this mana pool.
         """
 
-        assert self.can_pay(amount)
-
         other = mana_pool_from_string(amount)
-        self.white -= other.white
-        self.blue -= other.blue
-        self.black -= other.black
-        self.red -= other.red
-        self.green -= other.green
+        if other.total() == self.total():
+            self.reset()
+            return
 
-        # TODO: Colorless calculation
+        # TODO: Support not exact mana costs.
+        raise NotImplementedError("Deckr only supports exact mana right now")
+
+    def reset(self):
+        """
+        Set all values to 0.
+        """
+
+        self.white = 0
+        self.blue = 0
+        self.black = 0
+        self.red = 0
+        self.green = 0
+        self.colorless = 0
 
     def update_proto(self, proto):
         """
@@ -177,7 +186,9 @@ class Player(deckr.game.game_object.GameObject):  # pylint: disable=too-many-ins
         Activate an ability. Resolve it if it's a mana ability, otherwise, put it on the stack.
         """
 
-        card.activate_ability(ability_index)
+        ability = card.activate_ability(ability_index)
+        # Don't do this for non mana abilities.
+        ability.resolve()
 
     def declare_attackers(self, attackers):
         """

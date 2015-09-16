@@ -52,6 +52,8 @@ class ActionValidator(deckr.core.service.Service):
             self._validate_pass_priority(game, player)
         elif action == 'play':
             self._validate_play(game, player, *args)
+        elif action == 'activate':
+            self._validate_activate(game, player, *args)
         else:
             raise ValueError("Invalid Action")
 
@@ -82,6 +84,13 @@ class ActionValidator(deckr.core.service.Service):
             land_limit(player)
         else:
             can_pay_mana_cost(player, card)
+
+    def _validate_activate(self, game, player, card, index):
+        """
+        Check that we can play an activated ability.
+        """
+
+        pass
 
 #################################
 # Various rules checks go  here #
