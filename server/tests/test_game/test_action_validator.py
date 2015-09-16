@@ -34,13 +34,13 @@ class ActionValidatorTestCase(unittest.TestCase):
                           self.action_validator.validate, self.game,
                           self.player, 'play', card)
 
-    def test_play_land_sorcercy_speed(self):
+    def test_play_sorcercy_speed(self):
         """
         Make sure we can only play a land at sorcercy speed.
         """
 
         card = mock.MagicMock()
-        card.is_land.return_value = True
+        card.is_sorcery_speed.return_value = True
 
         self.game.turn_manager.priority_player = self.player
 
@@ -72,6 +72,23 @@ class ActionValidatorTestCase(unittest.TestCase):
 
         self.player.land_limit = 1
         self.player.lands_played = 1
+
+        self.assertRaises(deckr.game.action_validator.InvalidActionException,
+                          self.action_validator.validate, self.game,
+                          self.player, 'play', card)
+
+    def test_play_mana_cost(self):
+        """
+        Make sure that a player can pay the mana cost for the card they're
+        trying to play.
+        """
+
+        card = mock.MagicMock()
+        card.is_land.return_value = False
+        self.game.turn_manager.phase = 'precombat main'
+        self.game.turn_manager.step = 'precombat main'
+        self.game.turn_manager.priority_player = self.player
+        self.player.mana_pool.can_pay.return_value = False
 
         self.assertRaises(deckr.game.action_validator.InvalidActionException,
                           self.action_validator.validate, self.game,

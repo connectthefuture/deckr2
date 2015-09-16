@@ -75,11 +75,13 @@ class ActionValidator(deckr.core.service.Service):
 
         has_priority(game, player)
 
+        if card.is_sorcery_speed():
+            sorcery_speed(game, player)
+
         if card.is_land():
-            sorcery_speed(game)
             land_limit(player)
         else:
-            pass
+            can_pay_mana_cost(player, card)
 
 #################################
 # Various rules checks go  here #
@@ -106,12 +108,13 @@ def has_priority(game, player):
 
 
 @check("That can only be done at Sorcery speed")
-def sorcery_speed(game):
+def sorcery_speed(game, player):
     """
     Check that it is one of the main phases and that the stack is empty.
     """
 
-    return ("main" in game.turn_manager.step and
+    return (game.turn_manager.active_player == player and
+            "main" in game.turn_manager.step and
             "main" in game.turn_manager.phase and
             game.stack.is_empty())
 
@@ -123,3 +126,12 @@ def land_limit(player):
     """
 
     return player.lands_played < player.land_limit
+
+
+@check("You can't pay the mana cost for that card")
+def can_pay_mana_cost(player, card):
+    """
+    Check that a player can pay the mana cost for a card.
+    """
+
+    return player.mana_pool.can_pay(card.mana_cost)

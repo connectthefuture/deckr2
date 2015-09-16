@@ -43,6 +43,7 @@ def create_card_from_dict(card_data):
     card.types = card_data['types']
     card.subtypes = card_data.get('subtypes', [])
     card.supertypes = card_data.get('supertypes', [])
+    card.mana_cost = card_data.get('mana_cost', None)
     populate_abilities(card)
     return card
 
@@ -62,6 +63,7 @@ class Card(deckr.game.game_object.GameObject):  # pylint: disable=too-many-insta
         self.name = ''
         self.owner = None
         self.controller = None
+        self.mana_cost = None
         # Store function pointers for abilities
         self.abilities = []
         # These will generally be hidden based on the types of the card.
@@ -82,6 +84,20 @@ class Card(deckr.game.game_object.GameObject):  # pylint: disable=too-many-insta
         """
 
         return 'Land' in self.types
+
+    def is_sorcery_speed(self):
+        """
+        Check if we can only cast this at sorcercy speed.
+        """
+
+        return True  # Instants aren't implemented yet, everything is sorcercy speed
+
+    def is_permanent(self):
+        """
+        Is the card a permanent.
+        """
+
+        return True
 
     def update_proto(self, proto):
         """

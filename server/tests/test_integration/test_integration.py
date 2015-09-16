@@ -333,6 +333,7 @@ class SinglePlayerTestCase(unittest.TestCase):
         mana_pool = get_game_object(game_state, player.mana_pool)
         self.assertEqual(mana_pool.green, 1)
 
+    @unittest.skip  # This has been handled much better in the game_state_rewrite branch
     def test_play_creature(self):
         """
         Make sure we can play a creature.

@@ -7,6 +7,26 @@ import deckr.game.zone
 import proto.game_pb2 as proto_lib
 
 
+def mana_pool_from_string(str):
+    """
+    Create a mana pool from a string.
+    """
+
+    mana_pool = ManaPool()
+    white = str.count("W")
+    blue = str.count("U")
+    black = str.count("B")
+    red = str.count("R")
+    green = str.count("G")
+    remainder = str.translate(None, "WUBRG")
+    if remainder:
+        colorless = int(remainder)
+    else:
+        colorless = 0
+    mana_pool.add(white=white, blue=blue, black=black, red=red, green=green, colorless=colorless)
+    return mana_pool
+
+
 class ManaPool(deckr.game.game_object.GameObject):
     """
     A mana pool provides a clean interface for controlling mana. Each player
@@ -22,8 +42,9 @@ class ManaPool(deckr.game.game_object.GameObject):
         self.black = 0
         self.red = 0
         self.green = 0
+        self.colorless = 0
 
-    def add(self, white=0, blue=0, black=0, red=0, green=0):
+    def add(self, white=0, blue=0, black=0, red=0, green=0, colorless=0):
         """
         Modify the amount of mana in the pool.
         """
@@ -33,6 +54,43 @@ class ManaPool(deckr.game.game_object.GameObject):
         self.black += black
         self.red += red
         self.green += green
+        self.colorless += colorless
+
+    def can_pay(self, amount):
+        """
+        Can we pay the given amount (as a string).
+        """
+
+        other = mana_pool_from_string(amount)
+        return (self.white >= other.white and
+                self.blue >= other.blue and
+                self.black >= other.black and
+                self.red >= other.red and
+                self.green >= other.green and
+                self.total() >= other.total())
+
+    def total(self):
+        """
+        Return the total mana in this pool.
+        """
+
+        return self.white + self.blue + self.black + self.red + self.green + self.colorless
+
+    def subtract(self, amount):
+        """
+        Remove the amount specified from this mana pool.
+        """
+
+        assert self.can_pay(amount)
+
+        other = mana_pool_from_string(amount)
+        self.white -= other.white
+        self.blue -= other.blue
+        self.black -= other.black
+        self.red -= other.red
+        self.green -= other.green
+
+        # TODO: Colorless calculation
 
     def update_proto(self, proto):
         """
@@ -112,6 +170,7 @@ class Player(deckr.game.game_object.GameObject):  # pylint: disable=too-many-ins
         else:  # Otherwise we put it on the stack
             self.hand.remove(card)
             self._game.stack.append(card)
+            self.mana_pool.subtract(card.mana_cost)
 
         card.controller = self
 

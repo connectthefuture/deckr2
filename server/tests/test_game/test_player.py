@@ -19,6 +19,19 @@ class ManaPoolTestCase(unittest.TestCase):
     def setUp(self):
         self.mana_pool = deckr.game.player.ManaPool()
 
+    def test_mana_pool_from_string(self):
+        """
+        Create a mana pool object from a string.
+        """
+
+        mana_pool = deckr.game.player.mana_pool_from_string("10WUBRG")
+        self.assertEqual(mana_pool.white, 1)
+        self.assertEqual(mana_pool.blue, 1)
+        self.assertEqual(mana_pool.black, 1)
+        self.assertEqual(mana_pool.red, 1)
+        self.assertEqual(mana_pool.green, 1)
+        self.assertEqual(mana_pool.colorless, 10)
+
     def test_add(self):
         """
         Make sure we can add mana to a mana pool.
@@ -30,6 +43,18 @@ class ManaPoolTestCase(unittest.TestCase):
         self.assertEqual(self.mana_pool.black, 3)
         self.assertEqual(self.mana_pool.red, 4)
         self.assertEqual(self.mana_pool.green, 5)
+
+    def test_can_pay(self):
+        """
+        Make sure that we can see if we can pay a mana cost (based on a string).
+        """
+
+        self.mana_pool.add(green=1)
+        self.assertTrue(self.mana_pool.can_pay("G"))
+        self.assertFalse(self.mana_pool.can_pay("W"))
+        self.assertFalse(self.mana_pool.can_pay("1G"))
+        self.mana_pool.add(green=1)
+        self.assertTrue(self.mana_pool.can_pay("1G"))
 
     def test_update_proto(self):
         """

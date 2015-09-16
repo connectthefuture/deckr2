@@ -14,7 +14,8 @@ GRIZZLY_BEARS = {
     "types": ["Creature"],
     "subtypes": ["Bear"],
     "power": 2,
-    "toughness": 2
+    "toughness": 2,
+    "mana_cost": "1G"
 }
 
 SIMPLE_CARD_LIBRARY = {
