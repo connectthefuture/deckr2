@@ -36,7 +36,7 @@ def main():
         yaml.load(open('config/services/deckr_server_service.yml')),
         {'websockets': args.websockets, 'base64': args.base64})
     starter.add_service(
-        yaml.load(open('config/services/card_library_service.yml')), {})
+        yaml.load(open('config/services/card_library_service.yml')), {'load_from': 'config/cards.json'})
     starter.add_service(
         yaml.load(open('config/services/action_validator_service.yml')), {})
     starter.add_service(

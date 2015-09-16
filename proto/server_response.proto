@@ -10,7 +10,6 @@ message ServerResponse {
         LEAVE = 2;
         ERROR = 3;
         GAME_STATE = 4;
-        GAME_UPDATE = 5;
     }
 
     required ServerResponseType response_type = 1;
@@ -19,7 +18,6 @@ message ServerResponse {
     optional JoinResponse join_response = 3;
     optional ErrorResponse error_response = 4;
     optional GameStateResponse game_state_response = 5;
-    optional GameUpdateResponse game_update_response = 6;
 }
 
 // Next Field: 2
@@ -39,12 +37,4 @@ message GameStateResponse {
 
 message JoinResponse {
     required int32 player_id = 1;
-}
-
-// Update a single game object instead of the entire state. If the game_object
-// with the same ID already exists just update; otherwise create a new one. If
-// remove is set to True, remove that game object from the game.
-message GameUpdateResponse {
-    required GameObject game_object = 1;
-    optional bool remove = 2;
 }

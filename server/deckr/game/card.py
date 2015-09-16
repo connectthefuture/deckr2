@@ -6,7 +6,6 @@ import json
 
 import deckr.core.service
 import deckr.game.game_object
-import proto.game_pb2 as proto_lib
 
 
 def populate_abilities(card):
@@ -105,7 +104,7 @@ class Card(deckr.game.game_object.GameObject):  # pylint: disable=too-many-insta
         """
 
         super(Card, self).update_proto(proto)
-        proto.game_object_type = proto_lib.GameObject.CARD
+        proto.name = self.name
 
     def activate_ability(self, index):
         """

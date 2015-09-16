@@ -61,17 +61,15 @@ class ManaPoolTestCase(unittest.TestCase):
         Make sure we can properly update a proto.
         """
 
-        proto = proto_lib.GameObject()
+        proto = proto_lib.ManaPool()
         self.mana_pool.game_id = 0
         self.mana_pool.add(white=1, blue=2, black=3, red=4, green=5)
         self.mana_pool.update_proto(proto)
-        self.assertEqual(proto.game_object_type,
-                         proto_lib.GameObject.MANA_POOL)
-        self.assertEqual(proto.mana_pool.white, 1)
-        self.assertEqual(proto.mana_pool.blue, 2)
-        self.assertEqual(proto.mana_pool.black, 3)
-        self.assertEqual(proto.mana_pool.red, 4)
-        self.assertEqual(proto.mana_pool.green, 5)
+        self.assertEqual(proto.white, 1)
+        self.assertEqual(proto.blue, 2)
+        self.assertEqual(proto.black, 3)
+        self.assertEqual(proto.red, 4)
+        self.assertEqual(proto.green, 5)
 
 
 class PlayerTestCase(unittest.TestCase):
@@ -117,13 +115,14 @@ class PlayerTestCase(unittest.TestCase):
         Make sure we can properly update a protobuf.
         """
 
-        proto = proto_lib.GameObject()
+        proto = proto_lib.Player()
         self.player.update_proto(proto)
-        self.assertEqual(proto.player.life, self.player.life)
-        self.assertEqual(proto.player.graveyard, self.player.graveyard.game_id)
-        self.assertEqual(proto.player.library, self.player.library.game_id)
-        self.assertEqual(proto.player.hand, self.player.hand.game_id)
-        self.assertEqual(proto.player.lost, self.player.lost)
+        self.assertEqual(proto.life, self.player.life)
+        self.assertEqual(proto.graveyard.game_id,
+                         self.player.graveyard.game_id)
+        self.assertEqual(proto.library.game_id, self.player.library.game_id)
+        self.assertEqual(proto.hand.game_id, self.player.hand.game_id)
+        self.assertEqual(proto.lost, self.player.lost)
 
     def test_play_land(self):
         """

@@ -105,12 +105,12 @@ class ZoneAsContainerTestCase(unittest.TestCase):
         Make sure we can properly update a protobuf.
         """
 
-        proto = proto_lib.GameObject()
+        proto = proto_lib.Zone()
         self.zone.append(self.object1)
         self.zone.append(self.object2)
         self.zone.update_proto(proto)
 
-        self.assertEqual(proto.game_object_type, proto_lib.GameObject.ZONE)
-        self.assertEqual(len(proto.zone.objs), 2)
-        self.assertIn(self.object1.game_id, proto.zone.objs)
-        self.assertIn(self.object2.game_id, proto.zone.objs)
+        self.assertEqual(len(proto.cards), 2)
+        ids = [x.game_id for x in proto.cards]
+        self.assertIn(self.object1.game_id, ids)
+        self.assertIn(self.object2.game_id, ids)

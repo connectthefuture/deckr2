@@ -126,6 +126,15 @@ class PlayerManager(object):
 
         return self.players[0]
 
+    def update_proto(self, proto):
+        """
+        Fill in player information into a gamestate proto.
+        """
+
+        for player in self.players:
+            player_proto = proto.players.add()
+            player.update_proto(player_proto)
+
 
 class TurnManager(object):
     """
@@ -239,6 +248,16 @@ class TurnManager(object):
                     self._game.player_manager.first_player()):
                 self.active_player.draw()
 
+    def update_proto(self, proto):
+        """
+        Update a proto with turn information.
+        """
+
+        proto.current_step = self.step
+        proto.current_phase = self.phase
+        proto.active_player = self.active_player.game_id
+        proto.priority_player = self.priority_player.game_id
+
 
 class MagicTheGathering(object):  # pylint: disable=too-many-instance-attributes
     """
@@ -280,14 +299,13 @@ class MagicTheGathering(object):  # pylint: disable=too-many-instance-attributes
         self.turn_manager.start()
         self.player_manager.start()
 
-    def update_proto(self, game_state_proto):
+    def update_proto(self, proto):
         """
         Update a game state proto to reflect the current game state.
         """
 
-        # Grab the simple global stuff
-        game_state_proto.current_step = self.turn_manager.step
-        game_state_proto.current_phase = self.turn_manager.phase
-        for obj in self.registry:
-            proto = game_state_proto.game_objects.add()
-            obj.update_proto(proto)
+        self.turn_manager.update_proto(proto)
+        self.player_manager.update_proto(proto)
+        self.stack.update_proto(proto.stack)
+        self.battlefield.update_proto(proto.battlefield)
+        self.exile.update_proto(proto.exile)

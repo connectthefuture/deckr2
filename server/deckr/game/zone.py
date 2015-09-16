@@ -3,7 +3,6 @@ This module provides code to interact with zones.
 """
 
 import deckr.game.game_object
-import proto.game_pb2 as proto_lib
 
 
 class Zone(deckr.game.game_object.GameObject):
@@ -78,11 +77,10 @@ class Zone(deckr.game.game_object.GameObject):
         """
 
         super(Zone, self).update_proto(proto)
-        proto.game_object_type = proto_lib.GameObject.ZONE
 
         for obj in self._objs:
-            assert obj.game_id is not None
-            proto.zone.objs.append(obj.game_id)
+            card_proto = proto.cards.add()
+            obj.update_proto(card_proto)
 
     def __contains__(self, obj):
         return obj in self._objs

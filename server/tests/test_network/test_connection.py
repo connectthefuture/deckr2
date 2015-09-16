@@ -82,5 +82,6 @@ class ConnectionTestCase(unittest.TestCase):
         self.connection.recieve_message(self.message.SerializeToString())
         self.connection.send_error.called_once()
 
+
 if __name__ == "__main__":
     unittest.main()

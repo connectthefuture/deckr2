@@ -4,7 +4,6 @@ This module provides the code for Players.
 
 import deckr.game.game_object
 import deckr.game.zone
-import proto.game_pb2 as proto_lib
 
 
 def mana_pool_from_string(str):
@@ -98,12 +97,11 @@ class ManaPool(deckr.game.game_object.GameObject):
         """
 
         super(ManaPool, self).update_proto(proto)
-        proto.game_object_type = proto_lib.GameObject.MANA_POOL
-        proto.mana_pool.white = self.white
-        proto.mana_pool.blue = self.blue
-        proto.mana_pool.black = self.black
-        proto.mana_pool.red = self.red
-        proto.mana_pool.green = self.green
+        proto.white = self.white
+        proto.blue = self.blue
+        proto.black = self.black
+        proto.red = self.red
+        proto.green = self.green
 
 
 class Player(deckr.game.game_object.GameObject):  # pylint: disable=too-many-instance-attributes
@@ -217,10 +215,9 @@ class Player(deckr.game.game_object.GameObject):  # pylint: disable=too-many-ins
         """
 
         super(Player, self).update_proto(proto)
-        proto.game_object_type = proto_lib.GameObject.PLAYER
-        proto.player.graveyard = self.graveyard.game_id
-        proto.player.library = self.library.game_id
-        proto.player.hand = self.hand.game_id
-        proto.player.mana_pool = self.mana_pool.game_id
-        proto.player.life = self.life
-        proto.player.lost = self.lost
+        self.graveyard.update_proto(proto.graveyard)
+        self.library.update_proto(proto.library)
+        self.hand.update_proto(proto.hand)
+        self.mana_pool.update_proto(proto.mana_pool)
+        proto.life = self.life
+        proto.lost = self.lost

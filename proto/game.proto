@@ -1,76 +1,55 @@
 import 'util.proto';
 
+// NOTE: Some int32 fields should be populated with game ids. These will be noted.
 message GameState {
     required string current_phase = 1;
     required string current_step = 2;
-    repeated GameObject game_objects = 3;
-}
-
-// Union to represent any type of game object
-message GameObject {
-    enum GameObjectType {
-        PLAYER = 0;
-        ZONE = 1;
-        CARD = 2;
-        COUNTER = 3;
-        MANA_POOL = 4;
-    }
-
-    required GameObjectType game_object_type = 1;
-    required int32 game_id = 2;
-
-    optional Player player = 3;
-    optional Zone zone = 4;
-    optional Card card = 5;
-    optional Counter counter = 6;
-    optional ManaPool mana_pool = 7;
+    required int32 active_player =  3; // Game id
+    required int32 priority_player = 4; // Game id
+    required Zone stack = 5;
+    required Zone battlefield = 6;
+    required Zone exile = 7;
+    repeated Player players = 8;
 }
 
 message Player {
-    required int32 hand = 1;
-    required int32 graveyard = 2;
-    required int32 library = 3;
-    required int32 life = 4;
-    required bool lost = 5;
-    required int32 mana_pool = 6;
+    required int32 game_id = 1;
+    required Zone hand = 2;
+    required Zone graveyard = 3;
+    required Zone library = 4;
+    required ManaPool mana_pool = 5;
+    required int32 life = 6;
+    required bool lost = 7;
 }
 
 message Zone {
-    repeated int32 objs = 1; // List of game ids
+    required int32 game_id = 1;
+    repeated Card cards = 2;
 }
 
 message Card {
-    required string name = 1;
+    required int32 game_id = 1;
+    required string name = 2;
 
-    optional string mana_cost = 2;
-    optional string color = 3; // In case mana cost is 0
-    repeated string super_types = 4;
-    repeated string types = 5;
-    repeated string subtypes = 6;
-    repeated string abilities = 7; // This is an array of all abilities of the card
-    optional string flavor_text = 8;
-    optional int32 power = 9;
-    optional int32 toughness = 10;
+    optional string mana_cost = 3;
+    optional string color = 4; // In case mana cost is 0
+    repeated string super_types = 5;
+    repeated string types = 6;
+    repeated string subtypes = 7;
+    repeated string abilities = 8; // This is an array of all abilities of the card
+    optional string flavor_text = 9;
+    optional int32 power = 10;
+    optional int32 toughness = 11;
 
     // Anything not conveyed above can be stuffed in meta (like artwork)
-    repeated KeyValuePair meta = 11;
-}
-
-// For +1/+1 counters, loyalty counters, etc.
-message Counter {
-    required string type = 1;
-}
-
-// For activated abilities
-message Ability {
-    required int32 ability_on = 1;
-    required int32 ability_index = 2;
+    repeated KeyValuePair meta = 12;
 }
 
 message ManaPool {
-    required int32 white = 1;
-    required int32 blue = 2;
-    required int32 black = 3;
-    required int32 red = 4;
-    required int32 green = 5;
+    required int32 game_id = 1;
+    required int32 white = 2;
+    required int32 blue = 3;
+    required int32 black = 4;
+    required int32 red = 5;
+    required int32 green = 6;
 }
