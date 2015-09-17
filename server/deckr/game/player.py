@@ -6,23 +6,28 @@ import deckr.game.game_object
 import deckr.game.zone
 
 
-def mana_pool_from_string(str):
+def mana_pool_from_string(string):
     """
     Create a mana pool from a string.
     """
 
     mana_pool = ManaPool()
-    white = str.count("W")
-    blue = str.count("U")
-    black = str.count("B")
-    red = str.count("R")
-    green = str.count("G")
-    remainder = str.translate(None, "WUBRG")
+    white = string.count("W")
+    blue = string.count("U")
+    black = string.count("B")
+    red = string.count("R")
+    green = string.count("G")
+    remainder = string.translate(None, "WUBRG")
     if remainder:
         colorless = int(remainder)
     else:
         colorless = 0
-    mana_pool.add(white=white, blue=blue, black=black, red=red, green=green, colorless=colorless)
+    mana_pool.add(white=white,
+                  blue=blue,
+                  black=black,
+                  red=red,
+                  green=green,
+                  colorless=colorless)
     return mana_pool
 
 
@@ -61,12 +66,9 @@ class ManaPool(deckr.game.game_object.GameObject):
         """
 
         other = mana_pool_from_string(amount)
-        return (self.white >= other.white and
-                self.blue >= other.blue and
-                self.black >= other.black and
-                self.red >= other.red and
-                self.green >= other.green and
-                self.total() >= other.total())
+        return (self.white >= other.white and self.blue >= other.blue and
+                self.black >= other.black and self.red >= other.red and
+                self.green >= other.green and self.total() >= other.total())
 
     def total(self):
         """
@@ -186,7 +188,8 @@ class Player(deckr.game.game_object.GameObject):  # pylint: disable=too-many-ins
         Activate an ability. Resolve it if it's a mana ability, otherwise, put it on the stack.
         """
 
-        self._game.action_validator.validate(self._game, self, 'activate', card, ability_index)
+        self._game.action_validator.validate(self._game, self, 'activate',
+                                             card, ability_index)
 
         # Pay the cost first
         card.abilities[ability_index].pay_cost()

@@ -166,20 +166,17 @@ class PlayerTestCase(unittest.TestCase):
         """
 
         self.player.pass_priority()
-        self.game.action_validator.validate.assert_called_with(self.game,
-                                                               self.player,
-                                                               'pass_priority')
+        self.game.action_validator.validate.assert_called_with(
+            self.game, self.player, 'pass_priority')
         card = mock.MagicMock()
         self.player.hand.append(card)
         self.player.play_card(card)
-        self.game.action_validator.validate.assert_called_with(self.game,
-                                                               self.player,
-                                                               'play', card)
+        self.game.action_validator.validate.assert_called_with(
+            self.game, self.player, 'play', card)
 
         self.player.activate_ability(card, 0)
-        self.game.action_validator.validate.assert_called_with(self.game,
-                                                               self.player,
-                                                               'activate', card, 0)
+        self.game.action_validator.validate.assert_called_with(
+            self.game, self.player, 'activate', card, 0)
 
     def test_start_new_turn(self):
         """

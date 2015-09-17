@@ -76,7 +76,8 @@ class SinglePlayerTestCase(unittest.TestCase):
 
     def setUp(self):
         self.client = deckrclient.client.DeckrClient(ip='127.0.0.1',
-                                                     port=8080, raise_errors=True)
+                                                     port=8080,
+                                                     raise_errors=True)
         self.client.initialize()
 
     def tearDown(self):
@@ -89,8 +90,7 @@ class SinglePlayerTestCase(unittest.TestCase):
 
         self.client.create()
         response = self.client.listen()
-        self.client.join(response.create_response.game_id,
-                         deck=deck)
+        self.client.join(response.create_response.game_id, deck=deck)
         self.client.listen()
         self.client.start()
         self.client.listen()
@@ -214,7 +214,8 @@ class SinglePlayerTestCase(unittest.TestCase):
         self.client.listen()
         self.assertEqual(len(self.client.game_state.player.hand), 6)
         self.assertEqual(len(self.client.game_state.battlefield), 1)
-        self.assertEqual(self.client.game_state.battlefield[0].game_id, card.game_id)
+        self.assertEqual(self.client.game_state.battlefield[0].game_id,
+                         card.game_id)
 
     def test_activate_land(self):
         """

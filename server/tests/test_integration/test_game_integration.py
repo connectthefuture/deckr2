@@ -6,7 +6,6 @@ game stack.
 
 import unittest
 
-
 import nose.plugins.attrib
 
 import deckr.game.game
@@ -29,7 +28,8 @@ class GameIntegrationTestCase(unittest.TestCase):
         self.card_library = deckr.game.card.CardLibrary()
         self.card_library.load_from_dict(tests.utils.SIMPLE_CARD_LIBRARY)
         self.action_validator = deckr.game.action_validator.ActionValidator()
-        self.game = deckr.game.game.MagicTheGathering(self.action_validator, self.card_library)
+        self.game = deckr.game.game.MagicTheGathering(self.action_validator,
+                                                      self.card_library)
 
         self.player = self.game.player_manager.create_player([])  # Empty decklist for now.
 

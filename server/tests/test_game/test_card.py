@@ -20,15 +20,17 @@ class AbilityTestCase(unittest.TestCase):
         """
 
         card = mock.MagicMock()
+        player = mock.MagicMock()
         card.tapped = False
-        ability_factory = deckr.game.card.AbilityFactory(card=card,
-                                                         resolution=lambda: None,
-                                                         cost="{T}")
-        self.assertTrue(ability_factory.can_pay_cost())
+        ability_factory = deckr.game.card.AbilityFactory(
+            card=card,
+            resolution=lambda: None,
+            cost="{T}")
+        self.assertTrue(ability_factory.can_pay_cost(player))
         ability_factory.pay_cost()
         card.tap.assert_called_with()
         card.tapped = True
-        self.assertFalse(ability_factory.can_pay_cost())
+        self.assertFalse(ability_factory.can_pay_cost(player))
 
 
 class CardTestCase(unittest.TestCase):

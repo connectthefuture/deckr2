@@ -71,7 +71,7 @@ class AbilityFactory(object):
         self.cost = cost
         self.resolution = resolution
 
-    def can_pay_cost(self):
+    def can_pay_cost(self, player):  # pylint: disable=unused-argument
         """
         Can we pay the cost (for activated abilities only).
         """
@@ -152,14 +152,14 @@ class Card(deckr.game.game_object.GameObject):  # pylint: disable=too-many-insta
         Check if we can only cast this at sorcercy speed.
         """
 
-        return True  # Instants aren't implemented yet, everything is sorcercy speed
+        return not "Instant" in self.types
 
     def is_permanent(self):
         """
         Is the card a permanent.
         """
 
-        return True
+        return not "Sorcercy" in self.types and not "Instant" in self.types
 
     def update_proto(self, proto):
         """

@@ -99,12 +99,19 @@ class ActionValidator(deckr.core.service.Service):
 
 
 def check(error_string):
+    """
+    Checks the wrapped function, and if it returns a falsey value will raise
+    an error with the specified string.
+    """
+    # pylint: disable=missing-docstring
     def wrapper(func):
         def inner(*args, **kwargs):
             result = func(*args, **kwargs)
             if not result:
                 raise InvalidActionException(error_string)
+
         return inner
+
     return wrapper
 
 
@@ -125,8 +132,7 @@ def sorcery_speed(game, player):
 
     return (game.turn_manager.active_player == player and
             "main" in game.turn_manager.step and
-            "main" in game.turn_manager.phase and
-            game.stack.is_empty())
+            "main" in game.turn_manager.phase and game.stack.is_empty())
 
 
 @check("You have played to many lands this turn")
@@ -153,4 +159,4 @@ def can_pay_ability_cost(player, card, index):
     Check that we can pay the cost for an activated ability.
     """
 
-    return card.abilities[index].can_pay_cost()
+    return card.abilities[index].can_pay_cost(player)
