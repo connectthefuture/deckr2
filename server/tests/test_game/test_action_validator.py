@@ -3,9 +3,9 @@ Unittests for the action validator.
 """
 
 import unittest
-import mock
 
 import deckr.game.action_validator
+import mock
 
 
 class ActionValidatorTestCase(unittest.TestCase):
@@ -43,6 +43,7 @@ class ActionValidatorTestCase(unittest.TestCase):
         card.is_sorcery_speed.return_value = True
 
         self.game.turn_manager.priority_player = self.player
+        self.game.turn_manager.active_player = self.player
 
         # Play during a non main phase
         self.game.turn_manager.phase = 'beginning'
@@ -69,6 +70,7 @@ class ActionValidatorTestCase(unittest.TestCase):
         self.game.turn_manager.phase = 'precombat main'
         self.game.turn_manager.step = 'precombat main'
         self.game.turn_manager.priority_player = self.player
+        self.game.turn_manager.active_player = self.player
 
         self.player.land_limit = 1
         self.player.lands_played = 1
@@ -88,6 +90,8 @@ class ActionValidatorTestCase(unittest.TestCase):
         self.game.turn_manager.phase = 'precombat main'
         self.game.turn_manager.step = 'precombat main'
         self.game.turn_manager.priority_player = self.player
+        self.game.turn_manager.active_player = self.player
+
         self.player.mana_pool.can_pay.return_value = False
 
         self.assertRaises(deckr.game.action_validator.InvalidActionException,

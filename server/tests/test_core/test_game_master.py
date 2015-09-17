@@ -2,7 +2,10 @@
 This module tests the game master functionality.
 """
 
+import tempfile
 import unittest
+
+import nose.plugins.attrib
 
 import deckr.core.game_master
 import deckr.game.game
@@ -10,6 +13,9 @@ import mock
 
 
 class GameMasterTestCase(unittest.TestCase):
+    """
+    This file contains simple tests around the game master.
+    """
 
     def setUp(self):
         self.game_master = deckr.core.game_master.GameMaster()
@@ -21,6 +27,22 @@ class GameMasterTestCase(unittest.TestCase):
 
         result = self.game_master.create()
         self.assertIsNotNone(result)
+
+    def test_service_methods(self):
+        """
+        Test the simple setters.
+        """
+
+        # pylint: disable=protected-access
+        action_validator = mock.MagicMock()
+        card_library = mock.MagicMock()
+        self.game_master.set_action_validator(action_validator)
+        self.game_master.set_card_library(card_library)
+        self.assertEqual(self.game_master._action_validator, action_validator)
+        self.assertEqual(self.game_master._card_library, card_library)
+        # Make sure these run properly (they don't really need to do anything)
+        self.game_master.start()
+        self.game_master.stop()
 
     def test_create_unique_ids(self):
         """
@@ -75,3 +97,19 @@ class GameMasterTestCase(unittest.TestCase):
         game_master.load_from_file.assert_called_with('foobar')
         game_master.stop()
         game_master.save_to_file.assert_called_with('foobar')
+
+    @nose.plugins.attrib.attr('integration')
+    def test_load_and_save_integration(self):
+        """
+        Actually test the write and read ability to files. We mark this as an
+        integration test since it will actually hit a file.
+        """
+
+        # pylint: disable=protected-access
+        save_file = tempfile.NamedTemporaryFile()
+        self.game_master._games = {"foo": "bar"}  # Some fake data
+        self.game_master.save_to_file(save_file.name)
+
+        game_master = deckr.core.game_master.GameMaster()
+        game_master.load_from_file(save_file.name)
+        self.assertEqual(self.game_master._games, game_master._games)
