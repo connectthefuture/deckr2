@@ -54,6 +54,10 @@ class ActionValidator(deckr.core.service.Service):
             self._validate_play(game, player, *args)
         elif action == 'activate':
             self._validate_activate(game, player, *args)
+        elif action == 'declare_attackers':
+            self._validate_declare_attackers(game, player, *args)
+        elif action == 'declare_blockers':
+            self._validate_declare_blockers(game, player, *args)
         else:
             raise ValueError("Invalid Action")
 
@@ -92,6 +96,30 @@ class ActionValidator(deckr.core.service.Service):
 
         has_priority(game, player)
         can_pay_ability_cost(player, card, index)
+
+    def _validate_declare_attackers(self, game, player, attackers):
+        """
+        Check the following:
+
+        1) It's the active player
+        2) It's the declare attackers step.
+        3) All attackers are untaped.
+        """
+
+        is_active_player(game, player)
+        is_step(game, 'declare attackers')
+        are_untaped(attackers.keys())
+
+    def _validate_declare_blockers(self, game, player, blockers):
+        """
+        Check the following:
+
+        1) It's the declare blockers step.
+        2) All blockers are untaped.
+        """
+
+        is_step(game, 'declare blockers')
+        are_untaped(blockers.keys())
 
 #################################
 # Various rules checks go  here #
@@ -160,3 +188,31 @@ def can_pay_ability_cost(player, card, index):
     """
 
     return card.abilities[index].can_pay_cost(player)
+
+
+@check("You can't do that during this step")
+def is_step(game, step):
+    """
+    Check that the game is in the proper step.
+    """
+
+    return game.turn_manager.step == step
+
+
+@check("All creatures must be untapped to do that")
+def are_untaped(creatures):
+    """
+    Make sure that every creature is untapped.
+    """
+
+    return all(not x.tapped for x in creatures)
+
+
+@check("Only the active player can do that right now")
+def is_active_player(game, player):
+    """
+    Make sure that the player is the active player.
+    """
+
+    print game.turn_manager.active_player, player
+    return game.turn_manager.active_player == player

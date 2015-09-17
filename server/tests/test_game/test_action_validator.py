@@ -97,3 +97,64 @@ class ActionValidatorTestCase(unittest.TestCase):
         self.assertRaises(deckr.game.action_validator.InvalidActionException,
                           self.action_validator.validate, self.game,
                           self.player, 'play', card)
+
+    def test_declare_attackers(self):
+        """
+        Test all functionality around declaring attackers.
+        """
+
+        attacker = mock.MagicMock()
+        attackers = {attacker: self.player}
+
+        # Not the active player
+        self.assertRaises(deckr.game.action_validator.InvalidActionException,
+                          self.action_validator.validate, self.game, self.player,
+                          'declare_attackers', attackers)
+        self.game.turn_manager.active_player = self.player
+
+        # Make sure we have to be in the right phase
+        self.assertRaises(deckr.game.action_validator.InvalidActionException,
+                          self.action_validator.validate, self.game, self.player,
+                          'declare_attackers', attackers)
+
+        self.game.turn_manager.phase = 'combat'
+        self.game.turn_manager.step = 'declare attackers'
+        attacker.tapped = True
+
+        # We can't attack if the creature is tapped
+        self.assertRaises(deckr.game.action_validator.InvalidActionException,
+                          self.action_validator.validate, self.game, self.player,
+                          'declare_attackers', attackers)
+
+        attacker.tapped = False
+
+        # Finally make sure that we allow if everything lines up.
+        self.action_validator.validate(self.game, self.player, 'declare_attackers', attackers)
+
+    def test_declare_blockers(self):
+        """
+        Test all functionality around declaring blockers.
+        """
+
+        attacker = mock.MagicMock()
+        blocker = mock.MagicMock()
+        blockers = {blocker: attacker}
+
+        # Make sure we have to be in the right phase
+        self.assertRaises(deckr.game.action_validator.InvalidActionException,
+                          self.action_validator.validate, self.game, self.player,
+                          'declare_blockers', blockers)
+
+        self.game.turn_manager.phase = 'combat'
+        self.game.turn_manager.step = 'declare blockers'
+        blocker.tapped = True
+
+        # We can't attack if the creature is tapped
+        self.assertRaises(deckr.game.action_validator.InvalidActionException,
+                          self.action_validator.validate, self.game, self.player,
+                          'declare_blockers', blockers)
+
+        blocker.tapped = False
+
+        # Finally make sure that we allow if everything lines up.
+        self.action_validator.validate(self.game, self.player, 'declare_blockers', blockers)

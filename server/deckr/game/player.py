@@ -209,6 +209,8 @@ class Player(deckr.game.game_object.GameObject):  # pylint: disable=too-many-ins
         Declare attackers. All cards will be updated to indicate they are attacking.
         """
 
+        self._game.action_validator.validate(self._game, self, 'declare_attackers',
+                                             attackers)
         for attacker in attackers:
             attacker.attacking = attackers[attacker]
 
@@ -216,6 +218,9 @@ class Player(deckr.game.game_object.GameObject):  # pylint: disable=too-many-ins
         """
         Declare blockers. All cards will be updated to indicate they are defending.
         """
+
+        self._game.action_validator.validate(self._game, self, 'declare_blockers',
+                                             blockers)
 
         for blocker in blockers:
             blocker.blocking = blockers[blocker]

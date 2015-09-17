@@ -178,6 +178,14 @@ class PlayerTestCase(unittest.TestCase):
         self.game.action_validator.validate.assert_called_with(
             self.game, self.player, 'activate', card, 0)
 
+        self.player.declare_attackers({})
+        self.game.action_validator.validate.assert_called_with(
+            self.game, self.player, 'declare_attackers', {})
+
+        self.player.declare_blockers({})
+        self.game.action_validator.validate.assert_called_with(
+            self.game, self.player, 'declare_blockers', {})
+
     def test_start_new_turn(self):
         """
         Make sure that we can clear internal state when we start a new turn.
