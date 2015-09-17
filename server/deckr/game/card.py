@@ -23,7 +23,7 @@ def populate_abilities(card):
 
     ### Ability population ###
     if card.name == "Forest":
-        ability_factory = AbilityFactory(card, forest_ability)
+        ability_factory = AbilityFactory(card, forest_ability, cost="{T}")
         card.abilities.append(ability_factory)
 
 
@@ -75,7 +75,16 @@ class AbilityFactory(object):
         Can we pay the cost (for activated abilities only).
         """
 
-        return True
+        if "{T}" in self.cost:
+            return self.card.tapped == False
+
+    def pay_cost(self):
+        """
+        Pay the cost for this ability.
+        """
+
+        if "{T}" in self.cost:
+             self.card.tapped = True
 
 
     def create_instance(self):
@@ -108,6 +117,7 @@ class Card(deckr.game.game_object.GameObject):  # pylint: disable=too-many-insta
         # These will generally be hidden based on the types of the card.
         self.power = 0
         self.toughness = 0
+        self.tapped = False
 
     def reset(self):
         """

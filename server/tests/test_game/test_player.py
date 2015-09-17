@@ -155,8 +155,10 @@ class PlayerTestCase(unittest.TestCase):
         """
 
         card = mock.MagicMock()
+        card.abilities = [mock.MagicMock()]
         self.player.activate_ability(card, 0)
         card.activate_ability.assert_called_with(0)
+        card.abilities[0].pay_cost.assert_called_with()
 
     def test_validate_actions(self):
         """
@@ -173,6 +175,11 @@ class PlayerTestCase(unittest.TestCase):
         self.game.action_validator.validate.assert_called_with(self.game,
                                                                self.player,
                                                                'play', card)
+
+        self.player.activate_ability(card, 0)
+        self.game.action_validator.validate.assert_called_with(self.game,
+                                                               self.player,
+                                                               'activate', card, 0)
 
     def test_start_new_turn(self):
         """

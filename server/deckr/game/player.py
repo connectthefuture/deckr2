@@ -186,6 +186,10 @@ class Player(deckr.game.game_object.GameObject):  # pylint: disable=too-many-ins
         Activate an ability. Resolve it if it's a mana ability, otherwise, put it on the stack.
         """
 
+        self._game.action_validator.validate(self._game, self, 'activate', card, ability_index)
+
+        # Pay the cost first
+        card.abilities[ability_index].pay_cost()
         ability = card.activate_ability(ability_index)
         # Don't do this for non mana abilities.
         ability.resolve()

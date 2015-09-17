@@ -71,6 +71,11 @@ class GameIntegrationTestCase(unittest.TestCase):
         forest = self.card_library.create("Forest")
         forest.controller = self.player
         self.game.battlefield.append(forest)
+        self._prep_for_sorcery()
 
         self.player.activate_ability(forest, 0)
         self.assertEqual(self.player.mana_pool.green, 1)
+        # Make sure we can't activate it again, since it should be tapped.
+        self.assertTrue(forest.tapped)
+        self.assertRaises(deckr.game.action_validator.InvalidActionException,
+                          self.player.activate_ability, forest, 0)

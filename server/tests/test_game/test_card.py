@@ -13,11 +13,21 @@ class AbilityTestCase(unittest.TestCase):
     Test abilities and the ability factory.
     """
 
-    def setUp(self):
-        pass
+    def test_tap_cost(self):
+        """
+        Make sure we can use {T} as a cost.
+        """
 
-    # TODO: Write some unittests here.
-    
+        card = mock.MagicMock()
+        card.tapped = False
+        ability_factory = deckr.game.card.AbilityFactory(card=card,
+                                                         resolution=lambda: None,
+                                                         cost="{T}")
+        self.assertTrue(ability_factory.can_pay_cost())
+        ability_factory.pay_cost()
+        self.assertTrue(card.tapped)
+        self.assertFalse(ability_factory.can_pay_cost())
+
 class CardTestCase(unittest.TestCase):
     """
     Test the functionality associated with a generic card.
@@ -39,6 +49,7 @@ class CardTestCase(unittest.TestCase):
         self.card.activate_ability(1)
         ability2.create_instance.assert_called_with()
         self.assertRaises(IndexError, self.card.activate_ability, 2)
+
 
 
 class CardUtilityFunctionsTestCase(unittest.TestCase):

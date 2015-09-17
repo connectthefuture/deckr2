@@ -90,7 +90,8 @@ class ActionValidator(deckr.core.service.Service):
         Check that we can play an activated ability.
         """
 
-        pass
+        has_priority(game, player)
+        can_pay_ability_cost(player, card, index)
 
 #################################
 # Various rules checks go  here #
@@ -144,3 +145,11 @@ def can_pay_mana_cost(player, card):
     """
 
     return player.mana_pool.can_pay(card.mana_cost)
+
+@check("You can't pay the cost for that ability")
+def can_pay_ability_cost(player, card, index):
+    """
+    Check that we can pay the cost for an activated ability.
+    """
+
+    return card.abilities[index].can_pay_cost()
