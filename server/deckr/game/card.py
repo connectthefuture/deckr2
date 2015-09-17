@@ -118,6 +118,11 @@ class Card(deckr.game.game_object.GameObject):  # pylint: disable=too-many-insta
         self.toughness = 0
         self.tapped = False
 
+        # Transitory state
+        self.attacking = None
+        self.blocking = None
+        self.combat_damage = 0
+
     def reset(self):
         """
         Call whenever a card changes zones to remove any modifications.
@@ -139,6 +144,14 @@ class Card(deckr.game.game_object.GameObject):  # pylint: disable=too-many-insta
         """
 
         self.tapped = False
+
+    def deal_combat_damage(self, amount):
+        """
+        Deal combat damage to this card.
+        """
+
+        assert "Creature" in self.types
+        self.combat_damage += amount
 
     def is_land(self):
         """
