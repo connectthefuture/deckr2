@@ -84,7 +84,7 @@ class AbilityFactory(object):
         """
 
         if "{T}" in self.cost:
-             self.card.tapped = True
+             self.card.tap()
 
 
     def create_instance(self):
@@ -126,6 +126,20 @@ class Card(deckr.game.game_object.GameObject):  # pylint: disable=too-many-insta
         """
 
         pass
+
+    def tap(self):
+        """
+        Tap.
+        """
+
+        self.tapped = True
+
+    def untap(self):
+        """
+        Untap.
+        """
+
+        self.tapped = False
 
     def is_land(self):
         """

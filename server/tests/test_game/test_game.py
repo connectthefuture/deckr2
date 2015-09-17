@@ -223,6 +223,19 @@ class TurnManagerTestCase(unittest.TestCase):
                                self.player1, self.player1)
         self.game.stack.resolve.assert_called_with()
 
+    def test_untap(self):
+        """
+        Make sure we untap all creatures in the untap step.
+        """
+
+        card = mock.MagicMock()
+        self.turn_manager.step = self.turn_manager.UNTAP_STEP
+        self.turn_manager.phase = self.turn_manager.BEGINNING_PHASE
+        self.game.battlefield = [card]
+
+        self.turn_manager.turn_based_actions()
+        card.untap.assert_called_with()
+
 
 class MagicTheGatheringTestCase(unittest.TestCase):
     """

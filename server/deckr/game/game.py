@@ -247,6 +247,10 @@ class TurnManager(object):
             if (self.turn != 1 or self.active_player !=
                     self._game.player_manager.first_player()):
                 self.active_player.draw()
+        elif self.step == self.UNTAP_STEP:
+            for card in self._game.battlefield:
+                if card.tapped:
+                    card.untap()
 
     def update_proto(self, proto):
         """

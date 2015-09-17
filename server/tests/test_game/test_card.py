@@ -25,7 +25,8 @@ class AbilityTestCase(unittest.TestCase):
                                                          cost="{T}")
         self.assertTrue(ability_factory.can_pay_cost())
         ability_factory.pay_cost()
-        self.assertTrue(card.tapped)
+        card.tap.assert_called_with()
+        card.tapped = True
         self.assertFalse(ability_factory.can_pay_cost())
 
 class CardTestCase(unittest.TestCase):
