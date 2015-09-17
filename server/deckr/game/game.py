@@ -12,6 +12,32 @@ import deckr.game.zone
 LOGGER = logging.getLogger(__name__)
 
 
+class CombatDamageManager(object):
+    """
+    Handles combat damage.
+    """
+
+    def __init__(self, game):
+        self._game = game
+
+    def deal_combat_damage(self):
+        """
+        Deals combat damage.
+        """
+
+        attackers = [x for x in self._game.battlefield if x.attacking]
+        blockers = [x for x in self._game.battlefield if x.blocking]
+
+        blocked = [x.blocking for x in blockers]
+        unblocked = [x for x in attackers if x not in blocked]
+
+        for attacker in unblocked:
+            attacker.attacking.deal_combat_damage(attacker.power)
+
+        for blocker in blockers:
+            blocker.deal_combat_damage(blocker.blocking.power)
+            blocker.blocking.deal_combat_damage(blocker.power)
+
 class GameRegistry(object):
     """
     The game registry is responsible for handing out game_ids.
@@ -245,6 +271,8 @@ class TurnManager(object):
             if (self.turn != 1 or self.active_player !=
                     self._game.player_manager.first_player()):
                 self.active_player.draw()
+        elif self.step == self.COMBAT_DAMAGE_STEP:
+            self._game.combat_damage_manager.deal_combat_damage()
 
     def update_proto(self, proto):
         """
@@ -272,6 +300,7 @@ class MagicTheGathering(object):  # pylint: disable=too-many-instance-attributes
         self.registry = GameRegistry()
         self.player_manager = PlayerManager(self)
         self.turn_manager = TurnManager(self)
+        self.combat_damage_manager = CombatDamageManager(self)
 
         # Each game has a set of shared zones
         self.battlefield = deckr.game.zone.Zone('battlefield', None)

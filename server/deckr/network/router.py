@@ -127,7 +127,6 @@ class Router(object):
 
         assert game is not None and player is not None
 
-        print message.action_type
         if message.action_type == proto.client_message_pb2.ActionMessage.START:
             game.start()
         elif message.action_type == proto.client_message_pb2.ActionMessage.PASS_PRIORITY:
@@ -138,6 +137,20 @@ class Router(object):
         elif message.action_type == proto.client_message_pb2.ActionMessage.ACTIVATE:
             card = game.registry.lookup(message.activate_ability.card)
             player.activate_ability(card, message.activate_ability.index)
+        elif message.action_type == proto.client_message_pb2.ActionMessage.DECLARE_ATTACKERS:
+            attackers = {
+                game.registry.lookup(x.attacker): game.registry.lookup(
+                    x.target)
+                for x in message.declare_attackers.attackers
+            }
+            player.declare_attackers(attackers)
+        elif message.action_type == proto.client_message_pb2.ActionMessage.DECLARE_BLOCKERS:
+            blockers = {
+                game.registry.lookup(x.blocker): game.registry.lookup(
+                    x.blocking)
+                for x in message.declare_blockers.blockers
+            }
+            player.declare_blockers(blockers)
         else:  # Catch all bail out case.
             connection.send_error("Invalid action type {}".format(
                 message.action_type))

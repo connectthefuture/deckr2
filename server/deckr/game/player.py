@@ -77,6 +77,13 @@ class Player(deckr.game.game_object.GameObject):  # pylint: disable=too-many-ins
         else:
             self.hand.append(self.library.pop())
 
+    def deal_combat_damage(self, amount):
+        """
+        Deal combat damage to the player.
+        """
+
+        self.life -= amount
+
     def start(self):
         """
         Start the game. Draw the initial hand of 7 cards.
@@ -109,21 +116,23 @@ class Player(deckr.game.game_object.GameObject):  # pylint: disable=too-many-ins
 
         card.activate_ability(ability_index)
 
-    def declare_attackers(self, attackers):
+    def declare_attackers(self, attackers):  # pylint: disable=no-self-use
         """
         Declare attackers. All cards will be updated to indicate they are attacking.
         """
 
-        pass
+        for attacker in attackers:
+            attacker.attacking = attackers[attacker]
 
     def declare_blockers(self, blockers):
         """
         Declare blockers. All cards will be updated to indicate they are defending.
         """
 
-        pass
+        for blocker in blockers:
+            blocker.blocking = blockers[blocker]
 
-    def deal_combat_damage(self, comabt_damage):
+    def assign_combat_damage(self, comabt_damage):
         """
         Assign combat damage. Most of the time this should happen automatically, but there
         are some cases when you need to manually assign combat damage.

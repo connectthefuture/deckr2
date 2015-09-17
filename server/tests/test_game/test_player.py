@@ -129,3 +129,23 @@ class PlayerTestCase(unittest.TestCase):
         card = mock.MagicMock()
         self.player.activate_ability(card, 0)
         card.activate_ability.assert_called_with(0)
+
+    def test_declare_attackers(self):
+        """
+        Make sure that we can properly declare attackers.
+        """
+
+        card = mock.MagicMock()
+        player = mock.MagicMock()
+        self.player.declare_attackers({card: player})
+        self.assertEqual(card.attacking, player)
+
+    def test_declare_blockers(self):
+        """
+        Make sure that we can properly declare blockers.
+        """
+
+        attacking_card = mock.MagicMock()
+        blocking_card = mock.MagicMock()
+        self.player.declare_blockers({blocking_card: attacking_card})
+        self.assertEqual(blocking_card.blocking, attacking_card)
