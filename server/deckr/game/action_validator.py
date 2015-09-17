@@ -146,6 +146,7 @@ def can_pay_mana_cost(player, card):
 
     return player.mana_pool.can_pay(card.mana_cost)
 
+
 @check("You can't pay the cost for that ability")
 def can_pay_ability_cost(player, card, index):
     """

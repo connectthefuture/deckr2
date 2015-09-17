@@ -47,6 +47,7 @@ def create_card_from_dict(card_data):
     populate_abilities(card)
     return card
 
+
 class Ability(object):
     """
     Represents an ability on the stack.
@@ -54,9 +55,9 @@ class Ability(object):
 
     def __init__(self, resolve, controller, *args, **kwargs):
         super(Ability, self).__init__(*args, **kwargs)
-        self.resolve = lambda: resolve(self) # This is a function that takes in this ability as an argument.
+        # This is a function that takes in this ability as an argument.
+        self.resolve = lambda: resolve(self)
         self.controller = controller
-
 
 
 class AbilityFactory(object):
@@ -84,8 +85,7 @@ class AbilityFactory(object):
         """
 
         if "{T}" in self.cost:
-             self.card.tap()
-
+            self.card.tap()
 
     def create_instance(self):
         """
@@ -93,7 +93,6 @@ class AbilityFactory(object):
         """
 
         return Ability(self.resolution, self.card.controller)
-
 
 
 class Card(deckr.game.game_object.GameObject):  # pylint: disable=too-many-instance-attributes

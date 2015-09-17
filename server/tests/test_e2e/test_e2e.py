@@ -13,7 +13,6 @@ import deckr.core.service
 import deckrclient.client
 import proto.game_pb2
 import proto.server_response_pb2
-import tests.test_integration.simple_client
 import tests.utils
 
 
@@ -59,7 +58,7 @@ class SimpleServer(object):
         self._server_process.terminate()
 
 
-@nose.plugins.attrib.attr('integration')
+@nose.plugins.attrib.attr('e2e')
 class SinglePlayerTestCase(unittest.TestCase):
     """
     Integration tests for a single player. Generally, this is more related

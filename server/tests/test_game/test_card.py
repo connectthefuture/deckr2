@@ -8,6 +8,7 @@ import deckr.game.card
 import mock
 import tests.utils
 
+
 class AbilityTestCase(unittest.TestCase):
     """
     Test abilities and the ability factory.
@@ -28,6 +29,7 @@ class AbilityTestCase(unittest.TestCase):
         card.tap.assert_called_with()
         card.tapped = True
         self.assertFalse(ability_factory.can_pay_cost())
+
 
 class CardTestCase(unittest.TestCase):
     """
@@ -50,7 +52,6 @@ class CardTestCase(unittest.TestCase):
         self.card.activate_ability(1)
         ability2.create_instance.assert_called_with()
         self.assertRaises(IndexError, self.card.activate_ability, 2)
-
 
 
 class CardUtilityFunctionsTestCase(unittest.TestCase):
