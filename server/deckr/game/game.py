@@ -12,6 +12,32 @@ import deckr.game.zone
 LOGGER = logging.getLogger(__name__)
 
 
+class CombatDamageManager(object):
+    """
+    Handles combat damage.
+    """
+
+    def __init__(self, game):
+        self._game = game
+
+    def deal_combat_damage(self):
+        """
+        Deals combat damage.
+        """
+
+        attackers = [x for x in self._game.battlefield if x.attacking]
+        blockers = [x for x in self._game.battlefield if x.blocking]
+
+        blocked = [x.blocking for x in blockers]
+        unblocked = [x for x in attackers if x not in blocked]
+
+        for attacker in unblocked:
+            attacker.attacking.deal_combat_damage(attacker.power)
+
+        for blocker in blockers:
+            blocker.deal_combat_damage(blocker.blocking.power)
+            blocker.blocking.deal_combat_damage(blocker.power)
+
 class GameRegistry(object):
     """
     The game registry is responsible for handing out game_ids.
@@ -86,11 +112,12 @@ class PlayerManager(object):
         player = deckr.game.player.Player(self._game)
 
         self.players.append(player)
-        # Register the player zones and cards
+        # Register the player zones, mana pool, and cards
         self._game.registry.register(player)
         self._game.registry.register(player.hand)
         self._game.registry.register(player.library)
         self._game.registry.register(player.graveyard)
+        self._game.registry.register(player.mana_pool)
         # Create the deck
         cards = self._game.card_library.create_from_list(deck_list)
         for card in cards:
@@ -124,6 +151,15 @@ class PlayerManager(object):
         """
 
         return self.players[0]
+
+    def update_proto(self, proto):
+        """
+        Fill in player information into a gamestate proto.
+        """
+
+        for player in self.players:
+            player_proto = proto.players.add()
+            player.update_proto(player_proto)
 
 
 class TurnManager(object):
@@ -190,7 +226,12 @@ class TurnManager(object):
         next_player = self._game.player_manager.next_player(
             self.priority_player)
         if next_player == self.active_player:
-            self._next_step()
+            # Check the stack
+            if self._game.stack.is_empty():
+                self._next_step()
+            else:
+                self._game.stack.resolve()
+                self.priority_player = next_player
         else:
             self.priority_player = next_player
 
@@ -227,9 +268,21 @@ class TurnManager(object):
 
         if self.step == self.DRAW_STEP:
             # Suppress the draw on the very first turn
-            if self.turn != 1 or self.active_player != self._game.player_manager.first_player(
-            ):
+            if (self.turn != 1 or self.active_player !=
+                    self._game.player_manager.first_player()):
                 self.active_player.draw()
+        elif self.step == self.COMBAT_DAMAGE_STEP:
+            self._game.combat_damage_manager.deal_combat_damage()
+
+    def update_proto(self, proto):
+        """
+        Update a proto with turn information.
+        """
+
+        proto.current_step = self.step
+        proto.current_phase = self.phase
+        proto.active_player = self.active_player.game_id
+        proto.priority_player = self.priority_player.game_id
 
 
 class MagicTheGathering(object):  # pylint: disable=too-many-instance-attributes
@@ -247,11 +300,12 @@ class MagicTheGathering(object):  # pylint: disable=too-many-instance-attributes
         self.registry = GameRegistry()
         self.player_manager = PlayerManager(self)
         self.turn_manager = TurnManager(self)
+        self.combat_damage_manager = CombatDamageManager(self)
 
         # Each game has a set of shared zones
         self.battlefield = deckr.game.zone.Zone('battlefield', None)
         self.exile = deckr.game.zone.Zone('exile', None)
-        self.stack = deckr.game.zone.Zone('stack', None)
+        self.stack = deckr.game.zone.Stack(name='stack', owner=None, game=self)
 
         # Register all game objects
         self.registry.register(self.battlefield)
@@ -272,16 +326,13 @@ class MagicTheGathering(object):  # pylint: disable=too-many-instance-attributes
         self.turn_manager.start()
         self.player_manager.start()
 
-    def update_proto(self, game_state_proto):
+    def update_proto(self, proto):
         """
         Update a game state proto to reflect the current game state.
         """
 
-        # Grab the simple global stuff
-        game_state_proto.current_step = self.turn_manager.step
-        game_state_proto.current_phase = self.turn_manager.phase
-        game_state_proto.priority_player = self.turn_manager.priority_player.game_id
-        game_state_proto.turn_number = self.turn_manager.turn
-        for obj in self.registry:
-            proto = game_state_proto.game_objects.add()
-            obj.update_proto(proto)
+        self.turn_manager.update_proto(proto)
+        self.player_manager.update_proto(proto)
+        self.stack.update_proto(proto.stack)
+        self.battlefield.update_proto(proto.battlefield)
+        self.exile.update_proto(proto.exile)

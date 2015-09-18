@@ -29,6 +29,8 @@ class RouterTestCase(unittest.TestCase):
 
         self.router.create_room(0, self.game)
         self.router.add_to_room(self.connection, 0)
+        # Mock out the player
+        self.connection.player = mock.MagicMock()
 
     def test_create(self):
         """
@@ -136,3 +138,96 @@ class RouterTestCase(unittest.TestCase):
         self._create_and_join_game()
         self.router.handle_message(message, self.connection)
         self.connection.player.pass_priority.assert_called_with()
+
+    def test_play_card(self):
+        """
+        Make sure that we can play a card, and that it will properly parse the
+        card to play.
+        """
+
+        test_object = object()
+        message = proto.client_message_pb2.ClientMessage()
+        message.message_type = proto.client_message_pb2.ClientMessage.ACTION
+        message.action_message.action_type = proto.client_message_pb2.ActionMessage.PLAY
+        message.action_message.play.card = 1
+        self.game.registry.lookup.return_value = test_object
+        self._create_and_join_game()
+        self.router.handle_message(message, self.connection)
+        # Make sure we look it up in the registry
+        self.game.registry.lookup.assert_called_with(1)
+        # Make sure we properly sub in the object
+        self.connection.player.play_card.assert_called_with(test_object)
+
+    def test_activate_ability(self):
+        """
+        Make sure we can activate the ability of a card.
+        """
+
+        test_object = object()
+        message = proto.client_message_pb2.ClientMessage()
+        message.message_type = proto.client_message_pb2.ClientMessage.ACTION
+        message.action_message.action_type = proto.client_message_pb2.ActionMessage.ACTIVATE
+        message.action_message.activate_ability.card = 1
+        message.action_message.activate_ability.index = 0
+        self.game.registry.lookup.return_value = test_object
+        self._create_and_join_game()
+        self.router.handle_message(message, self.connection)
+        # Make sure we look it up in the registry
+        self.game.registry.lookup.assert_called_with(1)
+        # Make sure we properly sub in the object
+        self.connection.player.activate_ability.assert_called_with(test_object,
+                                                                   0)
+
+    def test_declare_attackers(self):
+        """
+        Make sure that we can declare attackers.
+        """
+
+        test_attacker = object()
+        test_target = object()
+        message = proto.client_message_pb2.ClientMessage()
+        message.message_type = proto.client_message_pb2.ClientMessage.ACTION
+        action_message = message.action_message
+        action_message.action_type = proto.client_message_pb2.ActionMessage.DECLARE_ATTACKERS
+        declare_attackers = action_message.declare_attackers
+        attacker = declare_attackers.attackers.add()
+        attacker.attacker = 0
+        attacker.target = 1
+
+        self.game.registry.lookup.side_effect = (
+            lambda x: test_attacker if x == 0 else test_target)
+        self._create_and_join_game()
+        self.router.handle_message(message, self.connection)
+        # Make sure we look it up in the registry
+        self.game.registry.lookup.assert_any_call(0)
+        self.game.registry.lookup.assert_any_call(1)
+        # Make sure we properly sub in the object
+        self.connection.player.declare_attackers.assert_called_with(
+            {test_attacker: test_target})
+
+    def test_declare_blockers(self):
+        """
+        Make sure that we can declare blocker.
+        """
+
+        test_blocker = object()
+        test_attacker = object()
+        message = proto.client_message_pb2.ClientMessage()
+        message.message_type = proto.client_message_pb2.ClientMessage.ACTION
+        action_message = message.action_message
+        action_message.action_type = proto.client_message_pb2.ActionMessage.DECLARE_BLOCKERS
+        declare_blockers = action_message.declare_blockers
+        blocker = declare_blockers.blockers.add()
+        blocker.blocker = 0
+        blocker.blocking = 1
+
+        self.game.registry.lookup.side_effect = (
+            lambda x: test_blocker if x == 0 else test_attacker)
+        self._create_and_join_game()
+        self.router.handle_message(message, self.connection)
+        # Make sure we look it up in the registry
+        self.game.registry.lookup.assert_any_call(0)
+        self.game.registry.lookup.assert_any_call(1)
+        # Make sure we properly sub in the object
+        self.connection.player.declare_blockers.assert_called_with(
+            {test_blocker: test_attacker})

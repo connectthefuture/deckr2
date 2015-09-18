@@ -3,7 +3,6 @@ This module provides code to interact with zones.
 """
 
 import deckr.game.game_object
-import proto.game_pb2 as proto_lib
 
 
 class Zone(deckr.game.game_object.GameObject):
@@ -65,17 +64,23 @@ class Zone(deckr.game.game_object.GameObject):
 
         self._objs.remove(obj)
 
+    def is_empty(self):
+        """
+        Is the zone empty?
+        """
+
+        return not self._objs
+
     def update_proto(self, proto):
         """
         Update a protobuff.
         """
 
         super(Zone, self).update_proto(proto)
-        proto.game_object_type = proto_lib.GameObject.ZONE
 
         for obj in self._objs:
-            assert obj.game_id is not None
-            proto.zone.objs.append(obj.game_id)
+            card_proto = proto.cards.add()
+            obj.update_proto(card_proto)
 
     def __contains__(self, obj):
         return obj in self._objs
@@ -85,3 +90,26 @@ class Zone(deckr.game.game_object.GameObject):
 
     def __getitem__(self, key):
         return self._objs[key]
+
+
+class Stack(Zone):
+    """
+    The stack is a special zone that has additional methods to check the stack
+    and resolve the top card.
+    """
+
+    def __init__(self, game, *args, **kwargs):
+        super(Stack, self).__init__(*args, **kwargs)
+        # Need to keep track of the game so we can add to the battlefield
+        self._game = game
+
+    def resolve(self):
+        """
+        Resolve the top card on the stack.
+        """
+
+        card = self.pop()
+        if card.is_permanent():
+            self._game.battlefield.append(card)
+        else:
+            pass

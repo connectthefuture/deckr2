@@ -5,11 +5,52 @@ classes.
 
 import unittest
 
+import deckr.game.card
 import deckr.game.game
 import deckr.game.game_object
 import deckr.game.player
 import mock
 import proto.game_pb2 as game_proto
+
+
+class CombatDamageManagerTestCase(unittest.TestCase):
+    """
+    Test the combat damage manager.
+    """
+
+    def setUp(self):
+        self.game = mock.MagicMock()
+        self.player = mock.MagicMock()
+        self.attacker = deckr.game.card.Card()
+        self.blocker = deckr.game.card.Card()
+        self.attacker.power = 2
+        self.blocker.power = 2
+        self.attacker.deal_combat_damage = mock.MagicMock()
+        self.blocker.deal_combat_damage = mock.MagicMock()
+        self.game.battlefield = [self.attacker, self.blocker]
+        self.attacker.attacking = self.player
+        self.combat_damage_manager = deckr.game.game.CombatDamageManager(
+            self.game)
+
+    def test_single_attacker(self):
+        """
+        Make sure that we can have a single attacker deal combat damage to a player.
+        """
+
+
+        self.combat_damage_manager.deal_combat_damage()
+        self.player.deal_combat_damage.assert_called_with(2)
+
+    def test_blocker(self):
+        """
+        Make sure we can have an attacker and a single blocker.
+        """
+
+        self.blocker.blocking = self.attacker
+        self.combat_damage_manager.deal_combat_damage()
+        self.player.deal_combat_damage.assert_not_called()
+        self.blocker.deal_combat_damage.assert_called_with(2)
+        self.attacker.deal_combat_damage.assert_called_with(2)
 
 
 class PlayerManagerTestCase(unittest.TestCase):
@@ -41,6 +82,7 @@ class PlayerManagerTestCase(unittest.TestCase):
         self.assert_registered(player.hand)
         self.assert_registered(player.library)
         self.assert_registered(player.graveyard)
+        self.assert_registered(player.mana_pool)
 
     def test_create_player_deck(self):
         """
@@ -194,6 +236,31 @@ class TurnManagerTestCase(unittest.TestCase):
         self.turn_manager.turn_based_actions()
         self.player1.draw.assert_called_with()
 
+    def test_deal_combat_damage(self):
+        """
+        Make sure that we deal combat damage during the combat damage phase.
+        """
+
+        self.turn_manager.step = self.turn_manager.COMBAT_DAMAGE_STEP
+        self.turn_manager.phase = self.turn_manager.COMBAT_PHASE
+        self.turn_manager.turn_based_actions()
+        self.game.combat_damage_manager.deal_combat_damage.assert_called_with()
+
+    def test_resolve_stack(self):
+        """
+        Make sure we don't continue if the stack isn't empty.
+        """
+
+        self.game.stack.is_empty.return_value = False
+        self.turn_manager.turn_based_actions = lambda: None
+        self.turn_manager.advance()
+        self.turn_manager.advance()
+        # We should still be in the default step/phase
+        self.assert_turn_state(deckr.game.game.TurnManager.UPKEEP_STEP,
+                               deckr.game.game.TurnManager.BEGINNING_PHASE,
+                               self.player1, self.player1)
+        self.game.stack.resolve.assert_called_with()
+
 
 class MagicTheGatheringTestCase(unittest.TestCase):
     """
@@ -211,6 +278,8 @@ class MagicTheGatheringTestCase(unittest.TestCase):
         Make sure that we properly update the game state proto.
         """
 
+        player1 = mock.MagicMock()
+        player1.game_id = 1
         proto = game_proto.GameState()
         mock_game_object = deckr.game.game_object.GameObject()
         mock_game_object.update_proto = mock.MagicMock()
@@ -218,15 +287,16 @@ class MagicTheGatheringTestCase(unittest.TestCase):
         # Set up the game
         self.game.turn_manager.step = 'untap'
         self.game.turn_manager.phase = 'beginning'
-        self.game.turn_manager.priority_player = mock.MagicMock()
-        self.game.turn_manager.priority_player.game_id = 1
-        self.game.registry.register(mock_game_object)
+        self.game.turn_manager.active_player = player1
+        self.game.turn_manager.priority_player = player1
+        self.game.player_manager.players = [player1]
 
         self.game.update_proto(proto)
         self.assertEqual(proto.current_step, 'untap')
         self.assertEqual(proto.current_phase, 'beginning')
-        self.assertTrue(mock_game_object.update_proto.called)
-        self.assertEqual(len(proto.game_objects), 4)
+        self.assertEqual(len(proto.players), 1)
+
+        self.assertEqual(player1.update_proto.call_count, 1)
 
 
 class GameRegistryTestCase(unittest.TestCase):

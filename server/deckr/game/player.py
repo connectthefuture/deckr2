@@ -4,10 +4,49 @@ This module provides the code for Players.
 
 import deckr.game.game_object
 import deckr.game.zone
-import proto.game_pb2 as proto_lib
 
 
-class Player(deckr.game.game_object.GameObject):
+class ManaPool(deckr.game.game_object.GameObject):
+    """
+    A mana pool provides a clean interface for controlling mana. Each player
+    has exactly one mana pool.
+    """
+
+    # Almost all of these will have 6 arguments. Suppress this.
+    # pylint: disable=too-many-arguments
+    def __init__(self):
+        super(ManaPool, self).__init__()
+        self.white = 0
+        self.blue = 0
+        self.black = 0
+        self.red = 0
+        self.green = 0
+
+    def add(self, white=0, blue=0, black=0, red=0, green=0):
+        """
+        Modify the amount of mana in the pool.
+        """
+
+        self.white += white
+        self.blue += blue
+        self.black += black
+        self.red += red
+        self.green += green
+
+    def update_proto(self, proto):
+        """
+        Update a proto.
+        """
+
+        super(ManaPool, self).update_proto(proto)
+        proto.white = self.white
+        proto.blue = self.blue
+        proto.black = self.black
+        proto.red = self.red
+        proto.green = self.green
+
+
+class Player(deckr.game.game_object.GameObject):  # pylint: disable=too-many-instance-attributes
     """
     A player has a number of attributes associated with them (life, etc.) and also is able to
     perform actions.
@@ -19,6 +58,7 @@ class Player(deckr.game.game_object.GameObject):
         self.life = 20
         self.poison_counters = 0
 
+        self.mana_pool = ManaPool()
         self.hand = deckr.game.zone.Zone('hand', self)
         self.graveyard = deckr.game.zone.Zone('graveyard', self)
         self.library = deckr.game.zone.Zone('library', self)
@@ -37,6 +77,13 @@ class Player(deckr.game.game_object.GameObject):
         else:
             self.hand.append(self.library.pop())
 
+    def deal_combat_damage(self, amount):
+        """
+        Deal combat damage to the player.
+        """
+
+        self.life -= amount
+
     def start(self):
         """
         Start the game. Draw the initial hand of 7 cards.
@@ -51,30 +98,41 @@ class Player(deckr.game.game_object.GameObject):
         if it's a land, or put it onto the stack.
         """
 
-        pass
+        assert card in self.hand
+        # Lands don't use the stack
+        if card.is_land():
+            self.hand.remove(card)
+            self._game.battlefield.append(card)
+        else:  # Otherwise we put it on the stack
+            self.hand.remove(card)
+            self._game.stack.append(card)
 
-    def activate_ability(self, card, ability_index):
+        card.controller = self
+
+    def activate_ability(self, card, ability_index):  # pylint: disable=no-self-use
         """
         Activate an ability. Resolve it if it's a mana ability, otherwise, put it on the stack.
         """
 
-        pass
+        card.activate_ability(ability_index)
 
-    def declare_attackers(self, attackers):
+    def declare_attackers(self, attackers):  # pylint: disable=no-self-use
         """
         Declare attackers. All cards will be updated to indicate they are attacking.
         """
 
-        pass
+        for attacker in attackers:
+            attacker.attacking = attackers[attacker]
 
     def declare_blockers(self, blockers):
         """
         Declare blockers. All cards will be updated to indicate they are defending.
         """
 
-        pass
+        for blocker in blockers:
+            blocker.blocking = blockers[blocker]
 
-    def deal_combat_damage(self, comabt_damage):
+    def assign_combat_damage(self, comabt_damage):
         """
         Assign combat damage. Most of the time this should happen automatically, but there
         are some cases when you need to manually assign combat damage.
@@ -95,9 +153,9 @@ class Player(deckr.game.game_object.GameObject):
         """
 
         super(Player, self).update_proto(proto)
-        proto.game_object_type = proto_lib.GameObject.PLAYER
-        proto.player.graveyard = self.graveyard.game_id
-        proto.player.library = self.library.game_id
-        proto.player.hand = self.hand.game_id
-        proto.player.life = self.life
-        proto.player.lost = self.lost
+        self.graveyard.update_proto(proto.graveyard)
+        self.library.update_proto(proto.library)
+        self.hand.update_proto(proto.hand)
+        self.mana_pool.update_proto(proto.mana_pool)
+        proto.life = self.life
+        proto.lost = self.lost

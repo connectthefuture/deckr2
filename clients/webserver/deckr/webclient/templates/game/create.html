@@ -1,0 +1,23 @@
+{% extends 'webclient/base.html' %}
+{% block morejs %}
+  {% load staticfiles %}
+  <script type="text/javascript" src="{% static 'js/sockets.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/proto.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/create_game.js' %}"></script>
+{% endblock %}
+{% block body %}
+
+<div class="wrapper">
+  <h1>Create Game</h1>
+
+  {{ form.errors }}
+
+  <form id="create-game-room" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+  </form>
+  <p><button class="btn create-game">Create Game</button></p>
+
+</div>
+
+{% endblock %}

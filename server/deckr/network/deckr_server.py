@@ -26,6 +26,7 @@ class DeckrServer(deckr.core.service.Service):
         # Load values from config
         self._websockets = config.get('websockets', False)
         self._port = config.get('port', 8080)
+        self._base64 = config.get('base64', False)
 
     def set_game_master(self, game_master):
         """
@@ -43,7 +44,10 @@ class DeckrServer(deckr.core.service.Service):
         Start the server. This will be a blocking function call.
         """
 
-        self._factory = DeckrFactory(self._router)
+        if self._base64:
+            LOGGER.info("Starting with base64 enconding/decoding")
+
+        self._factory = DeckrFactory(self._router, self._base64)
         if self._websockets:
             LOGGER.info("Starting with websocket support")
             self._factory = txsockjs.factory.SockJSFactory(self._factory)
@@ -69,12 +73,13 @@ class DeckrFactory(twisted.internet.protocol.Factory):
     A very simple factory for building deckr connetions.
     """
 
-    def __init__(self, router):
+    def __init__(self, router, use_base64=False):
         self._router = router
+        self._base64 = use_base64
 
     def buildProtocol(self, _):
         """
         Build the protocol and pass along the router.
         """
 
-        return deckr.network.connection.Connection(self._router)
+        return deckr.network.connection.Connection(self._router, self._base64)

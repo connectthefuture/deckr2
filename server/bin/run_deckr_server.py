@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+"""
+A very simple script to run the deckr server.
+"""
 
 import argparse
 import logging
@@ -24,6 +27,7 @@ def parse_arguments():
 
     parser = argparse.ArgumentParser(description='Run the deckr server.')
     parser.add_argument('--websockets', action='store_true', help='Run with websocket support')
+    parser.add_argument('--base64', action='store_true', help='Run with base64 protobuf encoding/decoding')
     return parser.parse_args()
 
 
@@ -39,10 +43,9 @@ def main():
     starter = deckr.core.service.ServiceStarter(False)
     starter.add_service(
         yaml.load(open('config/services/deckr_server_service.yml')),
-        {'websockets': args.websockets})
+        {'websockets': args.websockets, 'base64': args.base64})
     starter.add_service(
-        yaml.load(open('config/services/card_library_service.yml')),
-        {'library': SIMPLE_CARD_LIBRARY})
+        yaml.load(open('config/services/card_library_service.yml')), {'load_from': 'config/cards.json'})
     starter.add_service(
         yaml.load(open('config/services/action_validator_service.yml')), {})
     starter.add_service(
