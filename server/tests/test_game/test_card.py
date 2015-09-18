@@ -8,6 +8,8 @@ import deckr.game.card
 import mock
 import tests.utils
 
+import proto.game_pb2 as proto_lib
+
 
 class AbilityTestCase(unittest.TestCase):
     """
@@ -40,6 +42,9 @@ class CardTestCase(unittest.TestCase):
 
     def setUp(self):
         self.card = deckr.game.card.Card()
+        self.card.game_id = 0
+        self.card.name = "Test Card"
+        self.card.tapped = False
 
     def test_activate_ability(self):
         """
@@ -54,6 +59,16 @@ class CardTestCase(unittest.TestCase):
         self.card.activate_ability(1)
         ability2.create_instance.assert_called_with()
         self.assertRaises(IndexError, self.card.activate_ability, 2)
+
+    def test_update_proto(self):
+        """
+        Make sure we can properly update a protobuf.
+        """
+
+        proto = proto_lib.Card()
+        self.card.update_proto(proto)
+        self.assertEqual(proto.name, self.card.name)
+        self.assertEqual(proto.tapped, self.card.tapped)
 
 
 class CardUtilityFunctionsTestCase(unittest.TestCase):

@@ -181,6 +181,7 @@ class Card(deckr.game.game_object.GameObject):  # pylint: disable=too-many-insta
 
         super(Card, self).update_proto(proto)
         proto.name = self.name
+        proto.tapped = self.tapped
 
     def activate_ability(self, index):
         """
