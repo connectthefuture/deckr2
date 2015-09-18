@@ -5,9 +5,6 @@ functionality.
 
 import random
 
-import birthing_pod.client
-
-
 class Match(object):
     """
     This represents a match between two decks.
@@ -16,15 +13,6 @@ class Match(object):
     def __init__(self, first_deck, second_deck):
         self.first_deck = first_deck
         self.second_deck = second_deck
-        self.game_id = None
-
-    def initialize(self, client):
-        """
-        Create an actual game for this match.
-        """
-
-        response = client.send_and_wait(birthing_pod.client.message_create())
-        self.game_id = response.create_response.game_id
 
 class DeckIndividual(object):
     """
@@ -91,11 +79,8 @@ class BirthingPodMaster(object):
 
     def __init__(self):
         self.genetic_controller = GeneticController()
-
-        self._client = birthing_pod.client.Client()
         self._matches = []
         self._job_id = 0
-        self._next_match = None
         # Map from jobs to their decks
         self._current_jobs = {}
 
@@ -104,7 +89,6 @@ class BirthingPodMaster(object):
         Set up the birthing pod master.
         """
 
-        self._client.initialize()
         self.genetic_controller.initialize()
         self._matches = self.genetic_controller.get_matches()
 
@@ -112,6 +96,13 @@ class BirthingPodMaster(object):
         """
         Get the next job. This will return a dictionary of the important
         information for the next game to play.
+
+        Returns
+            {
+                'deck1': First deck, should go first in the game
+                'deck2': Second deck, should go second.
+                'job_id': Unique id for this job
+            }
         """
 
         if self._matches == []: # We need some more matches. Evolve!
@@ -120,27 +111,17 @@ class BirthingPodMaster(object):
             self._matches = self.genetic_controller.get_matches()
 
 
-        if self._next_match is None:
-            self._next_match = self._matches.pop()
-            self._next_match.initialize(self._client)
-            deck = self._next_match.first_deck
-            game_id = self._next_match.game_id
-            start = False
-        else:
-            deck = self._next_match.second_deck
-            game_id = self._next_match.game_id
-            start = True
-            self._next_match = None
-
+        match = self._matches.pop()
+        deck1 = match.first_deck
+        deck2 = match.second_deck
         job_id = self._job_id
         self._job_id += 1
-        self._current_jobs[job_id] = deck
+        self._current_jobs[job_id] = match
 
         return {
-            'deck': deck.deck,
-            'job_id': job_id,
-            'game_id': game_id,
-            'start': start
+            'deck1': deck1.deck,
+            'deck2': deck2.deck,
+            'job_id': job_id
         }
 
 
@@ -148,12 +129,20 @@ class BirthingPodMaster(object):
     def report(self, stats):
         """
         This takes in a dictionary of stats and updates the proper deck object.
+
+        Format is
+        {
+            'job_id': JOB_ID,
+            'won': 1 if deck1 won, 2 if deck2 won.
+        }
         """
 
         job_id = stats['job_id']
-        deck = self._current_jobs[job_id]
-        if stats['won']:
-            deck.win_count += 1
+        match = self._current_jobs[job_id]
+        if stats['won'] == 1:
+            match.deck1.win_count += 1
+            match.deck2.lose_count += 1
         else:
-            deck.lose_count += 1
+            match.deck2.win_count += 1
+            match.deck1.lose_count += 1
         del self._current_jobs[job_id]
