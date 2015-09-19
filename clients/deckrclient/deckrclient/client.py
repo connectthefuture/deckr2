@@ -76,6 +76,13 @@ class GameState(object):
 
         return [x for x in self.players if x.game_id == player_id][0]
 
+    def is_over(self):
+        """
+        Check if the game is over (only one player is left who hasn't lost).
+        """
+
+        return len([x for x in self.players if not x.lost]) <= 1
+
 
 class DeckrClient(object):  # pylint: disable=too-many-instance-attributes
     """

@@ -5,6 +5,7 @@ functionality.
 
 import random
 
+
 class Match(object):
     """
     This represents a match between two decks.
@@ -62,7 +63,7 @@ class GeneticController(object):
 
         print "EVOLVE!"
         scores = [(x.win_count - x.lose_count, x.deck) for x in self.population]
-        scores.sort(reverse=True)
+        scores.sort(reverse=True, key=lambda x: x[0])
         # Take the top third and replicate
         new_population = []
         for i in range(len(scores) / 3):
@@ -105,11 +106,8 @@ class BirthingPodMaster(object):
             }
         """
 
-        if self._matches == []: # We need some more matches. Evolve!
-            # (It's possible we don't have all of the data. We'll have to live)
-            self.genetic_controller.evolve()
-            self._matches = self.genetic_controller.get_matches()
-
+        if self._matches == []:
+            return {}
 
         match = self._matches.pop()
         deck1 = match.first_deck
@@ -140,9 +138,13 @@ class BirthingPodMaster(object):
         job_id = stats['job_id']
         match = self._current_jobs[job_id]
         if stats['won'] == 1:
-            match.deck1.win_count += 1
-            match.deck2.lose_count += 1
+            match.first_deck.win_count += 1
+            match.second_deck.lose_count += 1
         else:
-            match.deck2.win_count += 1
-            match.deck1.lose_count += 1
+            match.second_deck.win_count += 1
+            match.first_deck.lose_count += 1
         del self._current_jobs[job_id]
+
+        if not self._current_jobs and not self._matches:
+            self.genetic_controller.evolve()
+            self._matches = self.genetic_controller.get_matches()

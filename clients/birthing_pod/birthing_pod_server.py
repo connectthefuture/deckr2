@@ -4,7 +4,6 @@ Run flask ontop of the birthing pod master.
 """
 
 import json
-import random
 
 import birthing_pod.master
 import flask
