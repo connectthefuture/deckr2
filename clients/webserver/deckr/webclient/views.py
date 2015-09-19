@@ -79,5 +79,5 @@ def proto(request, base_file_name):
     Returns appropriate .proto file.
     """
 
-    proto_file = open(settings.PROTO_PATH + base_file_name + '.proto').read()
+    proto_file = open(settings.PROTO_PATH + "/" + base_file_name + '.proto').read()
     return HttpResponse(proto_file, content_type='application/x-protobuf')

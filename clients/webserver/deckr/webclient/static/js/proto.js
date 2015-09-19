@@ -1,6 +1,6 @@
 var ProtoBuf = dcodeIO.ProtoBuf;
-var ClientMessageBuilder = ProtoBuf.loadProtoFile("../proto/client_message");
-var ServerResponseBuilder = ProtoBuf.loadProtoFile("../proto/server_response");
+var ClientMessageBuilder = ProtoBuf.loadProtoFile("../proto/client_message.proto");
+var ServerResponseBuilder = ProtoBuf.loadProtoFile("../proto/server_response.proto");
 // ClientMessage schemas
 var ClientMessage = ClientMessageBuilder.build("ClientMessage");
 var CreateMessage = ClientMessageBuilder.build("CreateMessage");
