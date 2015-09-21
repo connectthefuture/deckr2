@@ -286,6 +286,52 @@ class TurnManagerTestCase(unittest.TestCase):
         self.turn_manager.turn_based_actions()
         card.untap.assert_called_with()
 
+    def test_check_state_based_actions(self):
+        """
+        Make sure we check state based actions whenever a player gets priority.
+        """
+
+        self.turn_manager.state_based_actions = mock.MagicMock()
+        self.turn_manager.advance()
+        self.turn_manager.state_based_actions.assert_called_with()
+
+
+class StateBasedActionManagerTestCase(unittest.TestCase):
+    """
+    Test the state based action manager.
+    """
+
+    def setUp(self):
+        self.game = mock.MagicMock()
+        self.player = mock.MagicMock()
+        self.game.player_manager.players = [self.player]
+        self.state_based_action_manager = deckr.game.game.StateBasedActionManager(self.game)
+
+    def test_lose_0_life(self):
+        """
+        Make sure we mark a player as having lost if they have 0 or less life.
+        """
+
+        self.player.life = 0
+        self.player.lost = False
+        self.state_based_action_manager.check()
+        self.assertTrue(self.player.lost)
+
+    def test_creature_to_graveyard(self):
+        """
+        Make sure that leathal combat damage actually kills a creature.
+        """
+
+        creature = mock.MagicMock()
+        self.game.battlefield = [creature]
+        creature.toughness = 1
+        creature.damage = 1
+        creature.is_creature.return_value = True
+        creature.owner = self.player
+        self.state_based_action_manager.check()
+        self.assertNotIn(creature, self.game.battlefield)
+        self.player.graveyard.append.assert_called_with(creature)
+
 
 class MagicTheGatheringTestCase(unittest.TestCase):
     """
