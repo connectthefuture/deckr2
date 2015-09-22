@@ -1,0 +1,136 @@
+@import 'compass';
+@import 'compass/reset';
+@import 'compass/css3';
+
+$primary-color: rgb(73, 115, 208);
+$link-color: lighten($primary-color, 5%);
+$link-hover-color: darken($primary-color, 25%);
+
+$h1-size: 36px;
+$h2-size: 24px;
+$h3-size: 18px;
+$p-size: 16px;
+$sans-serif: 'Helvetica', 'Arial';
+
+body {
+  font-family: $sans-serif;
+  font-size: $p-size;
+  height: 100%;
+}
+h1, h2, h3, h4, h5, a, p {
+  margin: 3px 0;
+}
+h1 { font-size: $h1-size; }
+h2 { font-size: $h2-size; }
+h3 {
+  font-size: $h3-size;
+  font-weight: bold;
+}
+a {
+  color: $link-color;
+  text-decoration: none;
+  &:hover {
+    color: $link-hover-color;
+  }
+}
+
+#header {
+  overflow: hidden;
+  padding: 20px;
+  background-color: white;
+  border-bottom: 1px solid #ddd;
+}
+
+#logo {
+  float: left;
+  font-size: $h1-size;
+  margin-right: 20px;
+}
+
+#top-nav {
+  .btn {
+    display: inline-block;
+  }
+}
+
+.wrapper {
+  padding: 20px;
+}
+
+.btn {
+  padding: 10px;
+  background-color: #eee;
+  &:hover {
+    background-color: #ddd;
+  }
+}
+
+#room {
+  min-height: 100%;
+  position: relative;
+}
+
+.room-header {
+  padding: 10px 20px;
+  border-bottom: 1px solid #ddd;
+  .start-game,
+  .n-players,
+  .game-info,
+  .game-state {
+    display: inline-block;
+    margin-right: 20px;
+  }
+}
+
+.room-center {
+  height: 250px;
+  padding-bottom: 100px;
+}
+
+.player-info {
+  float: left;
+  padding: 20px;
+  border-right: 1px solid #ccc;
+  &:last-child {
+    margin-right: 20px;
+  }
+}
+
+.hand {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 60px;
+  padding: 20px;
+  border-top: 1px solid #ccc;
+}
+
+.battlefield {
+  padding: 20px;
+}
+
+.card {
+  float: left;
+  position: relative;
+  margin-right: 10px;
+  padding: 5px;
+  border: 1px solid #eee;
+  &:hover {
+    cursor: pointer;
+    border-color: black;
+  }
+
+  .card-actions {
+    position: absolute;
+    bottom: 35px;
+    left: 0px;
+    padding: 5px;
+    font-size: 12px;
+    border: 1px solid #ccc;
+    background-color: white;
+
+    &:hover {
+      background-color: #eee;
+    }
+  }
+}

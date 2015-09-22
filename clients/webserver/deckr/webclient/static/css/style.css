@@ -1,0 +1,217 @@
+/* line 5, ../../../../../../../../../../../Library/Ruby/Gems/2.0.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font: inherit;
+  font-size: 100%;
+  vertical-align: baseline;
+}
+
+/* line 22, ../../../../../../../../../../../Library/Ruby/Gems/2.0.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
+html {
+  line-height: 1;
+}
+
+/* line 24, ../../../../../../../../../../../Library/Ruby/Gems/2.0.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
+ol, ul {
+  list-style: none;
+}
+
+/* line 26, ../../../../../../../../../../../Library/Ruby/Gems/2.0.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* line 28, ../../../../../../../../../../../Library/Ruby/Gems/2.0.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
+caption, th, td {
+  text-align: left;
+  font-weight: normal;
+  vertical-align: middle;
+}
+
+/* line 30, ../../../../../../../../../../../Library/Ruby/Gems/2.0.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
+q, blockquote {
+  quotes: none;
+}
+/* line 103, ../../../../../../../../../../../Library/Ruby/Gems/2.0.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
+q:before, q:after, blockquote:before, blockquote:after {
+  content: "";
+  content: none;
+}
+
+/* line 32, ../../../../../../../../../../../Library/Ruby/Gems/2.0.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
+a img {
+  border: none;
+}
+
+/* line 116, ../../../../../../../../../../../Library/Ruby/Gems/2.0.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
+article, aside, details, figcaption, figure, footer, header, hgroup, main, menu, nav, section, summary {
+  display: block;
+}
+
+/* line 15, ../scss/style.scss */
+body {
+  font-family: "Helvetica", "Arial";
+  font-size: 16px;
+  height: 100%;
+}
+
+/* line 20, ../scss/style.scss */
+h1, h2, h3, h4, h5, a, p {
+  margin: 3px 0;
+}
+
+/* line 23, ../scss/style.scss */
+h1 {
+  font-size: 36px;
+}
+
+/* line 24, ../scss/style.scss */
+h2 {
+  font-size: 24px;
+}
+
+/* line 25, ../scss/style.scss */
+h3 {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* line 29, ../scss/style.scss */
+a {
+  color: #5d83d5;
+  text-decoration: none;
+}
+/* line 32, ../scss/style.scss */
+a:hover {
+  color: #203c7a;
+}
+
+/* line 37, ../scss/style.scss */
+#header {
+  overflow: hidden;
+  padding: 20px;
+  background-color: white;
+  border-bottom: 1px solid #ddd;
+}
+
+/* line 44, ../scss/style.scss */
+#logo {
+  float: left;
+  font-size: 36px;
+  margin-right: 20px;
+}
+
+/* line 51, ../scss/style.scss */
+#top-nav .btn {
+  display: inline-block;
+}
+
+/* line 56, ../scss/style.scss */
+.wrapper {
+  padding: 20px;
+}
+
+/* line 60, ../scss/style.scss */
+.btn {
+  padding: 10px;
+  background-color: #eee;
+}
+/* line 63, ../scss/style.scss */
+.btn:hover {
+  background-color: #ddd;
+}
+
+/* line 68, ../scss/style.scss */
+#room {
+  min-height: 100%;
+  position: relative;
+}
+
+/* line 73, ../scss/style.scss */
+.room-header {
+  padding: 10px 20px;
+  border-bottom: 1px solid #ddd;
+}
+/* line 76, ../scss/style.scss */
+.room-header .start-game,
+.room-header .n-players,
+.room-header .game-info,
+.room-header .game-state {
+  display: inline-block;
+  margin-right: 20px;
+}
+
+/* line 85, ../scss/style.scss */
+.room-center {
+  height: 250px;
+  padding-bottom: 100px;
+}
+
+/* line 90, ../scss/style.scss */
+.player-info {
+  float: left;
+  padding: 20px;
+  border-right: 1px solid #ccc;
+}
+/* line 94, ../scss/style.scss */
+.player-info:last-child {
+  margin-right: 20px;
+}
+
+/* line 99, ../scss/style.scss */
+.hand {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 60px;
+  padding: 20px;
+  border-top: 1px solid #ccc;
+}
+
+/* line 108, ../scss/style.scss */
+.battlefield {
+  padding: 20px;
+}
+
+/* line 112, ../scss/style.scss */
+.card {
+  float: left;
+  position: relative;
+  margin-right: 10px;
+  padding: 5px;
+  border: 1px solid #eee;
+}
+/* line 118, ../scss/style.scss */
+.card:hover {
+  cursor: pointer;
+  border-color: black;
+}
+/* line 123, ../scss/style.scss */
+.card .card-actions {
+  position: absolute;
+  bottom: 35px;
+  left: 0px;
+  padding: 5px;
+  font-size: 12px;
+  border: 1px solid #ccc;
+  background-color: white;
+}
+/* line 132, ../scss/style.scss */
+.card .card-actions:hover {
+  background-color: #eee;
+}

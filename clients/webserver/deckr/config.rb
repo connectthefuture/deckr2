@@ -1,0 +1,9 @@
+preferred_syntax = :scss
+http_path = '/'
+css_dir = 'webclient/static/css'
+sass_dir = 'webclient/static/scss'
+images_dir = 'webclient/static/images'
+javascripts_dir = 'webclient/static/js'
+relative_assets = true
+line_comments = true
+# output_style = :compressed
