@@ -10,9 +10,9 @@ SOCKET_STATES = {
 };
 
 function runOnceSocketOpens (callback) {
-  if (getSocketState() === SOCKET_STATES.OPEN) {
+  if (getSocketState() === SOCKET_STATES.OPEN)
     return callback();
-  }
+
   var return_value;
   setTimeout(function () {
     if (getSocketState() === SOCKET_STATES.OPEN) {
@@ -50,8 +50,7 @@ SERVER_RESPONSE_TYPES = [
   'JOIN',
   'LEAVE',
   'ERROR',
-  'GAME_STATE',
-  'GAME_UPDATE'
+  'GAME_STATE'
 ];
 
 function isResponseType(response, type) {
@@ -61,11 +60,8 @@ function isResponseType(response, type) {
 function handleServerResponse (message) {
   SERVER_RESPONSE_DISPATCHER = {
     'CREATE': _handleCreate,
-    'JOIN': _handleJoin,
     'LEAVE': _handleLeave,
-    'ERROR': _handleError,
-    'GAME_STATE': _handleGameState,
-    'GAME_UPDATE': _handleGameUpdate
+    'ERROR': _handleError
   };
   var response_type = SERVER_RESPONSE_TYPES[message.response_type];
   SERVER_RESPONSE_DISPATCHER[response_type](message);
@@ -77,12 +73,6 @@ function _handleCreate (message) {
   handleCreate(message); // Defined in create_game.js
 }
 
-function _handleJoin (message) {
-  console.log("Handling JOIN response");
-  var message = message.join_response;
-  return;
-}
-
 function _handleLeave (message) {
   console.log("Handling LEAVE response");
   return;
@@ -91,19 +81,6 @@ function _handleLeave (message) {
 function _handleError (message) {
   console.log("Handling ERROR response");
   var message = message.error_response;
-  return;
-}
-
-function _handleGameState (message) {
-  console.log("Handling GAME STATE response");
-  var message = message.game_state_response;
-  handleGameState(message); // Defined in game.js
-  return;
-}
-
-function _handleGameUpdate (message) {
-  console.log("Handling GAME UPDATE response");
-  var message = message.game_update_response;
   return;
 }
 

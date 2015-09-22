@@ -1,29 +1,26 @@
 {% extends 'webclient/base.html' %}
 {% block morejs %}
   {% load staticfiles %}
-  <script type="text/javascript" src="{% static 'js/sockets.js' %}"></script>
-  <script type="text/javascript" src="{% static 'js/proto.js' %}"></script>
-  <script type="text/javascript" src="{% static 'js/game.js' %}"></script>
   <script type="text/javascript">
     var game_id = parseInt('{{ game.game_id }}');
     var is_player = Boolean('{{ is_player }}');
   </script>
+  <script type="text/javascript" src="{% static 'js/sockets.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/proto.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/game.js' %}"></script>
+  <script type="text/jsx" src="{% static 'js/Room.jsx' %}"></script>
 {% endblock %}
 {% block body %}
-
-<div class="wrapper">
-  <h1>Game (id: {{ game.game_id }}, name: {{ game.name }})</h1>
-
-  <div class="player-info">
-    <h2>Player: {{ nick }}</h2>
-    <p><span class="your-turn"></span></p>
-    <p>Cards in deck: <span class="cards-in-deck"></span></p>
-  </div>
-
-  <div class="game-actions">
-    <button class="start-game">Start Game</button>
-    <button class="pass-priority">Pass Priority</button>
-  </div>
-</div>
+  <div id="room"></div>
+  <script type="text/jsx">
+    React.render(
+      <Room
+        gameId='{{ game.game_id }}'
+        gameName='{{ game.name }}'
+        nick='{{ nick }}'
+      />,
+      document.getElementById('room')
+    );
+  </script>
 
 {% endblock %}
