@@ -1,6 +1,9 @@
 // Next Field: 2
 message PlayAction {
     required int32 card = 1;
+     // If it's ambigious how you would pay the mana cost you should include
+     // a string specification here. If you don't you'll get an error.
+    optional string mana_cost = 2;
 }
 
 // Next Field: 3

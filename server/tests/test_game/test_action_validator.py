@@ -158,3 +158,22 @@ class ActionValidatorTestCase(unittest.TestCase):
 
         # Finally make sure that we allow if everything lines up.
         self.action_validator.validate(self.game, self.player, 'declare_blockers', blockers)
+
+    def test_ambigious_mana_cost(self):
+        """
+        Make sure we check for ambigious mana costs.
+        """
+
+        card = mock.MagicMock()
+        card.is_land.return_value = False
+        self.game.turn_manager.phase = 'precombat main'
+        self.game.turn_manager.step = 'precombat main'
+        self.game.turn_manager.priority_player = self.player
+        self.game.turn_manager.active_player = self.player
+
+        self.player.mana_pool.can_pay.return_value = True
+        self.player.mana_pool.can_pay_exact.return_value = False
+
+        self.assertRaises(deckr.game.action_validator.InvalidActionException,
+                          self.action_validator.validate, self.game,
+                          self.player, 'play', card)

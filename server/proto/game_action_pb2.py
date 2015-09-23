@@ -13,7 +13,7 @@ from google.protobuf import descriptor_pb2
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='game_action.proto',
   package='',
-  serialized_pb='\n\x11game_action.proto\"\x1a\n\nPlayAction\x12\x0c\n\x04\x63\x61rd\x18\x01 \x02(\x05\"-\n\x0e\x41\x63tivateAction\x12\x0c\n\x04\x63\x61rd\x18\x01 \x02(\x05\x12\r\n\x05index\x18\x02 \x02(\x05\"\x89\x01\n\x16\x44\x65\x63lareAttackersAction\x12:\n\tattackers\x18\x01 \x03(\x0b\x32\'.DeclareAttackersAction.AttackerMapping\x1a\x33\n\x0f\x41ttackerMapping\x12\x10\n\x08\x61ttacker\x18\x01 \x02(\x05\x12\x0e\n\x06target\x18\x02 \x02(\x05\"\x85\x01\n\x15\x44\x65\x63lareBlockersAction\x12\x37\n\x08\x62lockers\x18\x01 \x03(\x0b\x32%.DeclareBlockersAction.BlockerMapping\x1a\x33\n\x0e\x42lockerMapping\x12\x0f\n\x07\x62locker\x18\x01 \x02(\x05\x12\x10\n\x08\x62locking\x18\x02 \x02(\x05')
+  serialized_pb='\n\x11game_action.proto\"-\n\nPlayAction\x12\x0c\n\x04\x63\x61rd\x18\x01 \x02(\x05\x12\x11\n\tmana_cost\x18\x02 \x01(\t\"-\n\x0e\x41\x63tivateAction\x12\x0c\n\x04\x63\x61rd\x18\x01 \x02(\x05\x12\r\n\x05index\x18\x02 \x02(\x05\"\x89\x01\n\x16\x44\x65\x63lareAttackersAction\x12:\n\tattackers\x18\x01 \x03(\x0b\x32\'.DeclareAttackersAction.AttackerMapping\x1a\x33\n\x0f\x41ttackerMapping\x12\x10\n\x08\x61ttacker\x18\x01 \x02(\x05\x12\x0e\n\x06target\x18\x02 \x02(\x05\"\x85\x01\n\x15\x44\x65\x63lareBlockersAction\x12\x37\n\x08\x62lockers\x18\x01 \x03(\x0b\x32%.DeclareBlockersAction.BlockerMapping\x1a\x33\n\x0e\x42lockerMapping\x12\x0f\n\x07\x62locker\x18\x01 \x02(\x05\x12\x10\n\x08\x62locking\x18\x02 \x02(\x05')
 
 
 
@@ -32,6 +32,13 @@ _PLAYACTION = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
+    _descriptor.FieldDescriptor(
+      name='mana_cost', full_name='PlayAction.mana_cost', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=unicode("", "utf-8"),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
   ],
   extensions=[
   ],
@@ -42,7 +49,7 @@ _PLAYACTION = _descriptor.Descriptor(
   is_extendable=False,
   extension_ranges=[],
   serialized_start=21,
-  serialized_end=47,
+  serialized_end=66,
 )
 
 
@@ -76,8 +83,8 @@ _ACTIVATEACTION = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=49,
-  serialized_end=94,
+  serialized_start=68,
+  serialized_end=113,
 )
 
 
@@ -111,8 +118,8 @@ _DECLAREATTACKERSACTION_ATTACKERMAPPING = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=183,
-  serialized_end=234,
+  serialized_start=202,
+  serialized_end=253,
 )
 
 _DECLAREATTACKERSACTION = _descriptor.Descriptor(
@@ -138,8 +145,8 @@ _DECLAREATTACKERSACTION = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=97,
-  serialized_end=234,
+  serialized_start=116,
+  serialized_end=253,
 )
 
 
@@ -173,8 +180,8 @@ _DECLAREBLOCKERSACTION_BLOCKERMAPPING = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=319,
-  serialized_end=370,
+  serialized_start=338,
+  serialized_end=389,
 )
 
 _DECLAREBLOCKERSACTION = _descriptor.Descriptor(
@@ -200,8 +207,8 @@ _DECLAREBLOCKERSACTION = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=237,
-  serialized_end=370,
+  serialized_start=256,
+  serialized_end=389,
 )
 
 _DECLAREATTACKERSACTION_ATTACKERMAPPING.containing_type = _DECLAREATTACKERSACTION;

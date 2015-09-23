@@ -69,7 +69,7 @@ class ActionValidator(deckr.core.service.Service):
 
         has_priority(game, player)
 
-    def _validate_play(self, game, player, card):
+    def _validate_play(self, game, player, card, mana_cost=None):
         """
         To play a card the following conditions need to be met:
 
@@ -88,6 +88,7 @@ class ActionValidator(deckr.core.service.Service):
             land_limit(player)
         else:
             can_pay_mana_cost(player, card)
+            ambigious_mana_cost(player, card, mana_cost)
 
     def _validate_activate(self, game, player, card, index):
         """
@@ -137,9 +138,7 @@ def check(error_string):
             result = func(*args, **kwargs)
             if not result:
                 raise InvalidActionException(error_string)
-
         return inner
-
     return wrapper
 
 
@@ -179,6 +178,16 @@ def can_pay_mana_cost(player, card):
     """
 
     return player.mana_pool.can_pay(card.mana_cost)
+
+@check("You need to specify how you want to pay the mana cost; it's ambigious")
+def ambigious_mana_cost(player, card, mana_cost):
+    """
+    Under the assumption that we can pay, see if we can pay exactly or if
+    it's ambigious. If it's ambigious look at the mana_cost passed in and make
+    sure that it's equivalent to the mana cost on the card.
+    """
+
+    return player.mana_pool.can_pay_exact(card.mana_cost)
 
 
 @check("You can't pay the cost for that ability")
