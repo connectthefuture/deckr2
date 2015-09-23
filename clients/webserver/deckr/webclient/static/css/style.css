@@ -197,11 +197,11 @@ a:hover {
   border: 1px solid #eee;
 }
 /* line 118, ../scss/style.scss */
-.card:hover {
+.card.show-actions, .card:hover {
   cursor: pointer;
   border-color: black;
 }
-/* line 123, ../scss/style.scss */
+/* line 124, ../scss/style.scss */
 .card .card-actions {
   position: absolute;
   bottom: 35px;
@@ -211,7 +211,7 @@ a:hover {
   border: 1px solid #ccc;
   background-color: white;
 }
-/* line 132, ../scss/style.scss */
+/* line 133, ../scss/style.scss */
 .card .card-actions:hover {
   background-color: #eee;
 }

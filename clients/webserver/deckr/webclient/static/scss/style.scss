@@ -115,6 +115,7 @@ a {
   margin-right: 10px;
   padding: 5px;
   border: 1px solid #eee;
+  &.show-actions,
   &:hover {
     cursor: pointer;
     border-color: black;
