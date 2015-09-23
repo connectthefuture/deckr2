@@ -216,6 +216,8 @@ class SinglePlayerTestCase(unittest.TestCase):
         self.assertEqual(len(self.client.game_state.player.hand), 6)
         self.assertEqual(len(self.client.game_state.battlefield), 1)
         self.assertEqual(self.client.game_state.battlefield[0].game_id, card.game_id)
+        self.assertEqual(self.client.game_state.battlefield[0].controller,
+                         self.client.player_id)
 
     def test_activate_land(self):
         """

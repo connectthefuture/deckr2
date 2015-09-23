@@ -37,7 +37,6 @@ class CombatDamageManagerTestCase(unittest.TestCase):
         Make sure that we can have a single attacker deal combat damage to a player.
         """
 
-
         self.combat_damage_manager.deal_combat_damage()
         self.player.deal_combat_damage.assert_called_with(2)
 

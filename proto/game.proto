@@ -40,9 +40,10 @@ message Card {
     optional string flavor_text = 9;
     optional int32 power = 10;
     optional int32 toughness = 11;
+    optional int32 controller = 12; // Game id
 
     // Anything not conveyed above can be stuffed in meta (like artwork)
-    repeated KeyValuePair meta = 12;
+    repeated KeyValuePair meta = 13;
 }
 
 message ManaPool {

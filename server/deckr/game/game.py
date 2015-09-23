@@ -38,6 +38,7 @@ class CombatDamageManager(object):
             blocker.deal_combat_damage(blocker.blocking.power)
             blocker.blocking.deal_combat_damage(blocker.power)
 
+
 class GameRegistry(object):
     """
     The game registry is responsible for handing out game_ids.

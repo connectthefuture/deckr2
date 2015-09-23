@@ -33,6 +33,7 @@ class Card(object):
     def __init__(self, proto):
         self.game_id = proto.game_id
         self.name = proto.name
+        self.controller = proto.controller
 
 
 class Player(object):
