@@ -1,8 +1,5 @@
-// GLOBALS
-var player_id;
-var active_player;
-var priority_player;
-var started = false;
+var React = require('react');
+var Room = require('./Room');
 
 function _60Forests () {
   var deck = [];
@@ -38,8 +35,13 @@ function sendStartGameMessage () {
   sendMessage(start_msg);
 }
 
+// MAIN
 $(document).ready(function () {
-  sendJoinGameMessage();
   $(document).on('click', ".start-game", sendStartGameMessage);
-  // $(document).on('click', ".pass-priority", sendPassPriorityMessage);
+
+  sendJoinGameMessage();
+  React.render(
+    <Room gameId={game_id} gameName={game_name} nick={nick} />,
+    document.getElementById('room')
+  );
 });

@@ -1,66 +1,11 @@
-function sendPlayMessage (card_id) {
-  var play_card_msg = new ClientMessage({
-    'message_type': 'ACTION',
-    'action_message': new ActionMessage({
-      'action_type': 'PLAY',
-      'play': new PlayAction({
-        'card': card_id
-      })
-    })
-  });
+var React = require('react');
+var RoomHeader = require('./RoomHeader');
+var PlayerInfoList = require('./PlayerInfoList');
+var Battlefield = require('./Battlefield');
+var Hand = require('./Hand');
 
-  sendMessage(play_card_msg);
-}
-
-function sendPassPriorityMessage () {
-  var pass_priority_msg = new ClientMessage({
-    'message_type': 'ACTION',
-    'action_message': new ActionMessage({
-      'action_type': 'PASS_PRIORITY'
-    })
-  });
-
-  sendMessage(pass_priority_msg);
-}
-
-var RoomHeader = React.createClass({
-  _renderStartButton: function () {
-    if (!this.props.started) {
-      return <button className="start-game">Start Game</button>;
-    }
-  },
-  render: function () {
-    return (
-      <div className="room-header">
-        {this._renderStartButton()}
-        <h3 className="game-info">Game: {this.props.name} (id: {this.props.gameId})</h3>
-        <span className="n-players">Number of players: {this.props.nPlayers}</span>
-        <div className="game-state">Phase: <span className="phase">{this.props.phase}</span></div>
-        <div className="game-state">Step: <span className="step">{this.props.step}</span></div>
-      </div>
-    );
-  }
-});
-
-var Battlefield = React.createClass({
-  render: function () {
-    if (!this.props.cards) {
-      var cards = "";
-    } else {
-      var cards = this.props.cards.map(function (card) {
-        return <Card cardData={card} zone="battlefield" />;
-      });
-    }
-    return (
-      <div className="battlefield">
-        <h4>Battlefield</h4>
-        {cards}
-      </div>
-    );
-  }
-});
-
-var Room = React.createClass({
+module.exports = React.createClass({
+  displayName: 'Room',
   _getPlayer: function (players) {
     for (var i = 0; i < players.length; i++) {
       if (players[i].game_id == this.state.player_id)
@@ -68,7 +13,7 @@ var Room = React.createClass({
     }
   },
   _handleServerResponse: function (message) {
-    SERVER_RESPONSE_DISPATCHER = {
+    var SERVER_RESPONSE_DISPATCHER = {
       'JOIN': this._handleJoin,
       'LEAVE': this._handleLeave,
       'ERROR': _handleError,
@@ -84,7 +29,6 @@ var Room = React.createClass({
   },
   _handleGameState: function (message) {
     console.log("(ROOM) Handling GAME_STATE response.");
-    var room = this;
     var message = message.game_state_response.game_state;
     this.setState({
       started: true,
@@ -100,11 +44,9 @@ var Room = React.createClass({
   },
   _handlePhase: function (phase) {
     this.setState({current_phase: phase});
-    return;
   },
   _handleStep: function (step) {
     this.setState({current_step: step});
-    return;
   },
   getInitialState: function () {
     return {
@@ -121,12 +63,12 @@ var Room = React.createClass({
     }
   },
   componentDidMount: function () {
-    var room = this;
+    var _this = this;
     socket.onmessage = function (event) {
-      response = event.data.substring(0, event.data.length - 2)
-      message = ServerResponse.decode64(response);
+      var response = event.data.substring(0, event.data.length - 2)
+      var message = ServerResponse.decode64(response);
       console.log("(ROOM) Recieved message:", message);
-      room._handleServerResponse(message);
+      _this._handleServerResponse(message);
     };
   },
   render: function () {

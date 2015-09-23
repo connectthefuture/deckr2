@@ -44,6 +44,7 @@ INSTALLED_APPS = (
     'lettuce.django',
     # Deckr
     'webclient',
+    'webpack_loader',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -108,6 +109,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'BUNDLE_DIR_NAME': 'bundles/',
+        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
+    }
+}
 PROTO_PATH = DECKR_ROOT + "/proto"
 
 # Lettuce configuration

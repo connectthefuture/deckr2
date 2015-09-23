@@ -2,26 +2,16 @@
 {% block morejs %}
   {% load staticfiles %}
   <script type="text/javascript">
+    var nick = parseInt('{{ nick }}');
     var game_id = parseInt('{{ game.game_id }}');
+    var game_name = parseInt('{{ game.name }}');
     var is_player = Boolean('{{ is_player }}');
   </script>
   <script type="text/javascript" src="{% static 'js/sockets.js' %}"></script>
   <script type="text/javascript" src="{% static 'js/proto.js' %}"></script>
-  <script type="text/javascript" src="{% static 'js/game.js' %}"></script>
-  <script type="text/jsx" src="{% static 'js/Card.jsx' %}"></script>
-  <script type="text/jsx" src="{% static 'js/Player.jsx' %}"></script>
-  <script type="text/jsx" src="{% static 'js/Room.jsx' %}"></script>
+  {% load render_bundle from webpack_loader %}
 {% endblock %}
 {% block body %}
   <div id="room"></div>
-  <script type="text/jsx">
-    React.render(
-      <Room
-        gameId='{{ game.game_id }}'
-        gameName='{{ game.name }}'
-        nick='{{ nick }}'
-      />,
-      document.getElementById('room')
-    );
-  </script>
+  {% render_bundle 'main' %}
 {% endblock %}

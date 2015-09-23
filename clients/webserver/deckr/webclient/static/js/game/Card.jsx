@@ -1,34 +1,8 @@
-var CardAction = React.createClass({
-  _handleClick: function () {
-    if (this.props.action === "Play") {
-      sendPlayMessage(this.props.cardId);
-    }
-  },
-  render: function () {
-    return (
-      <li onClick={this._handleClick}>{this.props.action}</li>
-    );
-  }
-});
+var React = require('react');
+var CardActionList = require('./CardActionList');
 
-var CardActionList = React.createClass({
-  render: function () {
-    var _this = this;
-    var actions = this.props.actions.map(function (action) {
-      return (
-        <CardAction action={action} cardId={_this.props.cardId} />
-      );
-    });
-    var display = this.props.showActions ? 'block' : 'none';
-    return (
-      <ul className="card-actions" style={{display: display}}>
-        {actions}
-      </ul>
-    );
-  }
-});
-
-var Card = React.createClass({
+module.exports = React.createClass({
+  displayName: 'Card',
   _cardActions: function () {
     if (this.props.zone == "hand") {
       return ["Play"];
