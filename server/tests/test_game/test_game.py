@@ -295,6 +295,19 @@ class TurnManagerTestCase(unittest.TestCase):
         self.turn_manager.advance()
         self.turn_manager.state_based_actions.assert_called_with()
 
+    def test_cleanup_combat_damage(self):
+        """
+        Make sure we remove combat damage during the cleanup step.
+        """
+
+        card = mock.MagicMock()
+        self.game.battlefield = [card]
+        self.turn_manager.step = self.turn_manager.CLEANUP_STEP
+        self.turn_manager.phase = self.turn_manager.END_PHASE
+        self.turn_manager.turn_based_actions()
+
+        card.mark_end_of_turn.assert_called_with()
+
 
 class StateBasedActionManagerTestCase(unittest.TestCase):
     """

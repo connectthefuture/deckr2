@@ -133,6 +133,14 @@ class Card(deckr.game.game_object.GameObject):  # pylint: disable=too-many-insta
 
         pass
 
+    def mark_end_of_turn(self):
+        """
+        Mark that a turn has ended. Clear effects that last until end of turn
+        and remove all combat damage.
+        """
+
+        self.combat_damage = 0
+
     def tap(self):
         """
         Tap.

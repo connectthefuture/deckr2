@@ -226,7 +226,6 @@ class TurnManager(object):
 
         # Before anything we check state based actions
 
-
         next_player = self._game.player_manager.next_player(
             self.priority_player)
         if next_player == self.active_player:
@@ -286,6 +285,9 @@ class TurnManager(object):
                     card.untap()
         elif self.step == self.COMBAT_DAMAGE_STEP:
             self._game.combat_damage_manager.deal_combat_damage()
+        elif self.step == self.CLEANUP_STEP:
+            for card in self._game.battlefield:
+                card.mark_end_of_turn()
 
     def state_based_actions(self):
         """

@@ -60,6 +60,16 @@ class CardTestCase(unittest.TestCase):
         ability2.create_instance.assert_called_with()
         self.assertRaises(IndexError, self.card.activate_ability, 2)
 
+    def test_mark_end_of_turn(self):
+        """
+        Make sure that when we mark the end of the turn we remove all comabt
+        damage.
+        """
+
+        self.card.combat_damage = 1
+        self.card.mark_end_of_turn()
+        self.assertEqual(self.card.combat_damage, 0)
+
     def test_update_proto(self):
         """
         Make sure we can properly update a protobuf.
