@@ -3,8 +3,8 @@
   {% load staticfiles %}
   <script type="text/javascript">
     var nick = parseInt('{{ nick }}');
+    var game_name = '{{ game.name }}';
     var game_id = parseInt('{{ game.game_id }}');
-    var game_name = parseInt('{{ game.name }}');
     var is_player = Boolean('{{ is_player }}');
   </script>
   <script type="text/javascript" src="{% static 'js/sockets.js' %}"></script>
