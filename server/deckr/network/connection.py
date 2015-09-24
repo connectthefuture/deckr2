@@ -6,6 +6,7 @@ import base64
 import logging
 import traceback
 
+import deckr.network.json_proxy
 import google.protobuf.message
 import proto.client_message_pb2
 import proto.server_response_pb2
@@ -20,7 +21,7 @@ class Connection(twisted.protocols.basic.LineReceiver):
     1 game.
     """
 
-    def __init__(self, router, use_base64=False):
+    def __init__(self, router, use_base64=False, json=False):
         # What room this connection is part of
         self.room_id = None
         # The player assocaited with this connection, if any
@@ -29,6 +30,7 @@ class Connection(twisted.protocols.basic.LineReceiver):
         self._router = router
         # Load values from config
         self._base64 = use_base64
+        self._json = json
 
     def send_response(self, response):
         """
@@ -38,7 +40,10 @@ class Connection(twisted.protocols.basic.LineReceiver):
             response (ServerResponse): A server response that should be sent over the wire.
         """
 
-        serialized_response = response.SerializeToString()
+        if self._json:
+            serialized_response = deckr.network.json_proxy.encode_to_json(response)
+        else:
+            serialized_response = response.SerializeToString()
         if self._base64:
             self.sendLine(base64.b64encode(serialized_response))
         else:
@@ -56,9 +61,13 @@ class Connection(twisted.protocols.basic.LineReceiver):
 
         if self._base64:
             message = base64.b64decode(message)
-        decoded_message = proto.client_message_pb2.ClientMessage()
+
         try:
-            decoded_message.ParseFromString(message)
+            if self._json:
+                decoded_message = deckr.network.json_proxy.decode_from_json(message)
+            else:
+                decoded_message = proto.client_message_pb2.ClientMessage()
+                decoded_message.ParseFromString(message)
         except google.protobuf.message.DecodeError:
             self.send_error("Could not parse message")
             return
