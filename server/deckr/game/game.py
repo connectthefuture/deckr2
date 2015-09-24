@@ -224,6 +224,9 @@ class TurnManager(object):
         or change active player (or all).
         """
 
+        # Before anything we check state based actions
+
+
         next_player = self._game.player_manager.next_player(
             self.priority_player)
         if next_player == self.active_player:
@@ -232,8 +235,10 @@ class TurnManager(object):
                 self._next_step()
             else:
                 self._game.stack.resolve()
+                self.state_based_actions()
                 self.priority_player = next_player
         else:
+            self.state_based_actions()
             self.priority_player = next_player
 
     def _next_step(self):
@@ -250,6 +255,7 @@ class TurnManager(object):
                 step_phase) + 1]
         # First, we run an turn based actions
         self.turn_based_actions()
+        self.state_based_actions()
         self.priority_player = self.active_player
 
     def _next_turn(self):
@@ -281,6 +287,13 @@ class TurnManager(object):
         elif self.step == self.COMBAT_DAMAGE_STEP:
             self._game.combat_damage_manager.deal_combat_damage()
 
+    def state_based_actions(self):
+        """
+        Check for state based actions.
+        """
+
+        self._game.state_based_action_manager.check()
+
     def update_proto(self, proto):
         """
         Update a proto with turn information.
@@ -290,6 +303,44 @@ class TurnManager(object):
         proto.current_phase = self.phase
         proto.active_player = self.active_player.game_id
         proto.priority_player = self.priority_player.game_id
+
+
+class StateBasedActionManager(object):
+    """
+    This manager handles all state based actions.
+    """
+
+    def __init__(self, game):
+        self._game = game
+
+    def check(self):
+        """
+        Check all state based actions. This is the main entry point into this
+        class.
+        """
+
+        self._check_player_0_life()
+        self._check_creature_damage()
+
+    def _check_player_0_life(self):
+        """
+        Check for any players with 0 or less life.
+        """
+
+        for player in self._game.player_manager.players:
+            if player.life <= 0:
+                player.lost = True
+
+    def _check_creature_damage(self):
+        """
+        Check any creatures for lethal damage.
+        """
+
+        for card in self._game.battlefield:
+            print card.owner
+            if card.is_creature() and card.damage >= card.toughness:
+                self._game.battlefield.remove(card)
+                card.owner.graveyard.append(card)
 
 
 class MagicTheGathering(object):  # pylint: disable=too-many-instance-attributes
@@ -308,6 +359,7 @@ class MagicTheGathering(object):  # pylint: disable=too-many-instance-attributes
         self.player_manager = PlayerManager(self)
         self.turn_manager = TurnManager(self)
         self.combat_damage_manager = CombatDamageManager(self)
+        self.state_based_action_manager = StateBasedActionManager(self)
 
         # Each game has a set of shared zones
         self.battlefield = deckr.game.zone.Zone('battlefield', None)

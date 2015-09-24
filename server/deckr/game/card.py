@@ -44,6 +44,8 @@ def create_card_from_dict(card_data):
     card.subtypes = card_data.get('subtypes', [])
     card.supertypes = card_data.get('supertypes', [])
     card.mana_cost = card_data.get('mana_cost', None)
+    card.power = card_data.get('power', 0)
+    card.toughness = card_data.get('toughness', 0)
     populate_abilities(card)
     return card
 
@@ -121,7 +123,7 @@ class Card(deckr.game.game_object.GameObject):  # pylint: disable=too-many-insta
         # Transitory state
         self.attacking = None
         self.blocking = None
-        self.combat_damage = 0
+        self.damage = 0
 
     def reset(self):
         """
@@ -151,7 +153,7 @@ class Card(deckr.game.game_object.GameObject):  # pylint: disable=too-many-insta
         """
 
         assert "Creature" in self.types
-        self.combat_damage += amount
+        self.damage += amount
 
     def is_land(self):
         """
@@ -159,6 +161,13 @@ class Card(deckr.game.game_object.GameObject):  # pylint: disable=too-many-insta
         """
 
         return 'Land' in self.types
+
+    def is_creature(self):
+        """
+        Is this a creature?
+        """
+
+        return 'Creature' in self.types
 
     def is_sorcery_speed(self):
         """

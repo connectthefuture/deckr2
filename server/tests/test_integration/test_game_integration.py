@@ -79,3 +79,28 @@ class GameIntegrationTestCase(unittest.TestCase):
         self.assertTrue(forest.tapped)
         self.assertRaises(deckr.game.action_validator.InvalidActionException,
                           self.player.activate_ability, forest, 0)
+
+    def test_lose_0_life(self):
+        """
+        Make sure that a player loses if tehy have 0 life.
+        """
+
+        self._prep_for_sorcery()
+        self.assertFalse(self.player.lost)
+        self.player.life = 0
+        self.player.pass_priority()
+        self.assertTrue(self.player.lost)
+
+    def test_creature_death(self):
+        """
+        Make sure we can kill a creature with combat damage.
+        """
+
+        self._prep_for_sorcery()
+        creature = self.card_library.create("Grizzly Bears")
+        creature.owner = self.player
+        self.game.battlefield.append(creature)
+        creature.deal_combat_damage(2)
+        self.player.pass_priority()
+        self.assertNotIn(creature, self.game.battlefield)
+        self.assertIn(creature, self.player.graveyard)
