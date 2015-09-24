@@ -158,22 +158,31 @@ a:hover {
 
 /* line 85, ../scss/style.scss */
 .room-center {
-  height: 250px;
+  overflow: hidden;
   padding-bottom: 100px;
 }
 
 /* line 90, ../scss/style.scss */
-.player-info {
+.player-infos {
+  overflow: hidden;
   float: left;
-  padding: 20px;
+  width: 200px;
   border-right: 1px solid #ccc;
-}
-/* line 94, ../scss/style.scss */
-.player-info:last-child {
   margin-right: 20px;
 }
 
-/* line 99, ../scss/style.scss */
+/* line 98, ../scss/style.scss */
+.player-info {
+  float: left;
+  padding: 20px;
+  width: 100%;
+}
+/* line 103, ../scss/style.scss */
+.player-info:not(:last-child) {
+  border-bottom: 1px solid #ccc;
+}
+
+/* line 108, ../scss/style.scss */
 .hand {
   position: absolute;
   bottom: 0;
@@ -183,12 +192,12 @@ a:hover {
   border-top: 1px solid #ccc;
 }
 
-/* line 108, ../scss/style.scss */
+/* line 117, ../scss/style.scss */
 .battlefield {
   padding: 20px;
 }
 
-/* line 112, ../scss/style.scss */
+/* line 121, ../scss/style.scss */
 .card {
   float: left;
   position: relative;
@@ -196,12 +205,12 @@ a:hover {
   padding: 5px;
   border: 1px solid #eee;
 }
-/* line 118, ../scss/style.scss */
+/* line 127, ../scss/style.scss */
 .card.show-actions, .card:hover {
   cursor: pointer;
   border-color: black;
 }
-/* line 124, ../scss/style.scss */
+/* line 133, ../scss/style.scss */
 .card .card-actions {
   position: absolute;
   bottom: 35px;
@@ -211,7 +220,7 @@ a:hover {
   border: 1px solid #ccc;
   background-color: white;
 }
-/* line 133, ../scss/style.scss */
+/* line 142, ../scss/style.scss */
 .card .card-actions:hover {
   background-color: #eee;
 }

@@ -37,11 +37,9 @@ module.exports = React.createClass({
       <span className="graveyard">{count}</span>
     );
   },
-  render: function() {
-    var class_name = "player-info";
-    class_name += this.props.isClient ? " client" : "";
+  _renderClientInfo: function () {
     return (
-      <div className="player-info">
+      <div className="player-info client-info">
         <h3>Player: {this.props.nick} (id: {this.props.playerId})</h3>
         <PlayerGameActions hasPriority={this._hasPriorityAndIsClient()} />
         <div className="stats">
@@ -53,5 +51,24 @@ module.exports = React.createClass({
         <p>{this._renderPriority()}</p>
       </div>
     )
+  },
+  _renderNonClientInfo: function () {
+    return (
+      <div className="player-info nonclient-info">
+        <h3>Player: (id: {this.props.playerId})</h3>
+        <div className="stats">
+          <p>Life: <span className="life">{this.props.player.life}</span></p>
+          <p>Library: {this._renderLibrary()}</p>
+          <p>Graveyard: {this._renderGraveyard()}</p>
+        </div>
+      </div>
+    )
+  },
+  render: function() {
+    if (this.props.isClient) {
+      return this._renderClientInfo();
+    } else {
+      return this._renderNonClientInfo();
+    }
   }
 });

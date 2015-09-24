@@ -12,9 +12,20 @@ module.exports = React.createClass({
   _isClient: function (player_id) {
     return this.props.clientPlayer == player_id;
   },
-  render: function () {
+  _clientPlayer: function () {
+    for (var i = 0; i < this.props.players.length; i++) {
+      var player = this.props.players[i];
+      if (player.game_id === this.props.clientPlayer) {
+        return player;
+      }
+    }
+  },
+  _renderNonClientInfoList: function () {
     var _this = this;
-    var player_infos = this.props.players.map(function (player) {
+    var players = this.props.players.filter(function (player) {
+      return !_this._isClient(player.game_id);
+    });
+    return players.map(function (player) {
       return (
         <PlayerInfo
           player={player}
@@ -24,9 +35,26 @@ module.exports = React.createClass({
           hasPriority={_this._hasPriority(player.game_id)} />
       );
     });
+  },
+  _renderClientInfo: function () {
+    var client_player = this._clientPlayer();
+    if (client_player) {
+      return (
+        <PlayerInfo
+          player={client_player}
+          playerId={client_player.game_id}
+          isClient={true}
+          isActivePlayer={this._isActivePlayer(client_player.game_id)}
+          hasPriority={this._hasPriority(client_player.game_id)}
+        />
+      );
+    }
+  },
+  render: function () {
     return (
       <div className="player-infos">
-        {player_infos}
+        {this._renderNonClientInfoList()}
+        {this._renderClientInfo()}
       </div>
     );
   }

@@ -83,16 +83,25 @@ a {
 }
 
 .room-center {
-  height: 250px;
+  overflow: hidden;
   padding-bottom: 100px;
+}
+
+.player-infos {
+  overflow: hidden;
+  float: left;
+  width: 200px;
+  border-right: 1px solid #ccc;
+  margin-right: 20px;
 }
 
 .player-info {
   float: left;
   padding: 20px;
-  border-right: 1px solid #ccc;
-  &:last-child {
-    margin-right: 20px;
+  width: 100%;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid #ccc;
   }
 }
 
