@@ -28,3 +28,12 @@ class ServiceWrapperTestCase(unittest.TestCase):
         self.assertTrue(isinstance(service, tests.services.TestService))
         self.assertEqual(service.config, self.config_for_service)
         self.assertEqual(self.service_wrapper.get_instance(), service)
+
+    def stop(self):
+        """
+        Make sure we properly stop a service.
+        """
+
+        service = self.service_wrapper.create()
+        self.service_wrapper.stop()
+        self.assertTrue(service.get_instance().stopped)

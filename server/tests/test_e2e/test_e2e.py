@@ -13,7 +13,6 @@ import deckr.core.service
 import deckrclient.client
 import proto.game_pb2
 import proto.server_response_pb2
-import tests.test_integration.simple_client
 import tests.utils
 
 
@@ -59,7 +58,7 @@ class SimpleServer(object):
         self._server_process.terminate()
 
 
-@nose.plugins.attrib.attr('integration')
+@nose.plugins.attrib.attr('e2e')
 class SinglePlayerTestCase(unittest.TestCase):
     """
     Integration tests for a single player. Generally, this is more related
@@ -77,7 +76,8 @@ class SinglePlayerTestCase(unittest.TestCase):
 
     def setUp(self):
         self.client = deckrclient.client.DeckrClient(ip='127.0.0.1',
-                                                     port=8080, raise_errors=True)
+                                                     port=8080,
+                                                     raise_errors=True)
         self.client.initialize()
 
     def tearDown(self):
@@ -90,8 +90,7 @@ class SinglePlayerTestCase(unittest.TestCase):
 
         self.client.create()
         response = self.client.listen()
-        self.client.join(response.create_response.game_id,
-                         deck=deck)
+        self.client.join(response.create_response.game_id, deck=deck)
         self.client.listen()
         self.client.start()
         self.client.listen()

@@ -8,6 +8,32 @@ import deckr.game.card
 import mock
 import tests.utils
 
+import proto.game_pb2 as proto_lib
+
+
+class AbilityTestCase(unittest.TestCase):
+    """
+    Test abilities and the ability factory.
+    """
+
+    def test_tap_cost(self):
+        """
+        Make sure we can use {T} as a cost.
+        """
+
+        card = mock.MagicMock()
+        player = mock.MagicMock()
+        card.tapped = False
+        ability_factory = deckr.game.card.AbilityFactory(
+            card=card,
+            resolution=lambda: None,
+            cost="{T}")
+        self.assertTrue(ability_factory.can_pay_cost(player))
+        ability_factory.pay_cost()
+        card.tap.assert_called_with()
+        card.tapped = True
+        self.assertFalse(ability_factory.can_pay_cost(player))
+
 
 class CardTestCase(unittest.TestCase):
     """
@@ -16,6 +42,9 @@ class CardTestCase(unittest.TestCase):
 
     def setUp(self):
         self.card = deckr.game.card.Card()
+        self.card.game_id = 0
+        self.card.name = "Test Card"
+        self.card.tapped = False
 
     def test_activate_ability(self):
         """
@@ -26,10 +55,20 @@ class CardTestCase(unittest.TestCase):
         ability2 = mock.MagicMock()
         self.card.abilities = [ability1, ability2]
         self.card.activate_ability(0)
-        ability1.assert_called_with(self.card)
+        ability1.create_instance.assert_called_with()
         self.card.activate_ability(1)
-        ability2.assert_called_with(self.card)
+        ability2.create_instance.assert_called_with()
         self.assertRaises(IndexError, self.card.activate_ability, 2)
+
+    def test_update_proto(self):
+        """
+        Make sure we can properly update a protobuf.
+        """
+
+        proto = proto_lib.Card()
+        self.card.update_proto(proto)
+        self.assertEqual(proto.name, self.card.name)
+        self.assertEqual(proto.tapped, self.card.tapped)
 
 
 class CardUtilityFunctionsTestCase(unittest.TestCase):

@@ -261,6 +261,8 @@ class TurnManager(object):
             self.active_player)
         self.step, self.phase = self.TURN_ORDER[0]
         self.turn += 1
+        for player in self._game.player_manager.players:
+            player.start_new_turn()
 
     def turn_based_actions(self):
         """
@@ -272,6 +274,10 @@ class TurnManager(object):
             if (self.turn != 1 or self.active_player !=
                     self._game.player_manager.first_player()):
                 self.active_player.draw()
+        elif self.step == self.UNTAP_STEP:
+            for card in self._game.battlefield:
+                if card.tapped:
+                    card.untap()
         elif self.step == self.COMBAT_DAMAGE_STEP:
             self._game.combat_damage_manager.deal_combat_damage()
 

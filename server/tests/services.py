@@ -39,11 +39,15 @@ class TestService(deckr.core.service.Service):
 
     def __init__(self, config):
         self.config = config
+        self.stopped = False
 
     def start(self):
         global TIMES_STARTED, LAST_STARTED
         TIMES_STARTED += 1
         LAST_STARTED = self
+
+    def stop(self):
+        self.stopped = True
 
 
 class DependentService(deckr.core.service.Service):
