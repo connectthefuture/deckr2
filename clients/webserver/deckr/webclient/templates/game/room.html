@@ -1,15 +1,18 @@
 {% extends 'webclient/base.html' %}
 {% block morejs %}
   {% load staticfiles %}
-  <script type="text/javascript">
-    var nick = parseInt('{{ nick }}');
-    var game_name = '{{ game.name }}';
-    var game_id = parseInt('{{ game.game_id }}');
-    var is_player = Boolean('{{ is_player }}');
-  </script>
   <script type="text/javascript" src="{% static 'js/sockets.js' %}"></script>
   <script type="text/javascript" src="{% static 'js/proto.js' %}"></script>
   {% load render_bundle from webpack_loader %}
+  <script type="text/javascript">
+    PassVars.loadVars({
+      nick: '{{ nick }}',
+      game_name: '{{ game.name }}',
+      game_id: parseInt('{{ game.game_id }}'),
+      client_type: '{{ client_type }}',
+      deck: {{ deck|safe }},
+    });
+  </script>
 {% endblock %}
 {% block body %}
   <div id="room"></div>

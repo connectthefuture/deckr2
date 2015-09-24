@@ -7,6 +7,7 @@ from django.conf import settings
 
 from .forms import CreateGameForm
 from .models import Game
+from .deck_builder import build_deck
 
 def index(request):
     """
@@ -63,15 +64,18 @@ def game(request, game_id):
     """
 
     if request.method == "POST":
-        request.session['is_player'] = request.POST.get('play', False)
+        client_type = 'PLAYER' if request.POST.get('play', False) else 'SPECTATOR'
         request.session['nick'] = request.POST.get("nick", "")
+        request.session['client_type'] = client_type
+        deck = build_deck(request.POST.get("custom-deck", "60 Forest"))
 
     game = get_object_or_404(Game, pk=game_id)
 
     return render(request, "game/room.html", {
         'game': game,
         'nick': request.session['nick'],
-        'is_player': request.session['is_player'],
+        'deck': deck,
+        'client_type': request.session['client_type'],
     })
 
 def proto(request, base_file_name):
