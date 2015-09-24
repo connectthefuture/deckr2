@@ -57,6 +57,7 @@ db.sqlite3
 .sass-cache
 bundles/
 node_modules/
+webpack-stats.json
 
 # Sphinx documentation
 docs/_build/

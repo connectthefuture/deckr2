@@ -5,10 +5,16 @@ module.exports = React.createClass({
   displayName: 'Card',
   _cardActions: function () {
     if (this.props.zone == "hand") {
-      return ["Play"];
+      return this._handActions();
     } else {
-      return [];
+      return this._battlefieldActions();
     }
+  },
+  _handActions: function () {
+    return ["Play"];
+  },
+  _battlefieldActions: function () {
+    return [];
   },
   _contextMenu: function (e) {
     e.preventDefault();
