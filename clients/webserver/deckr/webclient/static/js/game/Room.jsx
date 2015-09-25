@@ -90,7 +90,7 @@ module.exports = React.createClass({
             activePlayer={this.state.active_player}
             priorityPlayer={this.state.priority_player}
           />
-          <Battlefield cards={this.state.battlefield.cards} />
+          <Battlefield clientPlayer={this.state.player_id} cards={this.state.battlefield.cards} />
         </div>
         <Hand hand={this.state.player.hand} />
       </div>

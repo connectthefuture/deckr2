@@ -14,7 +14,7 @@ module.exports = React.createClass({
     return ["Play"];
   },
   _battlefieldActions: function () {
-    return [];
+    return this.props.cardData.abilities;
   },
   _contextMenu: function (e) {
     e.preventDefault();
