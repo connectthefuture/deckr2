@@ -41,6 +41,7 @@ module.exports = React.createClass({
     if (client_player) {
       return (
         <PlayerInfo
+          nick={this.props.clientNick}
           player={client_player}
           playerId={client_player.game_id}
           isClient={true}

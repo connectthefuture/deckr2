@@ -10,4 +10,3 @@ Feature: Creating and joining games
     Given I have created a standard game
     When I join the game
     Then I will be in the game room
-      And I will see my nickname

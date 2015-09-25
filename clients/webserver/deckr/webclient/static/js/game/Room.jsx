@@ -85,6 +85,7 @@ module.exports = React.createClass({
         <div className="room-center">
           <PlayerInfoList
             players={this.state.players}
+            clientNick={this.props.nick}
             clientPlayer={this.state.player_id}
             activePlayer={this.state.active_player}
             priorityPlayer={this.state.priority_player}
