@@ -73,8 +73,8 @@ def game(request, game_id):
 
     return render(request, "game/room.html", {
         'game': game,
-        'nick': request.session['nick'],
         'deck': deck,
+        'nick': request.session['nick'],
         'client_type': request.session['client_type'],
     })
 

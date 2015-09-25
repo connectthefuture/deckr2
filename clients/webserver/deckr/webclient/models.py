@@ -9,3 +9,10 @@ class Game(models.Model):
     # created_by = models.ForeignKey(User)
     is_game_started = models.BooleanField(default=False)
     is_game_over = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        """
+        Unicode representation of a game.
+        """
+
+        return "{0}: {1}".format(self.game_id, self.name)

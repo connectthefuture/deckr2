@@ -18,7 +18,7 @@ from django.contrib import admin
 
 INDEX = url(r'^$',
             'webclient.views.index',
-            name='webclient.index')
+            name='index')
 
 LOBBY = url(r'^lobby/$',
             'webclient.views.lobby',
@@ -26,7 +26,7 @@ LOBBY = url(r'^lobby/$',
 
 PROTO = url(r'^proto/(?P<base_file_name>.*)\.proto$',
             'webclient.views.proto',
-            name='webclient.proto')
+            name='proto')
 
 LOGIN = url(r'^login/$',
             'django.contrib.auth.views.login',
