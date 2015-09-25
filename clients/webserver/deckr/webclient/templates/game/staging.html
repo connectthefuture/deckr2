@@ -13,24 +13,16 @@
 <form class="join-game-form" method="post" action="{% url 'game' game_id=game.game_id %}">
   {% csrf_token %}
 
-  <div class="player-info">
+  <div class="player-config">
     <h2>Enter your nickname:</h2>
     <input type="text" name="nick" />
   </div>
-<!--
+
   <div class="decks">
-    <h2>Choose or create a deck</h2>
-    <p>(User decks go here...)</p>
-    <textarea name="custom-deck">
-Example:
-4 Black Lotus
-4 Dark Ritual
-4 Ancestral Recal
-20 Islands
-...
-    </textarea>
--->
+    <h2>Choose Deck</h2>
+    <textarea name="custom-deck">60 Forest</textarea>
   </div>
+
   <input type="hidden" name="game_id" value="{{ game.game_id }}" />
   <input name="play" type="submit" value="Play" />
   <input name="watch" type="submit" value="Watch" />

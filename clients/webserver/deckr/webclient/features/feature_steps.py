@@ -3,6 +3,7 @@ import lettuce_webdriver.webdriver
 from lettuce import *
 from lettuce.django import django_url
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from nose.tools import *
 from faker import Faker
@@ -24,6 +25,19 @@ def wait_for_connection(fn, time_waited=0):
         sleep_time = 0.05
         sleep(sleep_time)
         return wait_for_connection(fn, time_waited=time_waited + sleep_time)
+
+def send_pass_priority_message():
+    # NOTE: It might be better to use sockJS and proto bufs
+    # directly instead of messing with javascript...
+    js = (
+        "sendMessage(new ClientMessage({ "
+            "'message_type': 'ACTION', "
+            "'action_message': new ActionMessage({ "
+                "'action_type': 'PASS_PRIORITY' "
+            "}) "
+        "})); "
+    )
+    world.browser.execute_script(js)
 
 @before.all
 def create_browser():
@@ -48,20 +62,39 @@ def create_standard_game(step):
     world.browser.find_element_by_class_name('create-game').click()
     world.game_id = world.browser.find_element_by_name('game_id').get_attribute('value')
 
-@step(r'I join the game')
-def join_game(step):
+@step(r'I join the game( with a deck of Forests)?')
+def join_game(step, all_forests):
     world.nick = fake.name()
     step.given('I visit the url "{}"'.format("/staging/{}".format(world.game_id)))
     step.given('I fill in "nick" with "{}"'.format(world.nick))
+    if (all_forests):
+        step.given('I fill in "custom-deck" with "60 Forest"')
     step.given('I press "Play"')
 
 @step(r'I start the game')
 def start_game(step):
     step.given('I press "Start Game"')
 
+@step(r'I have priority')
+def get_priority(step):
+    try:
+        world.browser.find_element_by_class_name('pass-priority')
+    except NoSuchElementException:
+        send_pass_priority_message()
+        get_priority(step)
+
 @step(r'I pass priority')
 def pass_priorty(step):
     step.given('I press "Pass Priority"')
+
+@step(r'I play a land')
+def play_land(step):
+    card = world.browser.find_element_by_css_selector('.hand .card')
+    # TODO: Check that card type is land.
+    card.click()
+    # TODO: Save card game_id to world.
+    world.card_name = card.find_element_by_class_name('card-name').get_attribute('innerHTML')
+    card.find_element_by_css_selector('.card-actions li').click()
 
 @step(r'I have created a standard game')
 def have_created_standard_game(step):
@@ -73,9 +106,19 @@ def create_and_join_standard_game(step):
     step.given('I have created a standard game')
     step.given('I join the game')
 
-@step(r'I have started a standard game')
-def create_join_and_start_standard_game(step):
-    step.given('I have joined a standard game')
+@step(r'I have started a multiplayer standard game( with a deck of Forests)?')
+def create_join_and_start_standard_game(step, all_forests):
+    if (all_forests):
+        join_step = 'I join the game with a deck of Forests'
+    else:
+        join_step = 'I join the game'
+
+    step.given('I have created a standard game')
+
+    # TODO: Find a better way to test multiplayer...
+    for _ in range(4):
+        step.given(join_step)
+        sleep(0.01)
     step.given('I start the game')
 
 @step(r'I will be connected to the Deckr server')
@@ -109,15 +152,24 @@ def test_in_game_room(step):
 
 @step(r'I will see my nickname')
 def test_visible_nick(step):
-    step.given('I see "{}"'.format(world.nick))
+    step.then('I see "{}"'.format(world.nick))
 
 @step(r'the game will be started')
 def test_is_game_started(step):
-    # TODO: Check model for is_game_started
-    start_game_btn = world.browser.find_element_by_class_name('start-game')
-    assert_false(start_game_btn.is_displayed())
+    try:
+        world.browser.find_element_by_class_name('start-game')
+        assert False
+    except NoSuchElementException:
+        # TODO: Check model for is_game_started
+        assert True
 
 @step(r'I will no longer have priority')
 def test_no_longer_have_priority(step):
-    # TODO: Implement this test...
-    pass
+    step.then('I should not see "You have priority."')
+
+
+@step(u'my land will be on the battlefield')
+def test_land_is_on_battlefield(step):
+    card = world.browser.find_element_by_css_selector('.battlefield .card')
+    card_name = card.find_element_by_class_name('card-name').get_attribute('innerHTML')
+    assert_equals(world.card_name, card_name)
