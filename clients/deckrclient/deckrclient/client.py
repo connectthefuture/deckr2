@@ -34,6 +34,7 @@ class Card(object):
         self.game_id = proto.game_id
         self.name = proto.name
         self.controller = proto.controller
+        self.abilities = proto.abilities
 
 
 class Player(object):
