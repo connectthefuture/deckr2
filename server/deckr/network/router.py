@@ -7,6 +7,8 @@ import logging
 import proto.client_message_pb2
 import proto.server_response_pb2
 
+import deckr.game.action_validator
+
 LOGGER = logging.getLogger(__name__)
 
 
@@ -48,7 +50,11 @@ class Router(object):
         elif message_type == proto.client_message_pb2.ClientMessage.LEAVE:
             self._handle_leave(connection)
         elif message_type == proto.client_message_pb2.ClientMessage.ACTION:
-            self._handle_action(message.action_message, connection)
+            try:
+                self._handle_action(message.action_message, connection)
+            except deckr.game.action_validator.InvalidActionException as e:
+                connection.send_error(e.message)
+                return
         else:
             connection.send_error("Not implemented yet")
 

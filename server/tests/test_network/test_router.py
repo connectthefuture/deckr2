@@ -4,6 +4,7 @@ This module tests the router to make sure it can properly route requests.
 
 import unittest
 
+import deckr.game.action_validator
 import deckr.network.router
 import mock
 import proto.client_message_pb2
@@ -231,3 +232,16 @@ class RouterTestCase(unittest.TestCase):
         # Make sure we properly sub in the object
         self.connection.player.declare_blockers.assert_called_with(
             {test_blocker: test_attacker})
+
+    def test_catches_invlaid_action(self):
+        """
+        Make sure that if we try to perform an invalid action we get the proper error message.
+        """
+
+        message = proto.client_message_pb2.ClientMessage()
+        message.message_type = proto.client_message_pb2.ClientMessage.ACTION
+        message.action_message.action_type = proto.client_message_pb2.ActionMessage.PASS_PRIORITY
+        self._create_and_join_game()
+        self.connection.player.pass_priority.side_effect = deckr.game.action_validator.InvalidActionException("foobar")
+        self.router.handle_message(message, self.connection)
+        self.connection.send_error.assert_called_with("foobar")

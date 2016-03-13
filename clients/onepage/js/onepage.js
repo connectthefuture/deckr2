@@ -71,6 +71,19 @@ onepage.Application.prototype.passPriority = function() {
 };
 
 
+/** Activate a card ability. Right now, will only activate the first ability. */
+onepage.Application.prototype.activateAbility = function(gameId) {
+    this.socket_.sendMessage({message_type: 2,
+                              action_message: {
+                                  action_type: 2,
+                                  activate_ability: {
+                                      card: gameId,
+                                      index: 0
+                                  }
+                              }});
+};
+
+
 /** Create a deck list out of a string. */
 onepage.Application.prototype.stringToDeck = function(string) {
     deck = [];
@@ -100,12 +113,15 @@ onepage.Application.prototype.openCallback_ = function(event) {
 onepage.Application.prototype.messageCallback_ = function(message) {
     // Delegate to various other handlers
     switch (message.response_type) {
+        case 3: // Error
+            this.processError_(message.error_response.message);
+            break;
         case 4: // GameStateResponse
             this.proccessGameStateResponse_(message.game_state_response.game_state);
-            break
+            break;
         default:
             console.log("Encountered unhandled message. Ignoring.");
-    };
+    }
     // Call any other callbacks
     if (this.messageCallbacks_[message.response_type]) {
         var callbacks = this.messageCallbacks_[message.response_type];
@@ -123,6 +139,14 @@ onepage.Application.prototype.proccessGameStateResponse_ = function(gameState) {
     this.gameIdLookup_.setGameObjects(gameState);
     this.renderer_.render(gameState);
 };
+
+
+/** Process an error. Log it to the console and to the actual screen. */
+onepage.Application.prototype.processError_ = function(errorMessage) {
+    this.renderer_.renderError(errorMessage);
+    console.error(errorMessage);
+};
+
 
 // Kick everything off
 var app; // Make the app externally accesiable for easy debugging.
@@ -145,7 +169,11 @@ $(document).ready(function() {
     });
 
     $("#play-card").click(function() {
-        app.playCard(+$("#play-id").val());
+        app.playCard(+$("#card-id").val());
+    });
+
+    $("#activate-ability").click(function() {
+        app.activateAbility(+$("#card-id").val());
     });
 
     $("#join-game").click(function() {
