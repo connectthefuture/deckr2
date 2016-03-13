@@ -47,6 +47,7 @@ class CardTestCase(unittest.TestCase):
         self.card.game_id = 0
         self.card.name = "Test Card"
         self.card.tapped = False
+        self.card.raw_abilities = ["{T}: Add {G} to your mana pool"]
 
     def test_activate_ability(self):
         """
@@ -71,6 +72,8 @@ class CardTestCase(unittest.TestCase):
         self.card.update_proto(proto)
         self.assertEqual(proto.name, self.card.name)
         self.assertEqual(proto.tapped, self.card.tapped)
+        self.assertEqual(len(proto.abilities), 1)
+        self.assertEqual(proto.abilities[0], "{T}: Add {G} to your mana pool")
 
     def test_update_proto_controller(self):
         """
@@ -119,6 +122,7 @@ class CardUtilityFunctionsTestCase(unittest.TestCase):
         self.assertIn("Land", card.types)
         self.assertIn("Basic", card.supertypes)
         self.assertIn("Forest", card.subtypes)
+        self.assertEqual(card.raw_abilities, ["{T}: Add {G} to your mana pool"])
 
     def test_forest_abilities(self):
         """

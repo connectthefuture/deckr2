@@ -3,7 +3,8 @@
         "name": "Forest",
         "types": ["Land"],
         "supertypes": ["Basic"],
-        "subtypes": ["Forest"]
+        "subtypes": ["Forest"],
+        "abilities": ["{T}: Add {G} to your mana pool"]
     },
     "Norwood Ranger": {
         "name": "Norwood Ranger",
@@ -12,5 +13,6 @@
         "power": 1,
         "toughness": 2,
         "mana_cost": "G"
+
     }
 }

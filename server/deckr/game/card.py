@@ -49,6 +49,7 @@ def create_card_from_dict(card_data):
     card.mana_cost = card_data.get('mana_cost', None)
     card.power = card_data.get('power', 0)
     card.toughness = card_data.get('toughness', 0)
+    card.raw_abilities = card_data.get('abilities', [])
     populate_abilities(card)
     return card
 
@@ -118,6 +119,8 @@ class Card(deckr.game.game_object.GameObject):  # pylint: disable=too-many-insta
         self.mana_cost = None
         # Store function pointers for abilities
         self.abilities = []
+        # Strings for abilities
+        self.raw_abilities = []
         # These will generally be hidden based on the types of the card.
         self.power = 0
         self.toughness = 0
@@ -196,6 +199,8 @@ class Card(deckr.game.game_object.GameObject):  # pylint: disable=too-many-insta
         if self.controller:
             proto.controller = self.controller.game_id
         proto.tapped = self.tapped
+        for ability in self.raw_abilities:
+            proto.abilities.append(ability)
 
     def activate_ability(self, index):
         """

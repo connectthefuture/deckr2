@@ -6,7 +6,8 @@ FOREST_CARD_DATA = {
     "name": "Forest",
     "types": ["Land"],
     "supertypes": ["Basic"],
-    "subtypes": ["Forest"]
+    "subtypes": ["Forest"],
+    "abilities": ["{T}: Add {G} to your mana pool"]
 }
 
 GRIZZLY_BEARS = {

@@ -3,27 +3,18 @@
   {% load staticfiles %}
   <script type="text/javascript" src="{% static 'js/sockets.js' %}"></script>
   <script type="text/javascript" src="{% static 'js/proto.js' %}"></script>
-  <script type="text/javascript" src="{% static 'js/game.js' %}"></script>
+  {% load render_bundle from webpack_loader %}
   <script type="text/javascript">
-    var game_id = parseInt('{{ game.game_id }}');
-    var is_player = Boolean('{{ is_player }}');
+    PassVars.loadVars({
+      nick: '{{ nick }}',
+      game_name: '{{ game.name }}',
+      game_id: parseInt('{{ game.game_id }}'),
+      client_type: '{{ client_type }}',
+      deck: {{ deck|safe }},
+    });
   </script>
 {% endblock %}
 {% block body %}
-
-<div class="wrapper">
-  <h1>Game (id: {{ game.game_id }}, name: {{ game.name }})</h1>
-
-  <div class="player-info">
-    <h2>Player: {{ nick }}</h2>
-    <p><span class="your-turn"></span></p>
-    <p>Cards in deck: <span class="cards-in-deck"></span></p>
-  </div>
-
-  <div class="game-actions">
-    <button class="start-game">Start Game</button>
-    <button class="pass-priority">Pass Priority</button>
-  </div>
-</div>
-
+  <div id="room"></div>
+  {% render_bundle 'main' %}
 {% endblock %}
