@@ -4,9 +4,10 @@ Test the zone.
 
 import unittest
 
+import mock
+
 import deckr.game.game_object
 import deckr.game.zone
-import mock
 import proto.game_pb2 as proto_lib
 
 
@@ -78,18 +79,26 @@ class ZoneAsContainerTestCase(unittest.TestCase):
         self.assertIn(self.object1, self.zone)
         self.assertIn(self.object2, self.zone)
 
+        # Zone has both object1 and object2
         result = self.zone.pop()
         self.assertEqual(len(self.zone), 1)
         self.assertIn(self.object1, self.zone)
         self.assertNotIn(self.object2, self.zone)
         self.assertEqual(result, self.object2)
 
+        # Zone has just object 1
         self.zone.insert(0, self.object3)
         self.assertEqual(self.zone[0], self.object3)
         self.assertEqual(self.zone[1], self.object1)
 
+        # Zone has object1 and 3
         self.zone.remove(self.object1)
         self.assertNotIn(self.object1, self.zone)
+
+        # Zone has object 3
+        self.zone.append(self.object1)
+        result = self.zone.pop(0)
+        self.assertEqual(result, self.object3)
 
     def test_is_empty(self):
         """

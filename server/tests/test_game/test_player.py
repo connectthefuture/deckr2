@@ -4,9 +4,10 @@ This module contains player tests.
 
 import unittest
 
+import mock
+
 import deckr.game.card
 import deckr.game.player
-import mock
 import proto.game_pb2 as proto_lib
 import tests.utils
 
@@ -214,3 +215,20 @@ class PlayerTestCase(unittest.TestCase):
         blocking_card = mock.MagicMock()
         self.player.declare_blockers({blocking_card: attacking_card})
         self.assertEqual(blocking_card.blocking, attacking_card)
+
+    def test_deal_combat_damage(self):
+        """
+        Make sure combat damage subtracts from the life total.
+        """
+
+        self.player.deal_combat_damage(5)
+        self.assertEqual(self.player.life, 15)
+
+    def test_start(self):
+        """
+        Make sure we draw 7 cards when starting.
+        """
+
+        self.player.draw = mock.MagicMock()
+        self.player.start()
+        self.assertEqual(self.player.draw.call_count, 7)

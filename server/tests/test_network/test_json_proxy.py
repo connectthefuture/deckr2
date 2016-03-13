@@ -2,8 +2,9 @@
 Unittests for the JSON proxy functions.
 """
 
-import unittest
 import json
+import unittest
+
 import deckr.network.json_proxy
 import proto.client_message_pb2
 import proto.server_response_pb2
@@ -14,7 +15,7 @@ class JsonProxyTestCase(unittest.TestCase):
     Unittests around the json proxy.
     """
 
-    def test_encode_game_staet(self):
+    def test_encode_game_state(self):
         """
         Take a game state and make sure we can encode it.
         """
@@ -77,3 +78,24 @@ class JsonProxyTestCase(unittest.TestCase):
         self.assertEqual(result.join_message.game_id, 1)
         self.assertEqual(len(result.join_message.player_config.deck), 1)
         self.assertEqual(result.join_message.player_config.deck[0], "Forest")
+
+    def test_decode_declare_attackers(self):
+        """
+        Make sure we can decode declare attackers message.
+        """
+
+        message = {
+            'message_type': proto.client_message_pb2.ClientMessage.ACTION,
+            'action_message': {
+                'action_type': proto.client_message_pb2.ActionMessage.DECLARE_ATTACKERS,
+                'declare_attackers': {
+                    'attackers': [
+                        {'attacker': 1, 'target': 2}
+                    ]
+                }
+            }
+        }
+        result = deckr.network.json_proxy.decode_from_json(json.dumps(message))
+        self.assertEqual(result.message_type,
+                         proto.client_message_pb2.ClientMessage.ACTION)
+        self.assertEqual(len(result.action_message.declare_attackers.attackers), 1)

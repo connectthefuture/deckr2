@@ -2,13 +2,15 @@
 This module provides unittests for the card and card library logic.
 """
 
+import json
+import tempfile
 import unittest
 
-import deckr.game.card
 import mock
-import tests.utils
 
+import deckr.game.card
 import proto.game_pb2 as proto_lib
+import tests.utils
 
 
 class AbilityTestCase(unittest.TestCase):
@@ -69,6 +71,35 @@ class CardTestCase(unittest.TestCase):
         self.card.update_proto(proto)
         self.assertEqual(proto.name, self.card.name)
         self.assertEqual(proto.tapped, self.card.tapped)
+
+    def test_update_proto_controller(self):
+        """
+        Make sure we can properly update a protobuf.
+        """
+
+        proto = proto_lib.Card()
+        self.card.controller = mock.MagicMock()
+        self.card.controller.game_id = 1
+        self.card.update_proto(proto)
+        self.assertEqual(proto.controller, 1)
+
+    def test_untap(self):
+        """
+        Make sure we can untap a card.
+        """
+
+        self.card.tapped = True
+        self.card.untap()
+        self.assertFalse(self.card.tapped)
+
+    def test_reset(self):
+        """
+        Make sure that we properly reset the entire card state.
+        """
+
+        self.card.tapped = True
+        self.card.reset()
+        self.assertFalse(self.card.tapped)
 
 
 class CardUtilityFunctionsTestCase(unittest.TestCase):
@@ -137,3 +168,27 @@ class CardLibraryTestCase(unittest.TestCase):
 
         forest = self.card_library.create("Forest")
         self.assertTrue(forest.is_land())
+
+    def test_config(self):
+        """
+        We should be able to create it with a config.
+        """
+
+        library = {'Forest': {}}
+        card_library = deckr.game.card.CardLibrary(config={'library': library})
+        self.assertEqual(card_library._cards['Forest'], {})
+
+    def test_load_from_file(self):
+        """
+        We should be able to load the data from a file.
+        """
+
+        library = tempfile.NamedTemporaryFile()
+        library.write(json.dumps({'Forest': {}}))
+        library.flush()
+        card_library = deckr.game.card.CardLibrary()
+        card_library.start()
+        self.assertEqual(len(card_library._cards), 0)
+        card_library._load_file = library.name
+        card_library.start()
+        self.assertEqual(card_library._cards['Forest'], {})

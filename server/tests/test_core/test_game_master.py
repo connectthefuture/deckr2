@@ -5,11 +5,11 @@ This module tests the game master functionality.
 import tempfile
 import unittest
 
+import mock
 import nose.plugins.attrib
 
 import deckr.core.game_master
 import deckr.game.game
-import mock
 
 
 class GameMasterTestCase(unittest.TestCase):
@@ -82,6 +82,8 @@ class GameMasterTestCase(unittest.TestCase):
         result = self.game_master.create()
         self.game_master.destroy(result)
         self.assertRaises(KeyError, self.game_master.get_game, result)
+        # Destruction should not fail if there's nothing to destroy.
+        self.game_master.destroy(result)
 
     def test_save_file(self):
         """

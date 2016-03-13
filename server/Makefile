@@ -2,7 +2,7 @@ all: lint all-tests
 lint: format
 	pylint --rcfile=config/pylintrc deckr tests || true
 format:
-	autopep8 -r --in-place deckr tests --max-line-length 100
+	../env/bin/isort -y && autopep8 -r --in-place deckr tests --max-line-length 100
 test:
 	../env/bin/nosetests -a '!integration,!e2e'
 integration:

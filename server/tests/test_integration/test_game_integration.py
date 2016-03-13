@@ -8,11 +8,11 @@ import unittest
 
 import nose.plugins.attrib
 
-import deckr.game.game
-import deckr.game.card
 import deckr.game.action_validator
-
+import deckr.game.card
+import deckr.game.game
 import tests.utils
+
 
 # DO NOT IMPORT MOCK. You shouldn't mock anything out in these tests.
 

@@ -4,8 +4,9 @@ Unittests for the action validator.
 
 import unittest
 
-import deckr.game.action_validator
 import mock
+
+import deckr.game.action_validator
 
 
 class ActionValidatorTestCase(unittest.TestCase):
@@ -14,6 +15,14 @@ class ActionValidatorTestCase(unittest.TestCase):
         self.game = mock.MagicMock()
         self.player = mock.MagicMock()  # The player trying to act
         self.action_validator = deckr.game.action_validator.ActionValidator()
+
+    def test_invalid_action(self):
+        """
+        We should throw a ValueError if we try to validate an action we don't know about.
+        """
+
+        self.assertRaises(ValueError, self.action_validator.validate,
+                          self.game, self.player, 'foobar')
 
     def test_no_priority_pass(self):
         """
@@ -41,6 +50,7 @@ class ActionValidatorTestCase(unittest.TestCase):
 
         card = mock.MagicMock()
         card.is_sorcery_speed.return_value = True
+        card.is_land.return_value = False
 
         self.game.turn_manager.priority_player = self.player
         self.game.turn_manager.active_player = self.player
@@ -52,13 +62,20 @@ class ActionValidatorTestCase(unittest.TestCase):
                           self.action_validator.validate, self.game,
                           self.player, 'play', card)
 
-        # Make sure we can't do it if there's anything on the stack.
+        # We should be able to play it if it's a main phase and the stack is empty.
         self.game.turn_manager.phase = 'precombat main'
         self.game.turn_manager.step = 'precombat main'
+        self.action_validator.validate(self.game, self.player, 'play', card)
+
+        # Make sure we can't do it if there's anything on the stack.
         self.game.stack.is_empty.return_value = False
         self.assertRaises(deckr.game.action_validator.InvalidActionException,
                           self.action_validator.validate, self.game,
                           self.player, 'play', card)
+
+        # We should be able to play an instant speed card here
+        card.is_sorcery_speed.return_value = False
+        self.action_validator.validate(self.game, self.player, 'play', card)
 
     def test_play_land_limit(self):
         """

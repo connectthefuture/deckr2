@@ -21,21 +21,9 @@ class ActionValidator(deckr.core.service.Service):
     is mostly stateless and so is reused across games.
     """
 
+    # Why do these need to be part of a class? Think about it.
+    # pylint: disable=no-self-use
     def __init__(self, config=None):
-        pass
-
-    def start(self):
-        """
-        Run any setup for the validator.
-        """
-
-        pass
-
-    def stop(self):
-        """
-        Run any teardown for the validator.
-        """
-
         pass
 
     def validate(self, game, player, action, *args):
@@ -163,7 +151,7 @@ def sorcery_speed(game, player):
             "main" in game.turn_manager.phase and game.stack.is_empty())
 
 
-@check("You have played to many lands this turn")
+@check("You have played too many lands this turn")
 def land_limit(player):
     """
     Check that a player hasn't played too many lands already.

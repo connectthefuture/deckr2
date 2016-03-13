@@ -4,12 +4,13 @@ This module provides code for various deckr server implementations.
 
 import logging
 
-import deckr.core.service
-import deckr.network.connection
-import deckr.network.router
 import twisted.internet.endpoints
 import twisted.internet.reactor
 import txsockjs.factory
+
+import deckr.core.service
+import deckr.network.connection
+import deckr.network.router
 
 LOGGER = logging.getLogger(__name__)
 
@@ -51,10 +52,12 @@ class DeckrServer(deckr.core.service.Service):
         if self._json:
             LOGGER.info("Starting with JSON enconding/decoding")
 
-        self._factory = DeckrFactory(self._router, self._base64, self._json)
+        factory = DeckrFactory(self._router, self._base64, self._json)
         if self._websockets:
             LOGGER.info("Starting with websocket support")
-            self._factory = txsockjs.factory.SockJSFactory(self._factory)
+            self._factory = txsockjs.factory.SockJSFactory(factory)
+        else:
+            self._factory = factory
 
         twisted.internet.endpoints.serverFromString(
             twisted.internet.reactor,

@@ -6,11 +6,12 @@ import base64
 import logging
 import traceback
 
-import deckr.network.json_proxy
 import google.protobuf.message
+import twisted.protocols.basic
+
+import deckr.network.json_proxy
 import proto.client_message_pb2
 import proto.server_response_pb2
-import twisted.protocols.basic
 
 LOGGER = logging.getLogger(__name__)
 

@@ -63,10 +63,9 @@ class GameMaster(deckr.core.service.Service):
 
         self._card_library = card_library
 
-    def create(self, options=None):
+    def create(self):
         """
-        Create a new game. Takes in an optional dictionary for configuration. This will just
-        be passed directly to the game.
+        Create a new game.
 
         Returns:
             int: The game_id of the newly created game

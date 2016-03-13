@@ -5,11 +5,12 @@ classes.
 
 import unittest
 
+import mock
+
 import deckr.game.card
 import deckr.game.game
 import deckr.game.game_object
 import deckr.game.player
-import mock
 import proto.game_pb2 as game_proto
 
 
@@ -104,6 +105,17 @@ class PlayerManagerTestCase(unittest.TestCase):
         self.player_manager.start()
         player.start.assert_called_with()
 
+    def test_next_player(self):
+        """
+        We should be able to get the next player.
+        """
+
+        player1 = self.player_manager.create_player([])
+        player2 = self.player_manager.create_player([])
+        self.assertEqual(self.player_manager.next_player(
+            self.player_manager.first_player()), player2)
+        self.assertEqual(self.player_manager.next_player(player2), player1)
+
 
 class TurnManagerTestCase(unittest.TestCase):
     """
@@ -124,11 +136,9 @@ class TurnManagerTestCase(unittest.TestCase):
         self.game.player_manager.next_player.side_effect = fake_next_player
         self.game.player_manager.players = [self.player1, self.player2]
 
-        self.turn_manager.phase = 'beginning'
-        self.turn_manager.step = 'upkeep'
+        self.turn_manager.start()
         self.turn_manager.active_player = self.player1
         self.turn_manager.priority_player = self.player1
-        self.turn_manager.turn = 1
 
     def assert_turn_state(self, step, phase, active, priority):
         """
@@ -278,13 +288,17 @@ class TurnManagerTestCase(unittest.TestCase):
         Make sure we untap all creatures in the untap step.
         """
 
-        card = mock.MagicMock()
+        tapped = mock.MagicMock()
+        untapped = mock.MagicMock()
+        tapped.tapped = True
+        untapped.tapped = False
         self.turn_manager.step = self.turn_manager.UNTAP_STEP
         self.turn_manager.phase = self.turn_manager.BEGINNING_PHASE
-        self.game.battlefield = [card]
+        self.game.battlefield = [tapped, untapped]
 
         self.turn_manager.turn_based_actions()
-        card.untap.assert_called_with()
+        tapped.untap.assert_called_with()
+        untapped.untap.assert_not_called()
 
     def test_check_state_based_actions(self):
         """
@@ -369,6 +383,19 @@ class MagicTheGatheringTestCase(unittest.TestCase):
 
         self.assertEqual(player1.update_proto.call_count, 1)
 
+    def test_start(self):
+        """
+        Make sure that we can start the game and delegate out all start calls.
+        """
+
+        self.game.player_manager = mock.MagicMock()
+        self.game.turn_manager = mock.MagicMock()
+
+        self.game.start()
+        self.assertTrue(self.game._started)
+        self.game.player_manager.start.assert_called_with()
+        self.game.turn_manager.start.assert_called_with()
+
 
 class GameRegistryTestCase(unittest.TestCase):
     """
@@ -401,6 +428,8 @@ class GameRegistryTestCase(unittest.TestCase):
         self.assertEqual(self.registry.lookup(
             self.game_object1.game_id), self.game_object1)
 
+        self.assertEqual(self.registry[self.game_object1.game_id], self.game_object1)
+
     def test_unregister(self):
         """
         Make sure we can unregister an object.
@@ -410,3 +439,16 @@ class GameRegistryTestCase(unittest.TestCase):
         self.registry.unregister(self.game_object1)
         self.assertRaises(KeyError, self.registry.lookup,
                           self.game_object1.game_id)
+
+    def test_iteration(self):
+        """
+        We should be able to iterate over all of the items.
+        """
+
+        self.registry.register(self.game_object1)
+        self.registry.register(self.game_object2)
+        self.expected = [self.game_object1, self.game_object2]
+        for item in self.registry:
+            self.assertIn(item, self.expected)
+            self.expected.remove(item)
+        self.assertEqual(len(self.expected), 0)

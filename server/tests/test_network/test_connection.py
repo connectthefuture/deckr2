@@ -2,11 +2,13 @@
 This module provides code around testing connections.
 """
 
+import base64
 import unittest
 
-import base64
-import deckr.network.connection
 import mock
+
+import deckr.network.connection
+import deckr.network.json_proxy
 import proto.client_message_pb2
 import proto.server_response_pb2
 
@@ -23,6 +25,7 @@ class ConnectionTestCase(unittest.TestCase):
         self.message = proto.client_message_pb2.ClientMessage()
         self.message.message_type = proto.client_message_pb2.ClientMessage.CREATE
         self.message.create_message.variant = 'standard'
+        self.json_message = deckr.network.json_proxy.encode_to_json(self.message)
 
     def test_recieve_message(self):
         """
@@ -30,6 +33,11 @@ class ConnectionTestCase(unittest.TestCase):
         """
 
         self.connection.recieve_message(self.message.SerializeToString())
+        self.router.handle_message.assert_called_with(
+            self.message, self.connection)
+        # Check recieve json
+        self.connection._json = True
+        self.connection.recieve_message(self.json_message)
         self.router.handle_message.assert_called_with(
             self.message, self.connection)
 
@@ -82,6 +90,38 @@ class ConnectionTestCase(unittest.TestCase):
         self.connection.recieve_message(self.message.SerializeToString())
         self.connection.send_error.called_once()
 
+    def test_send_response(self):
+        """
+        We should serialize a response properly.
+        """
+
+        response = proto.server_response_pb2.ServerResponse()
+        response.response_type = proto.server_response_pb2.ServerResponse.ERROR
+        response.error_response.message = "Something went wrong."
+        json_response = '{"response_type": 3, "error_response": {"message": "Something went wrong."}}'
+        base64_json_response = "eyJyZXNwb25zZV90eXBlIjogMywgImVycm9yX3Jlc3BvbnNlIjogeyJtZXNzYWdlIjogIlNvbWV0aGluZyB3ZW50IHdyb25nLiJ9fQ=="
+        self.connection.sendLine = mock.MagicMock()
+        self.connection.send_response(response)
+        # It should have just sent out the serialized response.
+        self.connection.sendLine.assert_called_with(response.SerializeToString())
+        # It should do JSON encoding
+        self.connection._json = True
+        self.connection.send_response(response)
+        self.connection.sendLine.assert_called_with(json_response)
+        # It should do base 64 encoding
+        self.connection._base64 = True
+        self.connection.send_response(response)
+        self.connection.sendLine.assert_called_with(base64_json_response)
+
+    def test_twisted_specific(self):
+        """
+        Test the twisted specific functions.
+        """
+
+        self.connection.recieve_message = mock.MagicMock()
+        self.connection.connectionMade()
+        self.connection.lineReceived('foobar')
+        self.connection.recieve_message.assert_called_with('foobar')
 
 if __name__ == "__main__":
     unittest.main()

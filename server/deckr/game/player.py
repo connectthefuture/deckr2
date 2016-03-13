@@ -225,14 +225,6 @@ class Player(deckr.game.game_object.GameObject):  # pylint: disable=too-many-ins
         for blocker in blockers:
             blocker.blocking = blockers[blocker]
 
-    def assign_combat_damage(self, comabt_damage):
-        """
-        Assign combat damage. Most of the time this should happen automatically, but there
-        are some cases when you need to manually assign combat damage.
-        """
-
-        pass
-
     def pass_priority(self):
         """
         Pass priority to the next player.

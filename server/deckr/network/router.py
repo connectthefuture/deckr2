@@ -4,10 +4,9 @@ This module provides code for the Router.
 
 import logging
 
+import deckr.game.action_validator
 import proto.client_message_pb2
 import proto.server_response_pb2
-
-import deckr.game.action_validator
 
 LOGGER = logging.getLogger(__name__)
 
@@ -52,8 +51,8 @@ class Router(object):
         elif message_type == proto.client_message_pb2.ClientMessage.ACTION:
             try:
                 self._handle_action(message.action_message, connection)
-            except deckr.game.action_validator.InvalidActionException as e:
-                connection.send_error(e.message)
+            except deckr.game.action_validator.InvalidActionException as exc:
+                connection.send_error(exc.message)
                 return
         else:
             connection.send_error("Not implemented yet")

@@ -4,9 +4,10 @@ This module tests the router to make sure it can properly route requests.
 
 import unittest
 
+import mock
+
 import deckr.game.action_validator
 import deckr.network.router
-import mock
 import proto.client_message_pb2
 import proto.server_response_pb2
 
@@ -32,6 +33,16 @@ class RouterTestCase(unittest.TestCase):
         self.router.add_to_room(self.connection, 0)
         # Mock out the player
         self.connection.player = mock.MagicMock()
+
+    def test_bad_message(self):
+        """
+        It should handle a bad message type.
+        """
+
+        message = mock.MagicMock()
+        message.message_type = 'foobar'
+        self.router.handle_message(message, self.connection)
+        self.connection.send_error.assert_called_with("Not implemented yet")
 
     def test_create(self):
         """
@@ -113,6 +124,19 @@ class RouterTestCase(unittest.TestCase):
         self.assertIn(self.connection,
                       self.router.get_room_connections(room_id))
         self.assertEqual(self.connection.room_id, room_id)
+
+    def test_invalid_action(self):
+        """
+        Make sure we can handle an invalid action type.
+        """
+
+        message = mock.MagicMock()
+        message.message_type = proto.client_message_pb2.ClientMessage.ACTION
+        message.action_message.action_type = 'foobar'
+
+        self._create_and_join_game()
+        self.router.handle_message(message, self.connection)
+        self.connection.send_error.assert_called_with("Invalid action type foobar")
 
     def test_game_action_start(self):
         """

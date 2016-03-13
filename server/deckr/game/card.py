@@ -8,7 +8,6 @@ import logging
 import deckr.core.service
 import deckr.game.game_object
 
-
 LOGGER = logging.getLogger(__name__)
 
 
@@ -83,7 +82,7 @@ class AbilityFactory(object):
         """
 
         if "{T}" in self.cost:
-            return self.card.tapped == False
+            return self.card.tapped is False
 
     def pay_cost(self):
         """
@@ -135,7 +134,7 @@ class Card(deckr.game.game_object.GameObject):  # pylint: disable=too-many-insta
         (We'll deal with exceptions eventually.)
         """
 
-        pass
+        self.tapped = False
 
     def tap(self):
         """
@@ -178,14 +177,14 @@ class Card(deckr.game.game_object.GameObject):  # pylint: disable=too-many-insta
         Check if we can only cast this at sorcercy speed.
         """
 
-        return not "Instant" in self.types
+        return "Instant" not in self.types
 
     def is_permanent(self):
         """
         Is the card a permanent.
         """
 
-        return not "Sorcercy" in self.types and not "Instant" in self.types
+        return "Sorcercy" not in self.types and "Instant" not in self.types
 
     def update_proto(self, proto):
         """
