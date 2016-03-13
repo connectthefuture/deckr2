@@ -42,6 +42,7 @@ def decode_from_json(data):
     """
 
     result = proto.client_message_pb2.ClientMessage()
+    print(data)
     dict_data = json.loads(data)
     _dict_to_protobuf(dict_data, result)
     return result
