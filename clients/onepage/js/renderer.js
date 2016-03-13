@@ -11,6 +11,9 @@ onepage.Renderer = function(gameIdLookup) {
  * representation of a GameState proto and renders it to the screen.
  */
 onepage.Renderer.prototype.render = function(gameState) {
+    // Clear everything
+    $("#players").html('');
+    
     this.renderTurnState_(gameState);
     for(var i = 0; i < gameState.players.length; i++) {
         this.renderPlayer_(gameState.players[i]);
@@ -53,7 +56,7 @@ onepage.Renderer.prototype.renderZone_ = function(zone, name, parentDiv) {
 /** Render a single card. */
 onepage.Renderer.prototype.renderCard_ = function(card, parentDiv) {
     var cardSpan = $("<span/>");
-    cardSpan.text(card.name);
+    cardSpan.text(card.name+" ("+card.game_id+") ");
     parentDiv.append(cardSpan);
 };
 

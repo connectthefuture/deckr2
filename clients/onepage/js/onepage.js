@@ -50,6 +50,27 @@ onepage.Application.prototype.startGame = function() {
 };
 
 
+/** Attempt to play a card. */
+onepage.Application.prototype.playCard = function(gameId) {
+    this.socket_.sendMessage({message_type: 2,
+                              action_message: {
+                                  action_type: 1,
+                                  play: {
+                                      card: gameId
+                                  }
+                              }});
+};
+
+
+/** Pass priority. */
+onepage.Application.prototype.passPriority = function() {
+    this.socket_.sendMessage({message_type: 2,
+                              action_message: {
+                                  action_type: 5
+                              }});
+};
+
+
 /** Create a deck list out of a string. */
 onepage.Application.prototype.stringToDeck = function(string) {
     deck = [];
@@ -117,6 +138,14 @@ $(document).ready(function() {
 
     $("#start-game").click(function() {
         app.startGame();
+    });
+
+    $("#pass-priority").click(function() {
+        app.passPriority();
+    });
+
+    $("#play-card").click(function() {
+        app.playCard(+$("#play-id").val());
     });
 
     $("#join-game").click(function() {
