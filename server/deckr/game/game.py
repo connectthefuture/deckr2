@@ -226,7 +226,6 @@ class TurnManager(object):
 
         # Before anything we check state based actions
 
-
         next_player = self._game.player_manager.next_player(
             self.priority_player)
         if next_player == self.active_player:

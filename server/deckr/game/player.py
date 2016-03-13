@@ -17,7 +17,7 @@ def mana_pool_from_string(string):
     black = string.count("B")
     red = string.count("R")
     green = string.count("G")
-    remainder = string.translate(None, "WUBRG")
+    remainder = ''.join(c for c in string if c not in "WUBRG")
     if remainder:
         colorless = int(remainder)
     else:

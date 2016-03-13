@@ -24,7 +24,7 @@ class ManaPoolTestCase(unittest.TestCase):
         Create a mana pool object from a string.
         """
 
-        mana_pool = deckr.game.player.mana_pool_from_string("10WUBRG")
+        mana_pool = deckr.game.player.mana_pool_from_string(u"10WUBRG")
         self.assertEqual(mana_pool.white, 1)
         self.assertEqual(mana_pool.blue, 1)
         self.assertEqual(mana_pool.black, 1)

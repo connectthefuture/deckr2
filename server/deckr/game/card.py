@@ -3,9 +3,13 @@ This module provides the base code for cards.
 """
 
 import json
+import logging
 
 import deckr.core.service
 import deckr.game.game_object
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 def populate_abilities(card):
@@ -236,6 +240,7 @@ class CardLibrary(deckr.core.service.Service):
 
         for key in data:
             self._cards[key] = data[key]
+        LOGGER.info("Loaded %d cards", len(data))
 
     def create(self, card_name):
         """

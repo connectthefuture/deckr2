@@ -4,5 +4,13 @@
         "types": ["Land"],
         "supertypes": ["Basic"],
         "subtypes": ["Forest"]
+    },
+    "Norwood Ranger": {
+        "name": "Norwood Ranger",
+        "types": ["Creature"],
+        "subtypes": ["Elf Scout"],
+        "power": 1,
+        "toughness": 2,
+        "mana_cost": "G"
     }
 }

@@ -1,5 +1,7 @@
 /** The main onepage application handler. */
 onepage.Application = function(config) {
+    /** Accumulate attackres or blockers. */
+    this.attackersOrBlockers_ = [];
     /** The socket that we use to communicate with the server. */
     this.socket_ = new onepage.Socket(config.url);
 
@@ -84,12 +86,64 @@ onepage.Application.prototype.activateAbility = function(gameId) {
 };
 
 
+/** Populate an attackers or blockers message */
+onepage.Application.prototype.addAttackerOrBlocker = function(gameId, target) {
+    this.attackersOrBlockers_.push([gameId, target]);
+};
+
+
+/** Send an blockers message. This should already be populated. */
+onepage.Application.prototype.declareBlockers = function() {
+    // Convert to a proper list.
+    var blockers = [];
+    for (var i = 0; i < this.attackersOrBlockers_.length; i++) {
+        blockers.push({
+            blocker: this.attackersOrBlockers_[i][0],
+            blocking: this.attackersOrBlockers_[i][1]
+        });
+    }
+    this.socket_.sendMessage({
+        message_type: 2,
+        action_message: {
+            action_type: 4,
+            declare_blockers: {
+                blockers: blockers
+            }
+        }
+    });
+    this.attackersOrBlockers_ = [];
+};
+
+
+/** Send an attackers message. This should already be populated. */
+onepage.Application.prototype.declareAttackers = function() {
+    // Convert to a proper list.
+    var attackers = [];
+    for (var i = 0; i < this.attackersOrBlockers_.length; i++) {
+        attackers.push({
+            attacker: this.attackersOrBlockers_[i][0],
+            target: this.attackersOrBlockers_[i][1]
+        });
+    }
+    this.socket_.sendMessage({
+        message_type: 2,
+        action_message: {
+            action_type: 3,
+            declare_attackers: {
+                attackers: attackers
+            }
+        }
+    });
+    this.attackersOrBlockers_ = [];
+};
+
 /** Create a deck list out of a string. */
 onepage.Application.prototype.stringToDeck = function(string) {
     deck = [];
     for (var i = 0; i < 60; i++) {
         deck.push("Forest");
     }
+    deck.push("Norwood Ranger");
     return deck;
 };
 
@@ -132,9 +186,7 @@ onepage.Application.prototype.messageCallback_ = function(message) {
 };
 
 
-/**
- * Process a game state. This should update the UI accordingly.
- */
+/** Process a game state. This should update the UI accordingly. */
 onepage.Application.prototype.proccessGameStateResponse_ = function(gameState) {
     this.gameIdLookup_.setGameObjects(gameState);
     this.renderer_.render(gameState);
@@ -174,6 +226,18 @@ $(document).ready(function() {
 
     $("#activate-ability").click(function() {
         app.activateAbility(+$("#card-id").val());
+    });
+
+    $("#add").click(function() {
+        app.addAttackerOrBlocker(+$("#card-id").val(), +$("#card-id2").val());
+    });
+
+    $("#block").click(function() {
+        app.declareBlockers();
+    });
+
+    $("#attack").click(function() {
+        app.declareAttackers();
     });
 
     $("#join-game").click(function() {

@@ -36,8 +36,10 @@ onepage.Renderer.prototype.render = function(gameState) {
             player.battlefield = {};
         }
 
-        this.renderPlayer_(player);
+        this.renderPlayer_(player, this.getPlayerName_(player.game_id, gameState));
     }
+
+    this.renderZone_(gameState.stack, "Stack", $("#shared-zones"));
 };
 
 /** Render the state of the turn (who's turn it is, current step, phase, etc.) */
@@ -50,8 +52,9 @@ onepage.Renderer.prototype.renderTurnState_ = function(gameState) {
 
 
 /** Render a player and their zones. */
-onepage.Renderer.prototype.renderPlayer_ = function(player) {
+onepage.Renderer.prototype.renderPlayer_ = function(player, playerName) {
     var playerDiv = $("<div/>");
+    playerDiv.text(playerName + "("+player.game_id+")" + " Life: " + player.life);
     this.renderZone_(player.hand, "Hand", playerDiv);
     this.renderZone_(player.graveyard, "Graveyard", playerDiv);
     this.renderZone_(player.library, "Library", playerDiv);
@@ -113,4 +116,5 @@ onepage.Renderer.prototype.getPlayerName_ = function(game_id, gameState) {
 onepage.Renderer.prototype.clear_ = function() {
     $("#players").html('');
     $("#error-message").html('');
+    $("#shared-zones").html('');
 };

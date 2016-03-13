@@ -242,6 +242,7 @@ class RouterTestCase(unittest.TestCase):
         message.message_type = proto.client_message_pb2.ClientMessage.ACTION
         message.action_message.action_type = proto.client_message_pb2.ActionMessage.PASS_PRIORITY
         self._create_and_join_game()
-        self.connection.player.pass_priority.side_effect = deckr.game.action_validator.InvalidActionException("foobar")
+        self.connection.player.pass_priority.side_effect = deckr.game.action_validator.InvalidActionException(
+            "foobar")
         self.router.handle_message(message, self.connection)
         self.connection.send_error.assert_called_with("foobar")
