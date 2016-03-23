@@ -283,6 +283,7 @@ class TurnManager(object):
             for card in self._game.battlefield:
                 if card.tapped:
                     card.untap()
+                card.has_summoning_sickness = False
         elif self.step == self.COMBAT_DAMAGE_STEP:
             self._game.combat_damage_manager.deal_combat_damage()
 

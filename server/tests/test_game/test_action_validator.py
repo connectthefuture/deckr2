@@ -142,8 +142,14 @@ class ActionValidatorTestCase(unittest.TestCase):
         self.assertRaises(deckr.game.action_validator.InvalidActionException,
                           self.action_validator.validate, self.game, self.player,
                           'declare_attackers', attackers)
-
         attacker.tapped = False
+
+        # We can't attack if the creature has summoning sickness
+        attacker.has_summoning_sickness = True
+        self.assertRaises(deckr.game.action_validator.InvalidActionException,
+                          self.action_validator.validate, self.game, self.player,
+                          'declare_attackers', attackers)
+        attacker.has_summoning_sickness = False
 
         # Finally make sure that we allow if everything lines up.
         self.action_validator.validate(self.game, self.player, 'declare_attackers', attackers)

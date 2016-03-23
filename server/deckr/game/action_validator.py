@@ -92,11 +92,13 @@ class ActionValidator(deckr.core.service.Service):
         1) It's the active player
         2) It's the declare attackers step.
         3) All attackers are untaped.
+        4) None of the attackers have summoning sickness
         """
 
         is_active_player(game, player)
         is_step(game, 'declare attackers')
         are_untaped(attackers.keys())
+        not_has_summoning_sickness(attackers.keys())
 
     def _validate_declare_blockers(self, game, player, blockers):
         """
@@ -187,13 +189,22 @@ def is_step(game, step):
     return game.turn_manager.step == step
 
 
-@check("All creatures must be untapped to do that")
+@check("All attackers must be untapped")
 def are_untaped(creatures):
     """
     Make sure that every creature is untapped.
     """
 
     return all(not x.tapped for x in creatures)
+
+
+@check("You can't attack with creatures with summoning sickness")
+def not_has_summoning_sickness(creatures):
+    """
+    Make sure that no creature has summoning sickness..
+    """
+
+    return all(not x.has_summoning_sickness for x in creatures)
 
 
 @check("Only the active player can do that right now")

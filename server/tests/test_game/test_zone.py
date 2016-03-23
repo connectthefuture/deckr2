@@ -123,3 +123,15 @@ class ZoneAsContainerTestCase(unittest.TestCase):
         ids = [x.game_id for x in proto.cards]
         self.assertIn(self.object1.game_id, ids)
         self.assertIn(self.object2.game_id, ids)
+
+    def test_triggers_callback(self):
+        """
+        Make sure we trigger callbacks upon adding to zones.
+        """
+
+        obj = mock.MagicMock()
+        self.zone.append(obj)
+        obj.add_to_zone.assert_called_with(self.zone)
+        obj.reset_mock()
+        self.zone.insert(0, obj)
+        obj.add_to_zone.assert_called_with(self.zone)

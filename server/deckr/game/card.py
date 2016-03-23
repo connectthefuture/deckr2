@@ -125,6 +125,7 @@ class Card(deckr.game.game_object.GameObject):  # pylint: disable=too-many-insta
         self.power = 0
         self.toughness = 0
         self.tapped = False
+        self.has_summoning_sickness = False
 
         # Transitory state
         self.attacking = None
@@ -138,6 +139,7 @@ class Card(deckr.game.game_object.GameObject):  # pylint: disable=too-many-insta
         """
 
         self.tapped = False
+        self.has_summoning_sickness = False
 
     def tap(self):
         """
@@ -208,6 +210,20 @@ class Card(deckr.game.game_object.GameObject):  # pylint: disable=too-many-insta
         """
 
         return self.abilities[index].create_instance()
+
+    def add_to_zone(self, zone):
+        """
+        Callback when this card is added to a zone.
+        """
+
+        # Start by reseting all of this cards attributes. There are only
+        # a few cards that maintain some attributes between zones.
+        self.reset()
+
+        if zone.name == "battlefield":
+            # Note that it doesn't matter if you have haste; haste just allows you
+            # to ignore summoning sickness.
+            self.has_summoning_sickness = True
 
 
 class CardLibrary(deckr.core.service.Service):

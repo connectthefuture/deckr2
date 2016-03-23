@@ -309,6 +309,21 @@ class TurnManagerTestCase(unittest.TestCase):
         self.turn_manager.advance()
         self.turn_manager.state_based_actions.assert_called_with()
 
+    def test_remove_summoning_sickness(self):
+        """
+        Make sure that we remove summoning sickness of all creatures under your
+        control at the start of the turn.
+        """
+
+        sick = mock.MagicMock()
+        sick.has_summoning_sickness = True
+        self.turn_manager.step = self.turn_manager.UNTAP_STEP
+        self.turn_manager.phase = self.turn_manager.BEGINNING_PHASE
+        self.game.battlefield = [sick]
+
+        self.turn_manager.turn_based_actions()
+        self.assertFalse(sick.has_summoning_sickness)
+
 
 class StateBasedActionManagerTestCase(unittest.TestCase):
     """

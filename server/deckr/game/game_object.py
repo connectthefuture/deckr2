@@ -17,3 +17,10 @@ class GameObject(object):
         """
 
         proto.game_id = self.game_id
+
+    def add_to_zone(self, zone):
+        """
+        Called whenever this object is added to a zone. No-op by default.
+        """
+
+        pass

@@ -14,8 +14,9 @@ class Zone(deckr.game.game_object.GameObject):
     def __init__(self, name, owner):
         super(Zone, self).__init__()
 
+        self.name = name
+
         self._objs = []
-        self._name = name
         self._owner = owner
 
     def append(self, obj):
@@ -27,6 +28,7 @@ class Zone(deckr.game.game_object.GameObject):
         """
 
         self._objs.append(obj)
+        obj.add_to_zone(self)
 
     def pop(self, index=None):
         """
@@ -53,6 +55,7 @@ class Zone(deckr.game.game_object.GameObject):
         """
 
         self._objs.insert(index, obj)
+        obj.add_to_zone(self)
 
     def remove(self, obj):
         """

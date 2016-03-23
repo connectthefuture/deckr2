@@ -104,6 +104,23 @@ class CardTestCase(unittest.TestCase):
         self.card.reset()
         self.assertFalse(self.card.tapped)
 
+    def test_add_to_zone(self):
+        """
+        Make sure we properly reset the card and update attributes when adding
+        to a zone.
+        """
+
+        zone = mock.MagicMock()
+        self.card.reset = mock.MagicMock()
+
+        self.card.add_to_zone(zone)
+        self.card.reset.assert_called_with()
+
+        zone.name = "battlefield"
+        self.card.add_to_zone(zone)
+        # Make sure that we set summoning sickness to true for the battlefield
+        self.assertTrue(self.card.has_summoning_sickness)
+
 
 class CardUtilityFunctionsTestCase(unittest.TestCase):
     """

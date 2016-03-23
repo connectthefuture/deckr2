@@ -104,7 +104,7 @@ class PlayerTestCase(unittest.TestCase):
         Make sure we can draw a card, and we lose if we can't
         """
 
-        self.player.library.append(object())
+        self.player.library.append(mock.MagicMock())
         self.player.draw()
         self.assertEqual(len(self.player.hand), 1)
 
