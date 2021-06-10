@@ -1,4 +1,4 @@
-Django==1.8.4
+Django==2.2.24
 extras==0.0.3
 fake-factory==0.5.2
 fuzzywuzzy==0.6.1
